@@ -4,5 +4,5 @@ interface AppAuthManager {
 
     var listener: AppAuthManagerListener?
 
-    fun fetchAuthorizationServiceConfiguration(uriString: String)
+    fun fetchAuthorizationServiceConfiguration(host: String)
 }

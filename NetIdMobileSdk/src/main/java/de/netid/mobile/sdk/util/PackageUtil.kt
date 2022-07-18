@@ -6,7 +6,18 @@ class PackageUtil {
 
     companion object {
 
-        fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
+        fun getInstalledPackages(packageNames: List<String>, packageManager: PackageManager): List<String> {
+            val installedPackageNames = mutableListOf<String>()
+            for (packageName in packageNames) {
+                if (isPackageInstalled(packageName, packageManager)) {
+                    installedPackageNames.add(packageName)
+                }
+            }
+
+            return installedPackageNames
+        }
+
+        private fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
             return try {
                 packageManager.getPackageInfo(packageName, 0)
                 true
