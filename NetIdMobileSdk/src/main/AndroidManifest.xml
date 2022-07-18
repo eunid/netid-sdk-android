@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
     <manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="de.netid.mobile.sdk">
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        package="de.netid.mobile.sdk">
+
+    <queries>
+        <!-- TODO Put bundle identifiers of net ID apps -->
+        <package android:name="com.example.auth.app" />
+    </queries>
 
     </manifest>
