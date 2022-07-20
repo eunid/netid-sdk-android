@@ -1,5 +1,15 @@
 {
   "appIdentifiers": [
-    "com.example.auth.app"
+    {
+      "name": "Example",
+      "iOS": {
+        "bundleIdentifier": "com.example.auth.app",
+        "scheme": "example"
+      },
+      "Android": {
+        "applicationId": "com.example.auth.app",
+        "appName": "Example Auth App"
+      }
+    }
   ]
 }

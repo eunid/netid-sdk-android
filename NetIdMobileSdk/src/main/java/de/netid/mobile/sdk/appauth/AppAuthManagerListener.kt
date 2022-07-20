@@ -7,4 +7,8 @@ interface AppAuthManagerListener {
     fun onAuthorizationServiceConfigurationFetchedSuccessfully()
 
     fun onAuthorizationServiceConfigurationFetchFailed(error: NetIdError)
+
+    fun onAuthorizationSuccessful()
+
+    fun onAuthorizationFailed(error: NetIdError)
 }

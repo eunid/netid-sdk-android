@@ -1,6 +1,7 @@
 package de.netid.mobile.sdk.api
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.fragment.app.Fragment
 import de.netid.mobile.sdk.appauth.AppAuthManager
@@ -27,12 +28,6 @@ object NetIdService : AppAuthManagerListener {
         setupAuthManagerAndFetchConfiguration(netIdConfig.host)
     }
 
-    private fun setupAuthManagerAndFetchConfiguration(host: String) {
-        appAuthManager = AppAuthManagerFactory.createAppAuthManager()
-        appAuthManager.listener = this
-        appAuthManager.fetchAuthorizationServiceConfiguration(host)
-    }
-
     fun getAuthorizationFragment(context: Context): Fragment {
         checkAvailableNetIdApplications(context)
 
@@ -53,6 +48,16 @@ object NetIdService : AppAuthManagerListener {
         }
     }
 
+    fun processAuthorizationIntent(requestCode: Int, data: Intent) {
+        appAuthManager.processAuthorizationIntent(requestCode, data)
+    }
+
+    private fun setupAuthManagerAndFetchConfiguration(host: String) {
+        appAuthManager = AppAuthManagerFactory.createAppAuthManager()
+        appAuthManager.listener = this
+        appAuthManager.fetchAuthorizationServiceConfiguration(host)
+    }
+
     private fun checkAvailableNetIdApplications(context: Context) {
         availableAppIdentifiers.clear()
         val appIdentifiers = JsonUtil.loadAppIdentifiers(appIdentifierFilename, context)
@@ -67,5 +72,13 @@ object NetIdService : AppAuthManagerListener {
 
     override fun onAuthorizationServiceConfigurationFetchFailed(error: NetIdError) {
         Log.e(javaClass.simpleName, "Authorization Service Configuration fetch failed")
+    }
+
+    override fun onAuthorizationSuccessful() {
+        Log.i(javaClass.simpleName, "Authorization successful")
+    }
+
+    override fun onAuthorizationFailed(error: NetIdError) {
+        Log.e(javaClass.simpleName, "Authorization failed")
     }
 }
