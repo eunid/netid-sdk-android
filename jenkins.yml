@@ -1,0 +1,5 @@
+android:
+  publications:
+    - publication: release
+      repository: maven
+      branch: develop
