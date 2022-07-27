@@ -2,15 +2,19 @@ package de.netid.mobile.sdk.util
 
 import android.content.Context
 import android.util.Log
+import de.netid.mobile.sdk.model.AppIdentifier
+import de.netid.mobile.sdk.model.NetIdAppIdentifiers
+import kotlinx.serialization.decodeFromString
 import org.json.JSONException
 import org.json.JSONObject
+import kotlinx.serialization.json.Json
 import java.io.IOException
 
 class JsonUtil {
 
     companion object {
 
-        private const val appIdentifierArrayKey = "appIdentifiers"
+        private const val appIdentifierArrayKey = "netIdAppIdentifiers"
 
         private fun loadJsonFileFromAssets(filename: String, context: Context): String? {
             var jsonString: String? = null
@@ -28,16 +32,13 @@ class JsonUtil {
             return jsonString
         }
 
-        fun loadAppIdentifiers(filename: String, context: Context): List<String> {
-            val appIdentifiers = mutableListOf<String>()
+        fun loadAppIdentifiers(filename: String, context: Context): List<AppIdentifier> {
+            val appIdentifiers = mutableListOf<AppIdentifier>()
 
             loadJsonFileFromAssets(filename, context)?.let { jsonString ->
                 try {
-                    val jsonObject = JSONObject(jsonString)
-                    val identifierArray = jsonObject.getJSONArray(appIdentifierArrayKey)
-                    for (index in 0 until identifierArray.length()) {
-                        appIdentifiers.add(identifierArray.getString(index))
-                    }
+                    val appIdentifiersJson = Json.decodeFromString<NetIdAppIdentifiers>(jsonString)
+                    appIdentifiers.addAll(appIdentifiersJson.netIdAppIdentifiers)
                 } catch (exception: JSONException) {
                     exception.printStackTrace()
                     Log.e(JsonUtil::class.java.simpleName, "Error while parsing JSON $jsonString")

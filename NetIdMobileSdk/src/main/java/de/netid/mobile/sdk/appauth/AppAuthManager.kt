@@ -12,4 +12,6 @@ interface AppAuthManager {
     fun performWebAuthorization(clientId: String, redirectUri: String, activity: Activity)
 
     fun processAuthorizationIntent(requestCode: Int, data: Intent)
+
+    fun getAccessToken(): String?
 }

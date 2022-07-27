@@ -7,8 +7,11 @@ import androidx.fragment.app.Fragment
 import de.netid.mobile.sdk.appauth.AppAuthManager
 import de.netid.mobile.sdk.appauth.AppAuthManagerFactory
 import de.netid.mobile.sdk.appauth.AppAuthManagerListener
+import de.netid.mobile.sdk.model.UserInfo
 import de.netid.mobile.sdk.util.JsonUtil
 import de.netid.mobile.sdk.util.PackageUtil
+import de.netid.mobile.sdk.webservice.UserInfoCallback
+import de.netid.mobile.sdk.webservice.WebserviceApi
 
 object NetIdService : AppAuthManagerListener {
 
@@ -17,6 +20,7 @@ object NetIdService : AppAuthManagerListener {
     private var netIdConfig: NetIdConfig? = null
     private lateinit var appAuthManager: AppAuthManager
     private val availableAppIdentifiers = mutableListOf<String>()
+    private val netIdServiceListeners = mutableListOf<NetIdServiceListener>()
 
     fun initialize(netIdConfig: NetIdConfig) {
         if (this.netIdConfig != null) {
@@ -45,6 +49,26 @@ object NetIdService : AppAuthManagerListener {
             // TODO Perform App2App workflow
         } ?: run {
             // TODO Perform App2Web workflow
+        }
+    }
+
+    fun fetchUserInfo() {
+        netIdConfig?.let { config ->
+            appAuthManager.getAccessToken()?.let { token ->
+                WebserviceApi.performUserInfoRequest(token, config.host, object : UserInfoCallback {
+                    override fun onUserInfoFetched(userInfo: UserInfo) {
+                        for (item in netIdServiceListeners) {
+                            item.onUserInfoFinished(userInfo)
+                        }
+                    }
+
+                    override fun onUserInfoFetchFailed(error: NetIdError) {
+                        for (item in netIdServiceListeners) {
+                            item.onUserInfoFetchedWithError(error)
+                        }
+                    }
+                })
+            }
         }
     }
 

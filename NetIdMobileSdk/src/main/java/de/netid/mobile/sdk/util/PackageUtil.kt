@@ -1,16 +1,17 @@
 package de.netid.mobile.sdk.util
 
 import android.content.pm.PackageManager
+import de.netid.mobile.sdk.model.AppIdentifier
 
 class PackageUtil {
 
     companion object {
 
-        fun getInstalledPackages(packageNames: List<String>, packageManager: PackageManager): List<String> {
+        fun getInstalledPackages(appIdentifiers: List<AppIdentifier>, packageManager: PackageManager): List<String> {
             val installedPackageNames = mutableListOf<String>()
-            for (packageName in packageNames) {
-                if (isPackageInstalled(packageName, packageManager)) {
-                    installedPackageNames.add(packageName)
+            for (item in appIdentifiers) {
+                if (isPackageInstalled(item.android.applicationId, packageManager)) {
+                    installedPackageNames.add(item.android.applicationId)
                 }
             }
 

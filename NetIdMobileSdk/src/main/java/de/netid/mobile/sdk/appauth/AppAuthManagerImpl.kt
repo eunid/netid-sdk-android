@@ -27,6 +27,10 @@ class AppAuthManagerImpl : AppAuthManager {
     private var authorizationServiceConfiguration: AuthorizationServiceConfiguration? = null
     private var authState: AuthState? = null
 
+    override fun getAccessToken(): String? {
+        return authState?.lastAuthorizationResponse?.accessToken
+    }
+
     override fun fetchAuthorizationServiceConfiguration(host: String) {
         val uriString = scheme + host
         AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(uriString)) { serviceConfiguration, authorizationException ->

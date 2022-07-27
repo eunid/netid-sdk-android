@@ -1,14 +1,31 @@
 {
-  "appIdentifiers": [
+  "netIdAppIdentifiers": [
     {
-      "name": "Example",
+      "id": 1,
+      "name": "GMX",
+      "icon": "",
+      "backgroundColor": "#402FD2FF",
+      "foregroundColor": "#FFFFFFFF",
       "iOS": {
-        "bundleIdentifier": "com.example.auth.app",
-        "scheme": "example"
+        "bundleIdentifier": "de.gmx.mobile.ios.mail",
+        "scheme": "gmxmail"
       },
-      "Android": {
-        "applicationId": "com.example.auth.app",
-        "appName": "Example Auth App"
+      "android": {
+        "applicationId": "de.gmx.mobile.android.mail"
+      }
+    },
+    {
+      "id": 2,
+      "name": "WEB.DE",
+      "backgroundColor": "#F7AD0AFF",
+      "foregroundColor": "#212121FF",
+      "icon": "",
+      "iOS": {
+        "bundleIdentifier": "de.web.mobile.ios.mail",
+        "scheme": "webdemail"
+      },
+      "android": {
+        "applicationId": "de.web.mobile.android.mail"
       }
     }
   ]
