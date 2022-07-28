@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/authorization_outer_padding">
+
+    <ImageView
+        android:id="@+id/fragmentAuthorizationLogoImageView"
+        android:layout_width="@dimen/authorization_logo_width"
+        android:layout_height="@dimen/authorization_logo_height"
+        android:src="@drawable/ic_logo_net_id"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/authorization_logo_content_description" />
+
+    <TextView
+        android:id="@+id/fragmentAuthorizationTitleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/authorization_vertical_margin"
+        android:gravity="center"
+        android:text="@string/authorization_title_text"
+        android:fontFamily="@font/ibm_plex_sans_semi_bold"
+        android:textSize="@dimen/authorization_title_text_size"
+        android:textColor="@color/authorization_title_text_color"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fragmentAuthorizationLogoImageView" />
+
+    <TextView
+        android:id="@+id/fragmentAuthorizationLegalInfoTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/authorization_vertical_margin"
+        android:gravity="center"
+        android:text="@string/authorization_legal_info"
+        android:fontFamily="@font/verdana"
+        android:textSize="@dimen/authorization_legal_text_size"
+        android:textColor="@color/authorization_legal_info_text_color"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fragmentAuthorizationTitleTextView" />
+
+    <LinearLayout
+        android:id="@+id/fragmentAuthorizationButtonContainerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="@dimen/authorization_vertical_margin"
+        app:layout_constraintEnd_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fragmentAuthorizationLegalInfoTextView">
+
+        <Button
+            android:id="@+id/fragmentAuthorizationButtonAgreeAndContinue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/authorization_button_shape"
+            android:backgroundTint="@color/authorization_net_id_button_color"
+            android:text="@string/authorization_agree_and_continue_with_net_id"
+            android:textColor="@android:color/white"
+            android:textAllCaps="false"
+            android:fontFamily="@font/roboto_medium"
+            android:letterSpacing="@dimen/authorization_button_letter_spacing" />
+
+        <Button
+            android:id="@+id/fragmentAuthorizationButtonClose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/authorization_vertical_margin"
+            android:background="@drawable/authorization_close_button_shape"
+            android:text="@string/authorization_close"
+            android:textColor="@color/authorization_close_button_color"
+            android:textAllCaps="false"
+            android:fontFamily="@font/roboto_medium"
+            android:letterSpacing="@dimen/authorization_button_letter_spacing" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
