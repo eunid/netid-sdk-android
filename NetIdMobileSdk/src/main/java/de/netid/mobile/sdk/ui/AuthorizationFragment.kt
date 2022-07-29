@@ -35,7 +35,7 @@ class AuthorizationFragment(
 
     private fun setupStandardButtons() {
         binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
-            listener.onAgreeAndContinueWithNetIdClicked()
+            activity?.let { it1 -> listener.onAgreeAndContinueWithNetIdClicked(null, it1) }
         }
 
         binding.fragmentAuthorizationButtonClose.setOnClickListener {
