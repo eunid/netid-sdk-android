@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">NetIdMobileSdk-App</string>
+
+    <string name="net_id_service">NetID Service</string>
+    <string name="net_id_service_initialize">SDK initialisieren</string>
+    <string name="net_id_service_authorize">Authorisieren</string>
+    <string name="net_id_service_load_user_info">UserInfo laden</string>
+    <string name="net_id_service_end_session">Session beenden</string>
+    <string name="net_id_service_logs">Logs:\n\n</string>
+
+    <!-- Content descriptions -->
+    <string name="service_logo_content_description">NetID logo</string>
 </resources>

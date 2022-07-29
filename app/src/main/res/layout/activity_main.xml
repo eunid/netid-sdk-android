@@ -5,14 +5,147 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="@dimen/main_activity_outer_padding"
     tools:context=".MainActivity">
+
     <TextView
+        android:id="@+id/activityMainTitleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/net_id_service"
+        android:textSize="@dimen/net_id_service_title_text_size"
+        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/activityMainTitleIconImageView"
+        android:layout_width="@dimen/service_logo_width"
+        android:layout_height="@dimen/service_logo_height"
+        android:src="@drawable/ic_logo_net_id"
+        android:layout_marginEnd="@dimen/service_logo_margin_end"
+        app:layout_constraintEnd_toStartOf="@id/activityMainTitleTextView"
+        app:layout_constraintTop_toTopOf="@id/activityMainTitleTextView"
+        app:layout_constraintBottom_toBottomOf="@id/activityMainTitleTextView"
+        android:contentDescription="@string/service_logo_content_description" />
+
+    <LinearLayout
+        android:id="@+id/activityMainButtonContainerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="@dimen/main_activity_vertical_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activityMainTitleTextView">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/activityMainButtonInitialize"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="@dimen/main_activity_button_status_margin_horizontal"
+                android:backgroundTint="@android:color/holo_green_dark"
+                android:text="@string/net_id_service_initialize"
+                android:textAllCaps="false" />
+
+            <View
+                android:id="@+id/activityMainStatusViewInitialize"
+                android:layout_width="@dimen/status_circle_size"
+                android:layout_height="@dimen/status_circle_size"
+                android:background="@drawable/status_circle_shape"
+                android:backgroundTint="@android:color/darker_gray" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/activityMainButtonAuthorize"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="@dimen/main_activity_button_status_margin_horizontal"
+                android:backgroundTint="@android:color/holo_blue_dark"
+                android:text="@string/net_id_service_authorize"
+                android:textAllCaps="false" />
+
+            <View
+                android:id="@+id/activityMainStatusViewAuthorize"
+                android:layout_width="@dimen/status_circle_size"
+                android:layout_height="@dimen/status_circle_size"
+                android:background="@drawable/status_circle_shape"
+                android:backgroundTint="@android:color/darker_gray" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/activityMainButtonUserInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="@dimen/main_activity_button_status_margin_horizontal"
+                android:backgroundTint="@android:color/holo_orange_light"
+                android:text="@string/net_id_service_load_user_info"
+                android:textAllCaps="false" />
+
+            <View
+                android:id="@+id/activityMainStatusViewUserInfo"
+                android:layout_width="@dimen/status_circle_size"
+                android:layout_height="@dimen/status_circle_size"
+                android:background="@drawable/status_circle_shape"
+                android:backgroundTint="@android:color/darker_gray" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/main_activity_vertical_margin"
+        android:layout_marginBottom="@dimen/main_activity_vertical_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activityMainButtonContainerLayout"
+        app:layout_constraintBottom_toTopOf="@id/activityMainButtonEndSession"
+        app:layout_constraintVertical_bias="0">
+
+        <TextView
+            android:id="@+id/activityMainLogsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/net_id_service_logs"
+            android:fontFamily="sans-serif-condensed-medium" />
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/activityMainButtonEndSession"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@android:color/holo_red_light"
+        android:text="@string/net_id_service_end_session"
+        android:textAllCaps="false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
   </androidx.constraintlayout.widget.ConstraintLayout>
