@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/main_activity_outer_padding"
-    tools:context=".MainActivity">
+    tools:context="de.netid.mobile.sdk.example.MainActivity">
 
     <TextView
         android:id="@+id/activityMainTitleTextView"

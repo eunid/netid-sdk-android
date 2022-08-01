@@ -1,4 +1,4 @@
-package de.netid.mobile.sdk
+package de.netid.mobile.sdk.example
 
 enum class ServiceState {
     Uninitialized,

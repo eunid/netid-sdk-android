@@ -24,7 +24,15 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
     private var netIdConfig: NetIdConfig? = null
     private lateinit var appAuthManager: AppAuthManager
     private val availableAppIdentifiers = mutableListOf<AppIdentifier>()
-    private val netIdServiceListeners = mutableListOf<NetIdServiceListener>()
+    private val netIdServiceListeners = mutableSetOf<NetIdServiceListener>()
+
+    fun addListener(listener: NetIdServiceListener) {
+        netIdServiceListeners.add(listener)
+    }
+
+    fun removeListener(listener: NetIdServiceListener) {
+        netIdServiceListeners.remove(listener)
+    }
 
     fun initialize(netIdConfig: NetIdConfig) {
         if (this.netIdConfig != null) {
@@ -48,7 +56,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
             netIdConfig?.let { config ->
                 appAuthManager.performWebAuthorization(
                     config.clientId,
-                    config.redirectUri,
+                    config.host,
                     activity
                 )
             }

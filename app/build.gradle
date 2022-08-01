@@ -10,11 +10,13 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "de.netid.mobile.sdk"
+        applicationId "de.netid.mobile.sdk.example"
         minSdk 24
         targetSdk 32
         versionCode versionCodeInt
         versionName version
+
+        manifestPlaceholders = [appAuthRedirectScheme: 'de.netid.mobile.example']
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

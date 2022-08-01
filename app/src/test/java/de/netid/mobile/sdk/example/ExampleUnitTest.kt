@@ -1,4 +1,4 @@
-package de.netid.mobile.sdk
+package de.netid.mobile.example
 
 import org.junit.Test
 

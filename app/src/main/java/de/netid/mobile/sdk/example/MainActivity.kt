@@ -1,4 +1,4 @@
-package de.netid.mobile.sdk
+package de.netid.mobile.sdk.example
 
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -10,7 +10,8 @@ import de.netid.mobile.sdk.api.NetIdConfig
 import de.netid.mobile.sdk.api.NetIdError
 import de.netid.mobile.sdk.api.NetIdService
 import de.netid.mobile.sdk.api.NetIdServiceListener
-import de.netid.mobile.sdk.databinding.ActivityMainBinding
+import de.netid.mobile.sdk.example.SdkContentBottomDialogFragment
+import de.netid.mobile.sdk.example.databinding.ActivityMainBinding
 import de.netid.mobile.sdk.model.UserInfo
 
 class MainActivity : AppCompatActivity(), NetIdServiceListener {
@@ -44,6 +45,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
     private fun setupNetIdConfig() {
         netIdConfig = NetIdConfig(host, clientId, redirectUri)
+        NetIdService.addListener(this)
     }
 
     private fun setupInitializeButton() {

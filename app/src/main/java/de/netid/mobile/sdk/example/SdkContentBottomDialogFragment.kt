@@ -1,4 +1,4 @@
-package de.netid.mobile.sdk
+package de.netid.mobile.sdk.example
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import de.netid.mobile.sdk.databinding.BottomDialogSdkContentBinding
+import de.netid.mobile.sdk.example.databinding.BottomDialogSdkContentBinding
 
 class SdkContentBottomDialogFragment : BottomSheetDialogFragment() {
 
