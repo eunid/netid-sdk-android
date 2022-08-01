@@ -6,18 +6,33 @@ import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import de.netid.mobile.sdk.api.NetIdConfig
+import de.netid.mobile.sdk.api.NetIdError
+import de.netid.mobile.sdk.api.NetIdService
+import de.netid.mobile.sdk.api.NetIdServiceListener
 import de.netid.mobile.sdk.databinding.ActivityMainBinding
+import de.netid.mobile.sdk.model.UserInfo
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
     private lateinit var binding: ActivityMainBinding
 
+    private lateinit var netIdConfig: NetIdConfig
+
     private var serviceState = ServiceState.Uninitialized
+
+    companion object {
+        private const val clientId = "26e016e7-54c7-4ffd-bee0-782a9a4f87d6"
+        private const val host = "broker.netid.de"
+        private const val redirectUri = "de.netid.mobile.sdk.NetIdMobileSdk:/oauth2redirect/example-provider"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        setupNetIdConfig()
 
         setupInitializeButton()
         setupAuthorizeButton()
@@ -27,29 +42,23 @@ class MainActivity : AppCompatActivity() {
         updateElementsForServiceState()
     }
 
+    private fun setupNetIdConfig() {
+        netIdConfig = NetIdConfig(host, clientId, redirectUri)
+    }
+
     private fun setupInitializeButton() {
         binding.activityMainButtonInitialize.setOnClickListener {
             it.isEnabled = false
-            Handler(Looper.getMainLooper()).postDelayed(
-                {
-                    appendLog("Net ID service initialized successfully")
-                    serviceState = ServiceState.InitializationSuccessful
-                    updateElementsForServiceState()
-                }, 500
-            )
+            NetIdService.initialize(netIdConfig)
         }
     }
 
     private fun setupAuthorizeButton() {
         binding.activityMainButtonAuthorize.setOnClickListener {
             it.isEnabled = false
-            Handler(Looper.getMainLooper()).postDelayed(
-                {
-                    appendLog("Net ID service authorized successfully")
-                    serviceState = ServiceState.AuthorizationSuccessful
-                    updateElementsForServiceState()
-                }, 500
-            )
+            val bottomDialogFragment = SdkContentBottomDialogFragment()
+            bottomDialogFragment.sdkContentFragment = NetIdService.getAuthorizationFragment(this)
+            bottomDialogFragment.show(supportFragmentManager, null)
         }
     }
 
@@ -119,5 +128,50 @@ class MainActivity : AppCompatActivity() {
             ServiceState.UserInfoFailed -> redStateList
             else -> grayStateList
         }
+    }
+
+    // NetIdServiceListener functions
+
+    override fun onInitializationFinishedWithError(error: NetIdError?) {
+        error?.let {
+            appendLog("Net ID service initialization failed: ${it.code}, ${it.process}")
+            serviceState = ServiceState.InitializationFailed
+        } ?: run {
+            appendLog("Net ID service initialized successfully")
+            serviceState = ServiceState.InitializationSuccessful
+        }
+        updateElementsForServiceState()
+    }
+
+    override fun onAuthenticationFinished(accessToken: String) {
+        appendLog("Net ID service authorized successfully\nAccess Token:\n$accessToken")
+        serviceState = ServiceState.AuthorizationSuccessful
+        updateElementsForServiceState()
+    }
+
+    override fun onAuthenticationFinishedWithError(error: NetIdError) {
+        appendLog("Net ID service authorization failed: ${error.code}, ${error.process}")
+        serviceState = ServiceState.AuthorizationFailed
+        updateElementsForServiceState()
+    }
+
+    override fun onUserInfoFinished(userInfo: UserInfo) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onUserInfoFetchedWithError(error: NetIdError) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onSessionEnd() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onEncounteredNetworkError(error: NetIdError) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onAuthenticationCanceled(error: NetIdError) {
+        TODO("Not yet implemented")
     }
 }

@@ -7,7 +7,7 @@ interface NetIdServiceListener {
 
     fun onAuthenticationFinished(accessToken: String)
 
-    fun onAuthenticationFinishedWithError(error: NetIdError?)
+    fun onAuthenticationFinishedWithError(error: NetIdError)
 
     fun onUserInfoFinished(userInfo: UserInfo)
 
