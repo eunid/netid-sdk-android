@@ -23,9 +23,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     private var serviceState = ServiceState.Uninitialized
 
     companion object {
-        private const val clientId = "26e016e7-54c7-4ffd-bee0-782a9a4f87d6"
+        private const val clientId = "082531ba-1b22-4381-81b1-64add4b85b8a"
         private const val host = "broker.netid.de"
-        private const val redirectUri = "de.netid.mobile.sdk.NetIdMobileSdk:/oauth2redirect/example-provider"
+        private const val redirectUri = "de.netid.mobile.sdk.netidmobilesdk:/oauth2redirect/example-provider"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

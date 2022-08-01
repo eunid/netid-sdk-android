@@ -16,7 +16,7 @@ android {
         versionCode versionCodeInt
         versionName version
 
-        manifestPlaceholders = [appAuthRedirectScheme: 'de.netid.mobile.example']
+        manifestPlaceholders = [appAuthRedirectScheme: 'de.netid.mobile.sdk.netidmobilesdk']
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
