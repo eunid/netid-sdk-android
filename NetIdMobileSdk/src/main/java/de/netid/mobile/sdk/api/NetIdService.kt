@@ -56,7 +56,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
             netIdConfig?.let { config ->
                 appAuthManager.performWebAuthorization(
                     config.clientId,
-                    config.host,
+                    config.redirectUri,
                     activity
                 )
             }

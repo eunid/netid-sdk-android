@@ -44,17 +44,27 @@ class AppAuthManagerImpl : AppAuthManager {
 
                     listener?.onAuthorizationServiceConfigurationFetchedSuccessfully()
                 } ?: run {
-                    val netIdError = NetIdError(NetIdErrorProcess.Configuration, NetIdErrorCode.Unknown)
+                    val netIdError =
+                        NetIdError(NetIdErrorProcess.Configuration, NetIdErrorCode.Unknown)
                     listener?.onAuthorizationServiceConfigurationFetchFailed(netIdError)
                 }
             }
         }
     }
 
-    override fun performWebAuthorization(clientId: String, redirectUri: String, activity: Activity) {
+    override fun performWebAuthorization(
+        clientId: String,
+        redirectUri: String,
+        activity: Activity
+    ) {
         authorizationServiceConfiguration?.let { serviceConfiguration ->
             val authRequestBuilder =
-                AuthorizationRequest.Builder(serviceConfiguration, clientId, ResponseTypeValues.CODE, Uri.parse(redirectUri))
+                AuthorizationRequest.Builder(
+                    serviceConfiguration,
+                    clientId,
+                    ResponseTypeValues.CODE,
+                    Uri.parse(redirectUri)
+                ).setScopes(AuthorizationRequest.Scope.OPENID, AuthorizationRequest.Scope.PROFILE)
             val authRequest = authRequestBuilder.build()
 
             val authService = AuthorizationService(activity)
@@ -62,7 +72,8 @@ class AppAuthManagerImpl : AppAuthManager {
             activity.startActivityForResult(authIntent, authRequestCode)
         } ?: run {
             Log.e(javaClass.simpleName, "No authorization service configuration available")
-            val netIdError = NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.UnauthorizedClient)
+            val netIdError =
+                NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.UnauthorizedClient)
             listener?.onAuthorizationFailed(netIdError)
         }
     }
@@ -82,7 +93,8 @@ class AppAuthManagerImpl : AppAuthManager {
                     // TODO Provide access token
                     listener?.onAuthorizationSuccessful()
                 } ?: run {
-                    val netIdError = NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.Unknown)
+                    val netIdError =
+                        NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.Unknown)
                     listener?.onAuthorizationServiceConfigurationFetchFailed(netIdError)
                 }
             }
@@ -133,7 +145,10 @@ class AppAuthManagerImpl : AppAuthManager {
                 NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.MissingBrowser)
             }
             AuthorizationException.GeneralErrors.USER_CANCELED_AUTH_FLOW -> {
-                NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.AuthorizationCanceledByUser)
+                NetIdError(
+                    NetIdErrorProcess.Authentication,
+                    NetIdErrorCode.AuthorizationCanceledByUser
+                )
             }
             else -> {
                 NetIdError(NetIdErrorProcess.Configuration, NetIdErrorCode.Unknown)

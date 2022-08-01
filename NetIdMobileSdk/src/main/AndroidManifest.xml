@@ -7,5 +7,5 @@
         <!-- TODO Put bundle identifiers of net ID apps -->
         <package android:name="com.example.auth.app" />
     </queries>
-
+    <uses-permission android:name="android.permission.INTERNET" />
     </manifest>
