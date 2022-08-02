@@ -19,16 +19,17 @@ class AppAuthManagerImpl : AppAuthManager {
 
     companion object {
         private const val scheme = "https://"
-        private const val authRequestCode = 11 // TODO Different request code?
+        private const val scopePermissionManagement = "permission_management"
     }
 
     override var listener: AppAuthManagerListener? = null
 
     private var authorizationServiceConfiguration: AuthorizationServiceConfiguration? = null
     private var authState: AuthState? = null
+    private var authService: AuthorizationService? = null
 
     override fun getAccessToken(): String? {
-        return authState?.lastAuthorizationResponse?.accessToken
+        return authState?.accessToken
     }
 
     override fun fetchAuthorizationServiceConfiguration(host: String) {
@@ -51,11 +52,11 @@ class AppAuthManagerImpl : AppAuthManager {
         }
     }
 
-    override fun performWebAuthorization(
+    override fun getWebAuthorizationIntent(
         clientId: String,
         redirectUri: String,
         activity: Activity
-    ) {
+    ): Intent? {
         authorizationServiceConfiguration?.let { serviceConfiguration ->
             val authRequestBuilder =
                 AuthorizationRequest.Builder(
@@ -63,39 +64,53 @@ class AppAuthManagerImpl : AppAuthManager {
                     clientId,
                     ResponseTypeValues.CODE,
                     Uri.parse(redirectUri)
-                ).setScopes(AuthorizationRequest.Scope.OPENID, AuthorizationRequest.Scope.PROFILE)
+                ).setScopes(
+                    AuthorizationRequest.Scope.OPENID,
+                    AuthorizationRequest.Scope.PROFILE,
+                    scopePermissionManagement
+                )
             val authRequest = authRequestBuilder.build()
 
-            val authService = AuthorizationService(activity)
-            val authIntent = authService.getAuthorizationRequestIntent(authRequest)
-            activity.startActivityForResult(authIntent, authRequestCode)
+            authService = AuthorizationService(activity)
+            return authService?.getAuthorizationRequestIntent(authRequest)
         } ?: run {
             Log.e(javaClass.simpleName, "No authorization service configuration available")
-            val netIdError = NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.UnauthorizedClient)
-            listener?.onAuthorizationFailed(netIdError)
+            return null
         }
     }
 
-    override fun processAuthorizationIntent(requestCode: Int, data: Intent) {
-        if (requestCode == authRequestCode) {
-            val authorizationResponse = AuthorizationResponse.fromIntent(data)
-            val authorizationException = AuthorizationException.fromIntent(data)
+    override fun processAuthorizationIntent(data: Intent) {
+        val authorizationResponse = AuthorizationResponse.fromIntent(data)
+        val authorizationException = AuthorizationException.fromIntent(data)
 
-            authState?.update(authorizationResponse, authorizationException)
+        authState?.update(authorizationResponse, authorizationException)
 
-            authorizationException?.let {
-                val netIdError = createNetIdErrorForAuthorizationException(it)
-                listener?.onAuthorizationFailed(netIdError)
+        authorizationException?.let {
+            val netIdError = createNetIdErrorForAuthorizationException(it)
+            listener?.onAuthorizationFailed(netIdError)
+        } ?: run {
+            authorizationResponse?.let {
+                processTokenExchange(it)
+
             } ?: run {
-                authorizationResponse?.let {
+                val netIdError =
+                    NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.Unknown)
+                listener?.onAuthorizationServiceConfigurationFetchFailed(netIdError)
+            }
+        }
+    }
+
+    private fun processTokenExchange(authorizationResponse: AuthorizationResponse) {
+        authService?.performTokenRequest(authorizationResponse.createTokenExchangeRequest()) { response, exception ->
+            authState?.update(response, exception)
+            exception?.let { authException ->
+                listener?.onAuthorizationFailed(createNetIdErrorForAuthorizationException(authException))
+            } ?: run {
+                response?.let { tokenResponse ->
+                    Log.i(javaClass.simpleName, "Received token response: ${tokenResponse.accessToken}")
                     listener?.onAuthorizationSuccessful()
-                } ?: run {
-                    val netIdError = NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.Unknown)
-                    listener?.onAuthorizationServiceConfigurationFetchFailed(netIdError)
                 }
             }
-        } else {
-            Log.i(javaClass.simpleName, "Request code does not match authorization request code")
         }
     }
 
@@ -105,13 +120,17 @@ class AppAuthManagerImpl : AppAuthManager {
                 NetIdErrorProcess.Configuration,
                 NetIdErrorCode.NetworkError
             )
-            AuthorizationException.GeneralErrors.JSON_DESERIALIZATION_ERROR -> NetIdError(
-                NetIdErrorProcess.Configuration,
-                NetIdErrorCode.JsonDeserializationError
+            AuthorizationException.GeneralErrors.JSON_DESERIALIZATION_ERROR ->
+                NetIdError(
+                    NetIdErrorProcess.Configuration,
+                    NetIdErrorCode.JsonDeserializationError
+
             )
-            AuthorizationException.GeneralErrors.INVALID_DISCOVERY_DOCUMENT -> NetIdError(
-                NetIdErrorProcess.Configuration,
-                NetIdErrorCode.InvalidDiscoveryDocument
+            AuthorizationException.GeneralErrors.INVALID_DISCOVERY_DOCUMENT ->
+                NetIdError(
+                    NetIdErrorProcess.Configuration,
+                    NetIdErrorCode.InvalidDiscoveryDocument
+
             )
             AuthorizationException.AuthorizationRequestErrors.INVALID_REQUEST -> NetIdError(
                 NetIdErrorProcess.Authentication,
@@ -126,8 +145,10 @@ class AppAuthManagerImpl : AppAuthManager {
                 NetIdErrorCode.AccessDenied
             )
             AuthorizationException.AuthorizationRequestErrors.UNSUPPORTED_RESPONSE_TYPE -> NetIdError(
-                NetIdErrorProcess.Authentication,
-                NetIdErrorCode.UnsupportedResponseType
+
+                    NetIdErrorProcess.Authentication,
+                    NetIdErrorCode.UnsupportedResponseType
+
             )
             AuthorizationException.AuthorizationRequestErrors.INVALID_SCOPE -> NetIdError(
                 NetIdErrorProcess.Authentication,
@@ -138,8 +159,10 @@ class AppAuthManagerImpl : AppAuthManager {
                 NetIdErrorCode.ServerError
             )
             AuthorizationException.AuthorizationRequestErrors.TEMPORARILY_UNAVAILABLE -> NetIdError(
-                NetIdErrorProcess.Authentication,
-                NetIdErrorCode.TemporarilyUnavailable
+
+                    NetIdErrorProcess.Authentication,
+                    NetIdErrorCode.TemporarilyUnavailable
+
             )
             AuthorizationException.AuthorizationRequestErrors.CLIENT_ERROR -> NetIdError(
                 NetIdErrorProcess.Authentication,

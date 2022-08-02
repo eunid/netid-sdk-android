@@ -1,10 +1,14 @@
 package de.netid.mobile.sdk.ui
 
-import android.app.Activity
+import android.content.Intent
 
 interface AuthorizationFragmentListener {
 
-    fun onAgreeAndContinueWithNetIdClicked(packageName: String?, activity: Activity)
+    fun onAuthenticationFinished(response: Intent?)
+
+    fun onAuthenticationFailed()
+
+    fun onStartAuthentication()
 
     fun onCloseClicked()
 }

@@ -9,9 +9,13 @@ interface AppAuthManager {
 
     fun fetchAuthorizationServiceConfiguration(host: String)
 
-    fun performWebAuthorization(clientId: String, redirectUri: String, activity: Activity)
+    fun getWebAuthorizationIntent(
+        clientId: String,
+        redirectUri: String,
+        activity: Activity
+    ): Intent?
 
-    fun processAuthorizationIntent(requestCode: Int, data: Intent)
+    fun processAuthorizationIntent(data: Intent)
 
     fun getAccessToken(): String?
 }

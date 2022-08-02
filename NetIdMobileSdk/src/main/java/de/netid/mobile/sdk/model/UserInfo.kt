@@ -5,11 +5,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UserInfo(
     val sub: String,
-    val givenName: String,
-    val familyName: String,
-    val birthDate: String
+    val given_name: String,
+    val family_name: String,
+    val birthdate: String
 ) {
     override fun toString(): String {
-        return "UserInfo(sub='$sub', givenName='$givenName', familyName='$familyName', birthDate='$birthDate')"
+        return "UserInfo(sub='$sub', given_name='$given_name', family_name='$family_name', birthdate='$birthdate')"
     }
 }

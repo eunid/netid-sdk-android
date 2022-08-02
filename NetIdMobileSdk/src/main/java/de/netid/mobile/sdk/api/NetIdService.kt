@@ -47,9 +47,21 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
         }
     }
 
-    fun getAuthorizationFragment(context: Context): Fragment {
-        checkAvailableNetIdApplications(context)
-        return AuthorizationFragment(this, availableAppIdentifiers)
+    fun getAuthorizationFragment(activity: Activity): Fragment? {
+        checkAvailableNetIdApplications(activity)
+        netIdConfig?.let { config ->
+            return appAuthManager.getWebAuthorizationIntent(
+                config.clientId,
+                config.redirectUri,
+                activity
+            )?.let {
+                AuthorizationFragment(
+                    this, availableAppIdentifiers, it
+                )
+            }
+        }
+        //TODO optimise error handling
+        return null
     }
 
     private fun handleConnection(context: Context, process: NetIdErrorProcess): Boolean {
@@ -63,21 +75,17 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
         }
     }
 
-    private fun authorize(packageName: String?, activity: Activity) {
-        if (handleConnection(activity.applicationContext, NetIdErrorProcess.Authentication)) {
-            packageName?.let { applicationId ->
-                openApp(activity.applicationContext, applicationId)
-            } ?: run {
-                netIdConfig?.let { config ->
-                    appAuthManager.performWebAuthorization(
-                        config.clientId,
-                        config.redirectUri,
-                        activity
-                    )
-                }
-            }
-        }
-    }
+    //TODO
+//    fun authorize(packageName: String?, activity: Activity): Intent? {
+//        if (handleConnection(activity.applicationContext, NetIdErrorProcess.Authentication)) {
+//            packageName?.let { applicationId ->
+//                openApp(activity.applicationContext, applicationId)
+//            } ?: run {
+//
+//            }
+//        }
+//        return null
+//    }
 
     fun fetchUserInfo(context: Context) {
         if (handleConnection(context, NetIdErrorProcess.UserInfo)) {
@@ -102,10 +110,6 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
                 }
             }
         }
-    }
-
-    fun processAuthorizationIntent(requestCode: Int, data: Intent) {
-        appAuthManager.processAuthorizationIntent(requestCode, data)
     }
 
     private fun setupAuthManagerAndFetchConfiguration(host: String) {
@@ -165,13 +169,27 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
     }
 
     // AuthorizationFragmentListener functions
+    override fun onAuthenticationFinished(response: Intent?) {
+        response?.let { intent ->
+            appAuthManager.processAuthorizationIntent(intent)
+        } ?: run {
+            for (item in netIdServiceListeners) {
+                item.onAuthenticationFinishedWithError(
+                    NetIdError(
+                        NetIdErrorProcess.Authentication,
+                        NetIdErrorCode.Unknown
+                    )
+                )
+            }
+        }
+    }
 
-    override fun onAgreeAndContinueWithNetIdClicked(packageName: String?, activity: Activity) {
-        Log.i(
-            javaClass.simpleName,
-            "NetId Service user agreed legal. Authentication will be continued with packageName: $packageName"
-        )
-        authorize(packageName, activity)
+    override fun onAuthenticationFailed() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onStartAuthentication() {
+        TODO("Not yet implemented")
     }
 
     override fun onCloseClicked() {

@@ -143,6 +143,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     override fun onAuthenticationFinished(accessToken: String) {
         appendLog("Net ID service authorized successfully\nAccess Token:\n$accessToken")
         serviceState = ServiceState.AuthorizationSuccessful
+        bottomDialogFragment.dismiss()
         updateElementsForServiceState()
     }
 
@@ -155,11 +156,13 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     override fun onUserInfoFinished(userInfo: UserInfo) {
         appendLog("Net ID service user info -fetch finished successfully: $userInfo")
         serviceState = ServiceState.UserInfoSuccessful
+        updateElementsForServiceState()
     }
 
     override fun onUserInfoFetchedWithError(error: NetIdError) {
         appendLog("Net ID service user info failed: ${error.code}, ${error.process}")
         serviceState = ServiceState.UserInfoFailed
+        updateElementsForServiceState()
     }
 
     override fun onSessionEnd() {
