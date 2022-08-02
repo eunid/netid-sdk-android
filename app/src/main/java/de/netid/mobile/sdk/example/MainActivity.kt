@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     private lateinit var netIdConfig: NetIdConfig
 
     private var serviceState = ServiceState.Uninitialized
+    private lateinit var bottomDialogFragment: SdkContentBottomDialogFragment
 
     companion object {
         private const val clientId = "082531ba-1b22-4381-81b1-64add4b85b8a"
@@ -59,7 +60,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     private fun setupAuthorizeButton() {
         binding.activityMainButtonAuthorize.setOnClickListener {
             it.isEnabled = false
-            val bottomDialogFragment = SdkContentBottomDialogFragment()
+            bottomDialogFragment = SdkContentBottomDialogFragment()
             bottomDialogFragment.sdkContentFragment = NetIdService.getAuthorizationFragment(this)
             bottomDialogFragment.show(supportFragmentManager, null)
         }
@@ -172,9 +173,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     override fun onEncounteredNetworkError(error: NetIdError) {
         appendLog("Net ID service user info failed: ${error.code}, ${error.process}")
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Netzwerkfehler")
-        builder.setMessage("Bitte stelle sicher, dass eine Netzwerkverbindung besteht.")
-        builder.setPositiveButton(android.R.string.ok) { _, _ ->
+        builder.setTitle(R.string.network_error_alert_title)
+        builder.setMessage(R.string.network_error_alert_description)
+        builder.setPositiveButton(R.string.network_error_alert_action) { _, _ ->
             when (error.process) {
                 NetIdErrorProcess.Configuration -> {
                     binding.activityMainButtonInitialize.isEnabled = true
@@ -216,6 +217,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
                 //TODO
             }
         }
+        bottomDialogFragment.dismiss()
         updateElementsForServiceState()
     }
 }

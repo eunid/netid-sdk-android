@@ -7,6 +7,9 @@
     <string name="net_id_service_load_user_info">UserInfo laden</string>
     <string name="net_id_service_end_session">Session beenden</string>
     <string name="net_id_service_logs">Logs:\n\n</string>
+    <string name="network_error_alert_title">Netzwerkfehler</string>
+    <string name="network_error_alert_description">Bitte stelle sicher, dass eine Netzwerkverbindung besteht.</string>
+    <string name="network_error_alert_action">Verstanden</string>
 
     <!-- Content descriptions -->
     <string name="service_logo_content_description">NetID logo</string>
