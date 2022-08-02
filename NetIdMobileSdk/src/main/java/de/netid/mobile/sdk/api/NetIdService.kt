@@ -13,6 +13,7 @@ import de.netid.mobile.sdk.model.UserInfo
 import de.netid.mobile.sdk.ui.AuthorizationFragment
 import de.netid.mobile.sdk.ui.AuthorizationFragmentListener
 import de.netid.mobile.sdk.util.JsonUtil
+import de.netid.mobile.sdk.util.ReachabilityUtil
 import de.netid.mobile.sdk.webservice.UserInfoCallback
 import de.netid.mobile.sdk.webservice.WebserviceApi
 
@@ -34,14 +35,16 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
         netIdServiceListeners.remove(listener)
     }
 
-    fun initialize(netIdConfig: NetIdConfig) {
-        if (this.netIdConfig != null) {
-            Log.w(javaClass.simpleName, "NetId Service configuration has been set already")
-            return
-        }
+    fun initialize(netIdConfig: NetIdConfig, context: Context) {
+        if (handleConnection(context, NetIdErrorProcess.Configuration)) {
+            if (this.netIdConfig != null) {
+                Log.w(javaClass.simpleName, "NetId Service configuration has been set already")
+                return
+            }
 
-        this.netIdConfig = netIdConfig
-        setupAuthManagerAndFetchConfiguration(netIdConfig.host)
+            this.netIdConfig = netIdConfig
+            setupAuthManagerAndFetchConfiguration(netIdConfig.host)
+        }
     }
 
     fun getAuthorizationFragment(context: Context): Fragment {
@@ -49,36 +52,54 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
         return AuthorizationFragment(this, availableAppIdentifiers)
     }
 
+    private fun handleConnection(context: Context, process: NetIdErrorProcess): Boolean {
+        return if (ReachabilityUtil.hasConnection(context)) {
+            true
+        } else {
+            for (item in netIdServiceListeners) {
+                item.onEncounteredNetworkError(NetIdError(process, NetIdErrorCode.NetworkError))
+            }
+            false
+        }
+    }
+
     private fun authorize(packageName: String?, activity: Activity) {
-        packageName?.let { applicationId ->
-            openApp(activity.applicationContext, applicationId)
-        } ?: run {
-            netIdConfig?.let { config ->
-                appAuthManager.performWebAuthorization(
-                    config.clientId,
-                    config.redirectUri,
-                    activity
-                )
+        if (handleConnection(activity.applicationContext, NetIdErrorProcess.Authentication)) {
+            packageName?.let { applicationId ->
+                openApp(activity.applicationContext, applicationId)
+            } ?: run {
+                netIdConfig?.let { config ->
+                    appAuthManager.performWebAuthorization(
+                        config.clientId,
+                        config.redirectUri,
+                        activity
+                    )
+                }
             }
         }
     }
 
-    fun fetchUserInfo() {
-        netIdConfig?.let { config ->
-            appAuthManager.getAccessToken()?.let { token ->
-                WebserviceApi.performUserInfoRequest(token, config.host, object : UserInfoCallback {
-                    override fun onUserInfoFetched(userInfo: UserInfo) {
-                        for (item in netIdServiceListeners) {
-                            item.onUserInfoFinished(userInfo)
-                        }
-                    }
+    fun fetchUserInfo(context: Context) {
+        if (handleConnection(context, NetIdErrorProcess.UserInfo)) {
+            netIdConfig?.let { config ->
+                appAuthManager.getAccessToken()?.let { token ->
+                    WebserviceApi.performUserInfoRequest(
+                        token,
+                        config.host,
+                        object : UserInfoCallback {
+                            override fun onUserInfoFetched(userInfo: UserInfo) {
+                                for (item in netIdServiceListeners) {
+                                    item.onUserInfoFinished(userInfo)
+                                }
+                            }
 
-                    override fun onUserInfoFetchFailed(error: NetIdError) {
-                        for (item in netIdServiceListeners) {
-                            item.onUserInfoFetchedWithError(error)
-                        }
-                    }
-                })
+                            override fun onUserInfoFetchFailed(error: NetIdError) {
+                                for (item in netIdServiceListeners) {
+                                    item.onUserInfoFetchedWithError(error)
+                                }
+                            }
+                        })
+                }
             }
         }
     }
@@ -108,14 +129,20 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
     // AppAuthManagerListener functions
 
     override fun onAuthorizationServiceConfigurationFetchedSuccessfully() {
-        Log.i(javaClass.simpleName, "NetId Service Authorization Service Configuration fetched successfully")
+        Log.i(
+            javaClass.simpleName,
+            "NetId Service Authorization Service Configuration fetched successfully"
+        )
         for (item in netIdServiceListeners) {
             item.onInitializationFinishedWithError(null)
         }
     }
 
     override fun onAuthorizationServiceConfigurationFetchFailed(error: NetIdError) {
-        Log.e(javaClass.simpleName, "NetId Service Authorization Service Configuration fetch failed")
+        Log.e(
+            javaClass.simpleName,
+            "NetId Service Authorization Service Configuration fetch failed"
+        )
         for (item in netIdServiceListeners) {
             item.onInitializationFinishedWithError(error)
         }
