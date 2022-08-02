@@ -14,8 +14,6 @@ class JsonUtil {
 
     companion object {
 
-        private const val appIdentifierArrayKey = "netIdAppIdentifiers"
-
         private fun loadJsonFileFromAssets(filename: String, context: Context): String? {
             var jsonString: String? = null
             try {

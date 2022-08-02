@@ -26,8 +26,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     companion object {
         private const val clientId = "082531ba-1b22-4381-81b1-64add4b85b8a"
         private const val host = "broker.netid.de"
-        private const val redirectUri =
-            "de.netid.mobile.sdk.netidmobilesdk:/oauth2redirect/example-provider"
+        private const val redirectUri = "de.netid.mobile.sdk.netidmobilesdk:/oauth2redirect/example-provider"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,13 +88,10 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     private fun updateElementsForServiceState() {
-        val isUninitialized =
-            serviceState == ServiceState.Uninitialized || serviceState == ServiceState.InitializationFailed
-        val isNotAuthorized =
-            serviceState == ServiceState.InitializationSuccessful || serviceState == ServiceState.AuthorizationFailed
-        val isAuthorized =
-            serviceState == ServiceState.AuthorizationSuccessful || serviceState == ServiceState.UserInfoFailed
-                    || serviceState == ServiceState.UserInfoSuccessful
+        val isUninitialized = serviceState == ServiceState.Uninitialized || serviceState == ServiceState.InitializationFailed
+        val isNotAuthorized = serviceState == ServiceState.InitializationSuccessful || serviceState == ServiceState.AuthorizationFailed
+        val isAuthorized = serviceState == ServiceState.AuthorizationSuccessful || serviceState == ServiceState.UserInfoFailed
+                || serviceState == ServiceState.UserInfoSuccessful
 
         binding.activityMainButtonInitialize.isEnabled = isUninitialized
         binding.activityMainButtonAuthorize.isEnabled = isNotAuthorized
@@ -157,7 +153,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     override fun onUserInfoFinished(userInfo: UserInfo) {
-        appendLog("Net ID service user info -fetch finsihed successfully: ${userInfo.toString()}")
+        appendLog("Net ID service user info -fetch finished successfully: $userInfo")
         serviceState = ServiceState.UserInfoSuccessful
     }
 
@@ -176,22 +172,11 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         builder.setTitle(R.string.network_error_alert_title)
         builder.setMessage(R.string.network_error_alert_description)
         builder.setPositiveButton(R.string.network_error_alert_action) { _, _ ->
-            when (error.process) {
-                NetIdErrorProcess.Configuration -> {
-                    binding.activityMainButtonInitialize.isEnabled = true
-                    serviceState = ServiceState.InitializationFailed
-                }
-                NetIdErrorProcess.Authentication -> {
-                    binding.activityMainButtonAuthorize.isEnabled = true
-                    serviceState = ServiceState.AuthorizationFailed
-                }
-                NetIdErrorProcess.UserInfo -> {
-                    binding.activityMainButtonUserInfo.isEnabled = true
-                    serviceState = ServiceState.UserInfoFailed
-                }
-                else -> {
-                    //TODO
-                }
+            serviceState = when (error.process) {
+                NetIdErrorProcess.Configuration -> ServiceState.InitializationFailed
+                NetIdErrorProcess.Authentication -> ServiceState.AuthorizationFailed
+                NetIdErrorProcess.UserInfo -> ServiceState.UserInfoFailed
+                else -> ServiceState.Uninitialized
             }
             updateElementsForServiceState()
         }
@@ -200,24 +185,13 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
     override fun onAuthenticationCanceled(error: NetIdError) {
         appendLog("Net ID service user canceled authentication in process: ${error.process}")
-        when (error.process) {
-            NetIdErrorProcess.Configuration -> {
-                binding.activityMainButtonInitialize.isEnabled = true
-                serviceState = ServiceState.InitializationFailed
-            }
-            NetIdErrorProcess.Authentication -> {
-                binding.activityMainButtonAuthorize.isEnabled = true
-                serviceState = ServiceState.AuthorizationFailed
-            }
-            NetIdErrorProcess.UserInfo -> {
-                binding.activityMainButtonUserInfo.isEnabled = true
-                serviceState = ServiceState.UserInfoFailed
-            }
-            else -> {
-                //TODO
-            }
+        serviceState = when (error.process) {
+            NetIdErrorProcess.Configuration -> ServiceState.InitializationFailed
+            NetIdErrorProcess.Authentication -> ServiceState.AuthorizationFailed
+            NetIdErrorProcess.UserInfo -> ServiceState.UserInfoFailed
+            else -> ServiceState.Uninitialized
         }
-        bottomDialogFragment.dismiss()
         updateElementsForServiceState()
+        bottomDialogFragment.dismiss()
     }
 }

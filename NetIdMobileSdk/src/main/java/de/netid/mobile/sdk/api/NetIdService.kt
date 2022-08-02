@@ -19,7 +19,7 @@ import de.netid.mobile.sdk.webservice.WebserviceApi
 
 object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
 
-    private const val appIdentifierFilename = "netIdAppIdentifiers"
+    private const val appIdentifierFilename = "netIdAppIdentifiers.json"
     private const val netIdAuthorizeKey = "netid_authorize"
 
     private var netIdConfig: NetIdConfig? = null

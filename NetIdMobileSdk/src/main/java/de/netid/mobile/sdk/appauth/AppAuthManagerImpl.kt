@@ -44,8 +44,7 @@ class AppAuthManagerImpl : AppAuthManager {
 
                     listener?.onAuthorizationServiceConfigurationFetchedSuccessfully()
                 } ?: run {
-                    val netIdError =
-                        NetIdError(NetIdErrorProcess.Configuration, NetIdErrorCode.Unknown)
+                    val netIdError = NetIdError(NetIdErrorProcess.Configuration, NetIdErrorCode.Unknown)
                     listener?.onAuthorizationServiceConfigurationFetchFailed(netIdError)
                 }
             }
@@ -72,8 +71,7 @@ class AppAuthManagerImpl : AppAuthManager {
             activity.startActivityForResult(authIntent, authRequestCode)
         } ?: run {
             Log.e(javaClass.simpleName, "No authorization service configuration available")
-            val netIdError =
-                NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.UnauthorizedClient)
+            val netIdError = NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.UnauthorizedClient)
             listener?.onAuthorizationFailed(netIdError)
         }
     }
@@ -90,11 +88,9 @@ class AppAuthManagerImpl : AppAuthManager {
                 listener?.onAuthorizationFailed(netIdError)
             } ?: run {
                 authorizationResponse?.let {
-                    // TODO Provide access token
                     listener?.onAuthorizationSuccessful()
                 } ?: run {
-                    val netIdError =
-                        NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.Unknown)
+                    val netIdError = NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.Unknown)
                     listener?.onAuthorizationServiceConfigurationFetchFailed(netIdError)
                 }
             }
@@ -105,54 +101,63 @@ class AppAuthManagerImpl : AppAuthManager {
 
     private fun createNetIdErrorForAuthorizationException(authorizationException: AuthorizationException): NetIdError {
         return when (authorizationException) {
-            AuthorizationException.GeneralErrors.NETWORK_ERROR -> {
-                NetIdError(NetIdErrorProcess.Configuration, NetIdErrorCode.NetworkError)
-            }
-            AuthorizationException.GeneralErrors.JSON_DESERIALIZATION_ERROR -> {
-                NetIdError(NetIdErrorProcess.Configuration, NetIdErrorCode.JsonDeserializationError)
-            }
-            AuthorizationException.GeneralErrors.INVALID_DISCOVERY_DOCUMENT -> {
-                NetIdError(NetIdErrorProcess.Configuration, NetIdErrorCode.InvalidDiscoveryDocument)
-            }
-            AuthorizationException.AuthorizationRequestErrors.INVALID_REQUEST -> {
-                NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.InvalidRequest)
-            }
-            AuthorizationException.AuthorizationRequestErrors.UNAUTHORIZED_CLIENT -> {
-                NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.UnauthorizedClient)
-            }
-            AuthorizationException.AuthorizationRequestErrors.ACCESS_DENIED -> {
-                NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.AccessDenied)
-            }
-            AuthorizationException.AuthorizationRequestErrors.UNSUPPORTED_RESPONSE_TYPE -> {
-                NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.UnsupportedResponseType)
-            }
-            AuthorizationException.AuthorizationRequestErrors.INVALID_SCOPE -> {
-                NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.InvalidScope)
-            }
-            AuthorizationException.AuthorizationRequestErrors.SERVER_ERROR -> {
-                NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.ServerError)
-            }
-            AuthorizationException.AuthorizationRequestErrors.TEMPORARILY_UNAVAILABLE -> {
-                NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.TemporarilyUnavailable)
-            }
-            AuthorizationException.AuthorizationRequestErrors.CLIENT_ERROR -> {
-                NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.ClientError)
-            }
-            AuthorizationException.AuthorizationRequestErrors.STATE_MISMATCH -> {
-                NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.StateMismatch)
-            }
-            AuthorizationException.GeneralErrors.PROGRAM_CANCELED_AUTH_FLOW -> {
-                NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.MissingBrowser)
-            }
-            AuthorizationException.GeneralErrors.USER_CANCELED_AUTH_FLOW -> {
-                NetIdError(
-                    NetIdErrorProcess.Authentication,
-                    NetIdErrorCode.AuthorizationCanceledByUser
-                )
-            }
-            else -> {
-                NetIdError(NetIdErrorProcess.Configuration, NetIdErrorCode.Unknown)
-            }
+            AuthorizationException.GeneralErrors.NETWORK_ERROR -> NetIdError(
+                NetIdErrorProcess.Configuration,
+                NetIdErrorCode.NetworkError
+            )
+            AuthorizationException.GeneralErrors.JSON_DESERIALIZATION_ERROR -> NetIdError(
+                NetIdErrorProcess.Configuration,
+                NetIdErrorCode.JsonDeserializationError
+            )
+            AuthorizationException.GeneralErrors.INVALID_DISCOVERY_DOCUMENT -> NetIdError(
+                NetIdErrorProcess.Configuration,
+                NetIdErrorCode.InvalidDiscoveryDocument
+            )
+            AuthorizationException.AuthorizationRequestErrors.INVALID_REQUEST -> NetIdError(
+                NetIdErrorProcess.Authentication,
+                NetIdErrorCode.InvalidRequest
+            )
+            AuthorizationException.AuthorizationRequestErrors.UNAUTHORIZED_CLIENT -> NetIdError(
+                NetIdErrorProcess.Authentication,
+                NetIdErrorCode.UnauthorizedClient
+            )
+            AuthorizationException.AuthorizationRequestErrors.ACCESS_DENIED -> NetIdError(
+                NetIdErrorProcess.Authentication,
+                NetIdErrorCode.AccessDenied
+            )
+            AuthorizationException.AuthorizationRequestErrors.UNSUPPORTED_RESPONSE_TYPE -> NetIdError(
+                NetIdErrorProcess.Authentication,
+                NetIdErrorCode.UnsupportedResponseType
+            )
+            AuthorizationException.AuthorizationRequestErrors.INVALID_SCOPE -> NetIdError(
+                NetIdErrorProcess.Authentication,
+                NetIdErrorCode.InvalidScope
+            )
+            AuthorizationException.AuthorizationRequestErrors.SERVER_ERROR -> NetIdError(
+                NetIdErrorProcess.Authentication,
+                NetIdErrorCode.ServerError
+            )
+            AuthorizationException.AuthorizationRequestErrors.TEMPORARILY_UNAVAILABLE -> NetIdError(
+                NetIdErrorProcess.Authentication,
+                NetIdErrorCode.TemporarilyUnavailable
+            )
+            AuthorizationException.AuthorizationRequestErrors.CLIENT_ERROR -> NetIdError(
+                NetIdErrorProcess.Authentication,
+                NetIdErrorCode.ClientError
+            )
+            AuthorizationException.AuthorizationRequestErrors.STATE_MISMATCH -> NetIdError(
+                NetIdErrorProcess.Authentication,
+                NetIdErrorCode.StateMismatch
+            )
+            AuthorizationException.GeneralErrors.PROGRAM_CANCELED_AUTH_FLOW -> NetIdError(
+                NetIdErrorProcess.Authentication,
+                NetIdErrorCode.MissingBrowser
+            )
+            AuthorizationException.GeneralErrors.USER_CANCELED_AUTH_FLOW -> NetIdError(
+                NetIdErrorProcess.Authentication,
+                NetIdErrorCode.AuthorizationCanceledByUser
+            )
+            else -> NetIdError(NetIdErrorProcess.Configuration, NetIdErrorCode.Unknown)
         }
     }
 }
