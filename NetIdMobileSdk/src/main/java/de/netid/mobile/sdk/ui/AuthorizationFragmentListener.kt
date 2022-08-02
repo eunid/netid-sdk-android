@@ -1,6 +1,7 @@
 package de.netid.mobile.sdk.ui
 
 import android.content.Intent
+import de.netid.mobile.sdk.model.AppIdentifier
 
 interface AuthorizationFragmentListener {
 
@@ -8,7 +9,7 @@ interface AuthorizationFragmentListener {
 
     fun onAuthenticationFailed()
 
-    fun onStartAuthentication()
-
     fun onCloseClicked()
+
+    fun onAppButtonClicked(appIdentifier: AppIdentifier)
 }

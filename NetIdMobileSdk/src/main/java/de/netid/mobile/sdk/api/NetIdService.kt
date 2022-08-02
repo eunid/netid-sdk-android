@@ -179,10 +179,6 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
         TODO("Not yet implemented")
     }
 
-    override fun onStartAuthentication() {
-        TODO("Not yet implemented")
-    }
-
     override fun onCloseClicked() {
         Log.i(javaClass.simpleName, "NetId Service close authentication")
         for (item in netIdServiceListeners) {
@@ -193,5 +189,9 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
                 )
             )
         }
+    }
+
+    override fun onAppButtonClicked(appIdentifier: AppIdentifier) {
+        Log.i(javaClass.simpleName, "NetId Service will use app ${appIdentifier.name} for authentication")
     }
 }
