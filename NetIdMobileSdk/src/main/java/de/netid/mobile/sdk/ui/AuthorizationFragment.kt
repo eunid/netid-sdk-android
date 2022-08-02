@@ -14,9 +14,9 @@ import de.netid.mobile.sdk.databinding.FragmentAuthorizationBinding
 import de.netid.mobile.sdk.model.AppIdentifier
 
 class AuthorizationFragment(
-    private val listener: AuthorizationFragmentListener,
-    private val appIdentifiers: List<AppIdentifier>,
-    private val authorizationIntent: Intent
+        private val listener: AuthorizationFragmentListener,
+        private val appIdentifiers: List<AppIdentifier>,
+        private val authorizationIntent: Intent
 ) : Fragment() {
     companion object {
         private const val netIdScheme = "scheme"
@@ -28,7 +28,7 @@ class AuthorizationFragment(
     private val binding get() = _binding!!
 
     private val resultLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
+            ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             listener.onAuthenticationFinished(result.data)
@@ -38,9 +38,9 @@ class AuthorizationFragment(
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAuthorizationBinding.inflate(inflater, container, false)
         return binding.root
