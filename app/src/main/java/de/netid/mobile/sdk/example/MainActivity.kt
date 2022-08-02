@@ -26,7 +26,8 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     companion object {
         private const val clientId = "082531ba-1b22-4381-81b1-64add4b85b8a"
         private const val host = "broker.netid.de"
-        private const val redirectUri = "de.netid.mobile.sdk.netidmobilesdk:/oauth2redirect/example-provider"
+        private const val redirectUri =
+            "de.netid.mobile.sdk.netidmobilesdk:/oauth2redirect/example-provider"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,10 +89,13 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     private fun updateElementsForServiceState() {
-        val isUninitialized = serviceState == ServiceState.Uninitialized || serviceState == ServiceState.InitializationFailed
-        val isNotAuthorized = serviceState == ServiceState.InitializationSuccessful || serviceState == ServiceState.AuthorizationFailed
-        val isAuthorized = serviceState == ServiceState.AuthorizationSuccessful || serviceState == ServiceState.UserInfoFailed
-                || serviceState == ServiceState.UserInfoSuccessful
+        val isUninitialized =
+            serviceState == ServiceState.Uninitialized || serviceState == ServiceState.InitializationFailed
+        val isNotAuthorized =
+            serviceState == ServiceState.InitializationSuccessful || serviceState == ServiceState.AuthorizationFailed
+        val isAuthorized =
+            serviceState == ServiceState.AuthorizationSuccessful || serviceState == ServiceState.UserInfoFailed
+                    || serviceState == ServiceState.UserInfoSuccessful
 
         binding.activityMainButtonInitialize.isEnabled = isUninitialized
         binding.activityMainButtonAuthorize.isEnabled = isNotAuthorized

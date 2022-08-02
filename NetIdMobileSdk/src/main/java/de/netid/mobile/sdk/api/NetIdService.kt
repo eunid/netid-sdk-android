@@ -20,8 +20,6 @@ import de.netid.mobile.sdk.webservice.WebserviceApi
 object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
 
     private const val appIdentifierFilename = "netIdAppIdentifiers.json"
-    private const val netIdAuthorizeKey = "netid_authorize"
-
     private var netIdConfig: NetIdConfig? = null
     private lateinit var appAuthManager: AppAuthManager
     private val availableAppIdentifiers = mutableListOf<AppIdentifier>()
@@ -124,14 +122,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
         availableAppIdentifiers.addAll(appIdentifiers)
     }
 
-    private fun openApp(context: Context, packageName: String) {
-        val intent = context.packageManager.getLaunchIntentForPackage(packageName)
-        intent?.putExtra(netIdAuthorizeKey, context.applicationInfo.packageName)
-        context.startActivity(intent)
-    }
-
     // AppAuthManagerListener functions
-
     override fun onAuthorizationServiceConfigurationFetchedSuccessfully() {
         Log.i(
             javaClass.simpleName,
