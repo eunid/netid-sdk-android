@@ -1,15 +1,18 @@
 package de.netid.mobile.sdk.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserInfo(
     val sub: String,
-    val given_name: String,
-    val family_name: String,
+    @SerialName("given_name")
+    val givenName: String,
+    @SerialName("family_name")
+    val familyName: String,
     val birthdate: String
 ) {
     override fun toString(): String {
-        return "UserInfo(sub='$sub', given_name='$given_name', family_name='$family_name', birthdate='$birthdate')"
+        return "UserInfo(sub='$sub', givenName='$givenName', familyName='$familyName', birthdate='$birthdate')"
     }
 }
