@@ -13,6 +13,7 @@ import de.netid.mobile.sdk.model.UserInfo
 import de.netid.mobile.sdk.ui.AuthorizationFragment
 import de.netid.mobile.sdk.ui.AuthorizationFragmentListener
 import de.netid.mobile.sdk.util.JsonUtil
+import de.netid.mobile.sdk.util.PackageUtil
 import de.netid.mobile.sdk.util.ReachabilityUtil
 import de.netid.mobile.sdk.webservice.UserInfoCallback
 import de.netid.mobile.sdk.webservice.WebserviceApi
@@ -119,7 +120,8 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
     private fun checkAvailableNetIdApplications(context: Context) {
         availableAppIdentifiers.clear()
         val appIdentifiers = JsonUtil.loadAppIdentifiers(appIdentifierFilename, context)
-        availableAppIdentifiers.addAll(appIdentifiers)
+        val installedAppIdentifiers = PackageUtil.getInstalledPackages(appIdentifiers, context.packageManager)
+        availableAppIdentifiers.addAll(installedAppIdentifiers)
     }
 
     // AppAuthManagerListener functions

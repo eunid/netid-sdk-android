@@ -7,15 +7,15 @@ class PackageUtil {
 
     companion object {
 
-        fun getInstalledPackages(appIdentifiers: List<AppIdentifier>, packageManager: PackageManager): List<String> {
-            val installedPackageNames = mutableListOf<String>()
+        fun getInstalledPackages(appIdentifiers: List<AppIdentifier>, packageManager: PackageManager): List<AppIdentifier> {
+            val installedAppIdentifiers = mutableListOf<AppIdentifier>()
             for (item in appIdentifiers) {
                 if (isPackageInstalled(item.android.applicationId, packageManager)) {
-                    installedPackageNames.add(item.android.applicationId)
+                    installedAppIdentifiers.add(item)
                 }
             }
 
-            return installedPackageNames
+            return installedAppIdentifiers
         }
 
         private fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
