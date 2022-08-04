@@ -5,15 +5,26 @@ import android.util.Log
 import de.netid.mobile.sdk.model.AppIdentifier
 import de.netid.mobile.sdk.model.NetIdAppIdentifiers
 import kotlinx.serialization.decodeFromString
-import org.json.JSONException
-import org.json.JSONObject
 import kotlinx.serialization.json.Json
+import org.json.JSONException
 import java.io.IOException
 
+/**
+ * Provides functionalities to load and process JSON files.
+ */
 class JsonUtil {
 
     companion object {
 
+        /**
+         * Loads a specific JSON file from the assets.
+         *
+         * @param filename the filename of the JSON file to load from the assets
+         * @param context a context with which the assets are accessed
+         *
+         * @return A string containing the content of the loaded JSON file.
+         * If the file does not exist or could not be loaded, the returned string is `null`.
+         */
         private fun loadJsonFileFromAssets(filename: String, context: Context): String? {
             var jsonString: String? = null
             try {
@@ -30,6 +41,14 @@ class JsonUtil {
             return jsonString
         }
 
+        /**
+         * Loads a JSON file containing app identifier information from the assets.
+         *
+         * @param filename the filename of the JSON file containing app identifier information
+         * @param context a context with which the assets are accessed
+         *
+         * @return a list containing [AppIdentifier] elements representing the loaded information from the JSON file
+         */
         fun loadAppIdentifiers(filename: String, context: Context): List<AppIdentifier> {
             val appIdentifiers = mutableListOf<AppIdentifier>()
 
