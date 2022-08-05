@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
     <manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="de.netid.mobile.sdk">
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            package="de.netid.mobile.sdk">
 
+    <queries>
+        <package android:name="de.gmx.mobile.android.mail" />
+        <package android:name="de.web.mobile.android.mail" />
+    </queries>
+
+        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+        <uses-permission android:name="android.permission.INTERNET" />
     </manifest>

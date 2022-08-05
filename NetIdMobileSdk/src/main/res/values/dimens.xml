@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="authorization_outer_padding">20dp</dimen>
+    <dimen name="authorization_logo_width">100dp</dimen>
+    <dimen name="authorization_logo_height">40dp</dimen>
+    <dimen name="authorization_vertical_margin">10dp</dimen>
+    <dimen name="authorization_button_corner_radius">5dp</dimen>
+    <dimen name="authorization_close_button_stroke_width">1dp</dimen>
+
+    <dimen name="authorization_title_text_size">16sp</dimen>
+    <dimen name="authorization_legal_text_size">12sp</dimen>
+    <dimen name="authorization_button_text_size">14sp</dimen>
+    <dimen name="authorization_button_letter_spacing">0.15</dimen>
+</resources>

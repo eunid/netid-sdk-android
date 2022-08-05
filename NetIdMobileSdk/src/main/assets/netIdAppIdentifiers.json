@@ -1,0 +1,32 @@
+{
+  "netIdAppIdentifiers": [
+    {
+      "id": 1,
+      "name": "GMX",
+      "icon": "",
+      "backgroundColor": "#FF402FD2",
+      "foregroundColor": "#FFFFFFFF",
+      "iOS": {
+        "bundleIdentifier": "de.gmx.mobile.ios.mail",
+        "scheme": "gmxmail"
+      },
+      "android": {
+        "applicationId": "de.gmx.mobile.android.mail"
+      }
+    },
+    {
+      "id": 2,
+      "name": "WEB.DE",
+      "backgroundColor": "#FFF7AD0A",
+      "foregroundColor": "#FF212121",
+      "icon": "",
+      "iOS": {
+        "bundleIdentifier": "de.web.mobile.ios.mail",
+        "scheme": "webdemail"
+      },
+      "android": {
+        "applicationId": "de.web.mobile.android.mail"
+      }
+    }
+  ]
+}
