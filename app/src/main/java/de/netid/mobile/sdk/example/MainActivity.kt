@@ -155,6 +155,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         appendLog("Net ID service authorization failed: ${error.code}, ${error.process}")
         serviceState = ServiceState.AuthorizationFailed
         updateElementsForServiceState()
+        bottomDialogFragment.dismiss()
     }
 
     override fun onUserInfoFinished(userInfo: UserInfo) {
