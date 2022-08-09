@@ -12,17 +12,20 @@ import de.netid.mobile.sdk.model.AppIdentifier
 import de.netid.mobile.sdk.model.UserInfo
 import de.netid.mobile.sdk.ui.AuthorizationFragment
 import de.netid.mobile.sdk.ui.AuthorizationFragmentListener
+import de.netid.mobile.sdk.userinfo.UserInfoManager
+import de.netid.mobile.sdk.userinfo.UserInfoManagerListener
 import de.netid.mobile.sdk.util.JsonUtil
 import de.netid.mobile.sdk.util.PackageUtil
 import de.netid.mobile.sdk.util.ReachabilityUtil
-import de.netid.mobile.sdk.webservice.UserInfoCallback
-import de.netid.mobile.sdk.webservice.WebserviceApi
 
-object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
+object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener, UserInfoManagerListener {
 
     private const val appIdentifierFilename = "netIdAppIdentifiers.json"
     private var netIdConfig: NetIdConfig? = null
+
     private lateinit var appAuthManager: AppAuthManager
+    private lateinit var userInfoManager: UserInfoManager
+
     private val availableAppIdentifiers = mutableListOf<AppIdentifier>()
     private val netIdServiceListeners = mutableSetOf<NetIdServiceListener>()
 
@@ -43,6 +46,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
 
             this.netIdConfig = netIdConfig
             setupAuthManagerAndFetchConfiguration(netIdConfig.host)
+            setupUserInfoManager()
         }
     }
 
@@ -88,24 +92,21 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
 
     fun fetchUserInfo(context: Context) {
         if (handleConnection(context, NetIdErrorProcess.UserInfo)) {
+            var error: NetIdError? = null
+
             netIdConfig?.let { config ->
                 appAuthManager.getAccessToken()?.let { token ->
-                    WebserviceApi.performUserInfoRequest(
-                        token,
-                        config.host,
-                        object : UserInfoCallback {
-                            override fun onUserInfoFetched(userInfo: UserInfo) {
-                                for (item in netIdServiceListeners) {
-                                    item.onUserInfoFinished(userInfo)
-                                }
-                            }
+                    userInfoManager.fetchUserInfo(config.host, token)
+                } ?: {
+                    error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.UnauthorizedClient)
+                }
+            } ?: run {
+                error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.Uninitialized)
+            }
 
-                            override fun onUserInfoFetchFailed(error: NetIdError) {
-                                for (item in netIdServiceListeners) {
-                                    item.onUserInfoFetchedWithError(error)
-                                }
-                            }
-                        })
+            error?.let {
+                for (item in netIdServiceListeners) {
+                    item.onUserInfoFetchedWithError(it)
                 }
             }
         }
@@ -117,6 +118,11 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
         appAuthManager.fetchAuthorizationServiceConfiguration(host)
     }
 
+    private fun setupUserInfoManager() {
+        userInfoManager = UserInfoManager()
+        userInfoManager.listener = this
+    }
+
     private fun checkAvailableNetIdApplications(context: Context) {
         availableAppIdentifiers.clear()
         val appIdentifiers = JsonUtil.loadAppIdentifiers(appIdentifierFilename, context)
@@ -125,21 +131,16 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
     }
 
     // AppAuthManagerListener functions
+
     override fun onAuthorizationServiceConfigurationFetchedSuccessfully() {
-        Log.i(
-            javaClass.simpleName,
-            "NetId Service Authorization Service Configuration fetched successfully"
-        )
+        Log.i(javaClass.simpleName, "NetId Service Authorization Service Configuration fetched successfully")
         for (item in netIdServiceListeners) {
             item.onInitializationFinishedWithError(null)
         }
     }
 
     override fun onAuthorizationServiceConfigurationFetchFailed(error: NetIdError) {
-        Log.e(
-            javaClass.simpleName,
-            "NetId Service Authorization Service Configuration fetch failed"
-        )
+        Log.e(javaClass.simpleName, "NetId Service Authorization Service Configuration fetch failed")
         for (item in netIdServiceListeners) {
             item.onInitializationFinishedWithError(error)
         }
@@ -162,6 +163,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
     }
 
     // AuthorizationFragmentListener functions
+
     override fun onAuthenticationFinished(response: Intent?) {
         response?.let { intent ->
             appAuthManager.processAuthorizationIntent(intent)
@@ -195,5 +197,21 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener {
 
     override fun onAppButtonClicked(appIdentifier: AppIdentifier) {
         Log.i(javaClass.simpleName, "NetId Service will use app ${appIdentifier.name} for authentication")
+    }
+
+    // UserInfoManagerListener functions
+
+    override fun onUserInfoFetched(userInfo: UserInfo) {
+        Log.i(javaClass.simpleName, "NetId Service user info fetched successfully")
+        for (item in netIdServiceListeners) {
+            item.onUserInfoFinished(userInfo)
+        }
+    }
+
+    override fun onUserInfoFetchFailed(error: NetIdError) {
+        Log.e(javaClass.simpleName, "NetId Service user info fetch failed")
+        for (item in netIdServiceListeners) {
+            item.onUserInfoFetchedWithError(error)
+        }
     }
 }
