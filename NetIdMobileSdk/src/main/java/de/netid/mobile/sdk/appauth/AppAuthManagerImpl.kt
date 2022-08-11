@@ -32,6 +32,10 @@ class AppAuthManagerImpl : AppAuthManager {
         return authState?.accessToken
     }
 
+    override fun getIdToken(): String? {
+        return authState?.idToken
+    }
+
     override fun fetchAuthorizationServiceConfiguration(host: String) {
         val uriString = scheme + host
         AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(uriString)) { serviceConfiguration, authorizationException ->

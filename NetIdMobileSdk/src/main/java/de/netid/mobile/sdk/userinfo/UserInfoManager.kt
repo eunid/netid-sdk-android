@@ -5,9 +5,7 @@ import de.netid.mobile.sdk.model.UserInfo
 import de.netid.mobile.sdk.webservice.UserInfoCallback
 import de.netid.mobile.sdk.webservice.WebserviceApi
 
-class UserInfoManager {
-
-    var listener: UserInfoManagerListener? = null
+class UserInfoManager(private val listener: UserInfoManagerListener) {
 
     fun fetchUserInfo(host: String, accessToken: String) {
         WebserviceApi.performUserInfoRequest(
@@ -15,11 +13,11 @@ class UserInfoManager {
             host,
             object : UserInfoCallback {
                 override fun onUserInfoFetched(userInfo: UserInfo) {
-                    listener?.onUserInfoFetched(userInfo)
+                    listener.onUserInfoFetched(userInfo)
                 }
 
                 override fun onUserInfoFetchFailed(error: NetIdError) {
-                    listener?.onUserInfoFetchFailed(error)
+                    listener.onUserInfoFetchFailed(error)
                 }
             })
     }

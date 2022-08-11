@@ -18,4 +18,6 @@ interface AppAuthManager {
     fun processAuthorizationIntent(data: Intent)
 
     fun getAccessToken(): String?
+
+    fun getIdToken(): String?
 }

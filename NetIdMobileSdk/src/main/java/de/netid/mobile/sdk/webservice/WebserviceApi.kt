@@ -5,14 +5,20 @@ import android.os.Looper
 import de.netid.mobile.sdk.api.NetIdError
 import de.netid.mobile.sdk.api.NetIdErrorCode
 import de.netid.mobile.sdk.api.NetIdErrorProcess
+import de.netid.mobile.sdk.api.NetIdPermissionUpdate
 import de.netid.mobile.sdk.constants.WebserviceConstants
+import de.netid.mobile.sdk.model.Permissions
+import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.UserInfo
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
 
@@ -69,6 +75,150 @@ object WebserviceApi {
                             userInfoCallback.onUserInfoFetchFailed(
                                 NetIdError(
                                     NetIdErrorProcess.UserInfo,
+                                    NetIdErrorCode.InvalidRequest
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    /**
+     * Performs a request to read permissions related to an authorized user.
+     * The result of the request is provided via the given [Permissions] instance.
+     *
+     * @param accessToken a currently valid ID token to read permissions
+     * @param collapseSyncId If `true`, the response will not contain the sync id
+     * @param permissionReadCallback a [PermissionReadCallback] instance receiving callbacks when the request is complete
+     */
+    fun performPermissionReadRequest(
+        accessToken: String,
+        collapseSyncId: Boolean,
+        permissionReadCallback: PermissionReadCallback
+    ) {
+        val requestBuilder = Request.Builder()
+            .url(WebserviceConstants.HTTPS_PROTOCOL + WebserviceConstants.PERMISSION_READ_HOST + WebserviceConstants.PERMISSION_READ_PATH)
+            .method(WebserviceConstants.GET_METHOD, null)
+            .header(
+                WebserviceConstants.AUTHORIZATION_HEADER,
+                WebserviceConstants.AUTHORIZATION_BEARER_PREFIX + accessToken
+            )
+
+        if (collapseSyncId) {
+            requestBuilder.header(
+                WebserviceConstants.ACCEPT_HEADER_KEY,
+                WebserviceConstants.ACCEPT_HEADER_PERMISSION_READ
+            )
+        } else {
+            requestBuilder.header(
+                WebserviceConstants.ACCEPT_HEADER_KEY,
+                WebserviceConstants.ACCEPT_HEADER_PERMISSION_READ_AUDIT
+            )
+        }
+        val request = requestBuilder.build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+                permissionReadCallback.onPermissionsFetchFailed(
+                    NetIdError(
+                        NetIdErrorProcess.PermissionRead,
+                        NetIdErrorCode.Unknown
+                    )
+                )
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (response.isSuccessful) {
+                        val permissions = Json.decodeFromString<Permissions>(response.body?.string() ?: "")
+                        Handler(Looper.getMainLooper()).post {
+                            permissionReadCallback.onPermissionsFetched(permissions)
+                        }
+                    } else {
+                        Handler(Looper.getMainLooper()).post {
+                            permissionReadCallback.onPermissionsFetchFailed(
+                                NetIdError(
+                                    NetIdErrorProcess.PermissionRead,
+                                    NetIdErrorCode.InvalidRequest
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    /**
+     * Performs a request to read permissions related to an authorized user.
+     * The result of the request is provided via the given [Permissions] instance.
+     *
+     * @param accessToken a currently valid ID token to read permissions
+     * @param permissionUpdate a [NetIdPermissionUpdate] instance, defining the permission to update
+     * @param collapseSyncId If `true`, the response will not contain the sync id
+     * @param permissionUpdateCallback a [PermissionUpdateCallback] instance receiving callbacks when the request is complete
+     */
+    fun performPermissionUpdateRequest(
+        accessToken: String,
+        permissionUpdate: NetIdPermissionUpdate,
+        collapseSyncId: Boolean,
+        permissionUpdateCallback: PermissionUpdateCallback
+    ) {
+        val jsonElement = Json.encodeToJsonElement(permissionUpdate)
+        val body = jsonElement.toString().toRequestBody("application/json; charset=utf-8".toMediaType())
+
+        val requestBuilder = Request.Builder()
+            .url(WebserviceConstants.HTTPS_PROTOCOL + WebserviceConstants.PERMISSION_WRITE_HOST + WebserviceConstants.PERMISSION_WRITE_PATH)
+            .method(WebserviceConstants.POST_METHOD, null)
+            .header(
+                WebserviceConstants.AUTHORIZATION_HEADER,
+                WebserviceConstants.AUTHORIZATION_BEARER_PREFIX + accessToken
+            )
+
+        if (collapseSyncId) {
+            requestBuilder.header(
+                WebserviceConstants.ACCEPT_HEADER_KEY,
+                WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE
+            )
+        } else {
+            requestBuilder.header(
+                WebserviceConstants.ACCEPT_HEADER_KEY,
+                WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE_AUDIT
+            )
+        }
+
+        val request = requestBuilder.header(
+            WebserviceConstants.CONTENT_TYPE_HEADER_KEY,
+            WebserviceConstants.CONTENT_TYPE_PERMISSION_WRITE
+        )
+            .post(body)
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+                permissionUpdateCallback.onPermissionUpdateFailed(
+                    NetIdError(
+                        NetIdErrorProcess.PermissionWrite,
+                        NetIdErrorCode.Unknown
+                    )
+                )
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (response.isSuccessful) {
+                        val subjectIdentifiers = Json.decodeFromString<SubjectIdentifiers>(response.body?.string() ?: "")
+                        Handler(Looper.getMainLooper()).post {
+                            permissionUpdateCallback.onPermissionUpdated(subjectIdentifiers)
+                        }
+                    } else {
+                        Handler(Looper.getMainLooper()).post {
+                            permissionUpdateCallback.onPermissionUpdateFailed(
+                                NetIdError(
+                                    NetIdErrorProcess.PermissionWrite,
                                     NetIdErrorCode.InvalidRequest
                                 )
                             )

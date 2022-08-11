@@ -119,8 +119,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener, Use
     }
 
     private fun setupUserInfoManager() {
-        userInfoManager = UserInfoManager()
-        userInfoManager.listener = this
+        userInfoManager = UserInfoManager(this)
     }
 
     private fun checkAvailableNetIdApplications(context: Context) {
