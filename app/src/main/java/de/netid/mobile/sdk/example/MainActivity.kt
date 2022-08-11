@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import de.netid.mobile.sdk.api.*
 import de.netid.mobile.sdk.example.SdkContentBottomDialogFragment
 import de.netid.mobile.sdk.example.databinding.ActivityMainBinding
+import de.netid.mobile.sdk.model.Permissions
 import de.netid.mobile.sdk.model.UserInfo
 
 class MainActivity : AppCompatActivity(), NetIdServiceListener {
@@ -69,7 +70,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     private fun setupUserInfoButton() {
         binding.activityMainButtonUserInfo.setOnClickListener {
             it.isEnabled = false
-            NetIdService.fetchUserInfo(this.applicationContext)
+            NetIdService.fetchPermissions(this.applicationContext, false)
         }
     }
 
@@ -201,5 +202,21 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         }
         updateElementsForServiceState()
         bottomDialogFragment.dismiss()
+    }
+
+    override fun onPermissionUpdateFinishedWithError(error: NetIdError) {
+
+    }
+
+    override fun onPermissionFetchFinishedWithError(error: NetIdError) {
+
+    }
+
+    override fun onPermissionFetchFinished(permissions: Permissions) {
+
+    }
+
+    override fun onPermissionUpdateFinished() {
+
     }
 }
