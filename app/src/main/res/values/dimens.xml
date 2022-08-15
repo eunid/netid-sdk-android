@@ -4,8 +4,10 @@
     <dimen name="service_logo_margin_end">8dp</dimen>
     <dimen name="main_activity_vertical_margin">24dp</dimen>
     <dimen name="main_activity_button_status_margin_horizontal">50dp</dimen>
+    <dimen name="main_activity_permission_section_margin_horizontal">20dp</dimen>
 
     <dimen name="net_id_service_title_text_size">20sp</dimen>
+    <dimen name="net_id_service_title_permission_text_size">16sp</dimen>
 
     <dimen name="service_logo_width">60dp</dimen>
     <dimen name="service_logo_height">25dp</dimen>

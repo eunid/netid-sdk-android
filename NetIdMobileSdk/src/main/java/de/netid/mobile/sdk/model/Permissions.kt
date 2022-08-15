@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Permissions(
     @SerialName("status_code")
-    val statusCode: PermissionStatusCode,
+    val statusCode: String,
     @SerialName("subject_identifiers")
     val subjectIdentifiers: SubjectIdentifiers,
     @SerialName("netid_privacy_settings")

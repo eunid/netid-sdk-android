@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SubjectIdentifiers(
+    @SerialName("tpid")
     val tpId: String,
     @SerialName("sync_id")
     val syncId: String

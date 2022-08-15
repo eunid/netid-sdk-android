@@ -2,9 +2,12 @@
     <string name="app_name">NetIdMobileSdk-App</string>
 
     <string name="net_id_service">NetID Service</string>
+    <string name="net_id_service_permission_title">Permission Management</string>
     <string name="net_id_service_initialize">SDK initialisieren</string>
     <string name="net_id_service_authorize">Authorisieren</string>
     <string name="net_id_service_load_user_info">UserInfo laden</string>
+    <string name="net_id_service_load_permissions">Laden</string>
+    <string name="net_id_service_load_update_permissions">Aktualisieren</string>
     <string name="net_id_service_end_session">Session beenden</string>
     <string name="net_id_service_logs">Logs:\n\n</string>
     <string name="network_error_alert_title">Netzwerkfehler</string>

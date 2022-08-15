@@ -6,11 +6,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NetIdPrivacySettings(
     val type: String,
-    val status: NetIdPrivacySettingsStatus,
+    val status: String = "",
+    val value: String = "",
     @SerialName("changed_at")
     val changedAt: String
 ) {
     override fun toString(): String {
-        return "NetIdPrivacySettings(type='$type', status=$status, changedAt='$changedAt')"
+        return "NetIdPrivacySettings(type='$type', status='$status', value='$value', changedAt='$changedAt')"
     }
 }

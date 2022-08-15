@@ -18,6 +18,7 @@ import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
@@ -172,7 +173,7 @@ object WebserviceApi {
 
         val requestBuilder = Request.Builder()
             .url(WebserviceConstants.HTTPS_PROTOCOL + WebserviceConstants.PERMISSION_WRITE_HOST + WebserviceConstants.PERMISSION_WRITE_PATH)
-            .method(WebserviceConstants.POST_METHOD, null)
+            .method(WebserviceConstants.POST_METHOD, body)
             .header(
                 WebserviceConstants.AUTHORIZATION_HEADER,
                 WebserviceConstants.AUTHORIZATION_BEARER_PREFIX + accessToken
@@ -194,7 +195,6 @@ object WebserviceApi {
             WebserviceConstants.CONTENT_TYPE_HEADER_KEY,
             WebserviceConstants.CONTENT_TYPE_PERMISSION_WRITE
         )
-            .post(body)
             .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
