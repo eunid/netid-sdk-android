@@ -7,8 +7,8 @@ import de.netid.mobile.sdk.api.NetIdErrorCode
 import de.netid.mobile.sdk.api.NetIdErrorProcess
 import de.netid.mobile.sdk.api.NetIdPermissionUpdate
 import de.netid.mobile.sdk.constants.WebserviceConstants
+import de.netid.mobile.sdk.model.PermissionUpdateResponse
 import de.netid.mobile.sdk.model.Permissions
-import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.UserInfo
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -18,10 +18,10 @@ import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
+
 
 /**
  * Provides functions to perform web requests.
@@ -169,7 +169,10 @@ object WebserviceApi {
         permissionUpdateCallback: PermissionUpdateCallback
     ) {
         val jsonElement = Json.encodeToJsonElement(permissionUpdate)
-        val body = jsonElement.toString().toRequestBody("application/json; charset=utf-8".toMediaType())
+        val mediaType = "application/vnd.netid.permission-center.netid-permissions-v2+json".toMediaType()
+        val byteArray = jsonElement.toString().toByteArray()
+        val body = byteArray.toRequestBody(mediaType)
+
 
         val requestBuilder = Request.Builder()
             .url(WebserviceConstants.HTTPS_PROTOCOL + WebserviceConstants.PERMISSION_WRITE_HOST + WebserviceConstants.PERMISSION_WRITE_PATH)
@@ -182,7 +185,7 @@ object WebserviceApi {
         if (collapseSyncId) {
             requestBuilder.header(
                 WebserviceConstants.ACCEPT_HEADER_KEY,
-                WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE
+             WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE
             )
         } else {
             requestBuilder.header(
@@ -210,9 +213,9 @@ object WebserviceApi {
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (response.isSuccessful) {
-                        val subjectIdentifiers = Json.decodeFromString<SubjectIdentifiers>(response.body?.string() ?: "")
+                        val response = Json.decodeFromString<PermissionUpdateResponse>(response.body?.string() ?: "")
                         Handler(Looper.getMainLooper()).post {
-                            permissionUpdateCallback.onPermissionUpdated(subjectIdentifiers)
+                            permissionUpdateCallback.onPermissionUpdated(response.subjectIdentifiers)
                         }
                     } else {
                         Handler(Looper.getMainLooper()).post {
