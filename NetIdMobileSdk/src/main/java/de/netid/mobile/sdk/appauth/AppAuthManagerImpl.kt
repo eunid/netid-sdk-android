@@ -7,6 +7,7 @@ import android.util.Log
 import de.netid.mobile.sdk.api.NetIdError
 import de.netid.mobile.sdk.api.NetIdErrorCode
 import de.netid.mobile.sdk.api.NetIdErrorProcess
+import de.netid.mobile.sdk.util.TokenUtil
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationRequest
@@ -30,6 +31,14 @@ class AppAuthManagerImpl : AppAuthManager {
 
     override fun getAccessToken(): String? {
         return authState?.accessToken
+    }
+
+    override fun getIdToken(): String? {
+        return authState?.idToken
+    }
+
+    override fun getPermissionToken(): String? {
+        return getIdToken()?.let { TokenUtil.getPermissionTokenFrom(it) }
     }
 
     override fun fetchAuthorizationServiceConfiguration(host: String) {

@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import de.netid.mobile.sdk.api.*
 import de.netid.mobile.sdk.example.SdkContentBottomDialogFragment
 import de.netid.mobile.sdk.example.databinding.ActivityMainBinding
+import de.netid.mobile.sdk.model.Permissions
 import de.netid.mobile.sdk.model.UserInfo
 
 class MainActivity : AppCompatActivity(), NetIdServiceListener {
@@ -40,8 +41,8 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         setupInitializeButton()
         setupAuthorizeButton()
         setupUserInfoButton()
+        setupPermissionManagementButtons()
         setupEndSessionButton()
-
         updateElementsForServiceState()
     }
 
@@ -73,6 +74,24 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         }
     }
 
+    private fun setupPermissionManagementButtons() {
+        binding.activityMainButtonPermissionRead.setOnClickListener {
+            it.isEnabled = false
+            NetIdService.fetchPermissions(this.applicationContext, false)
+        }
+
+
+        binding.activityMainButtonPermissionWrite.setOnClickListener {
+            it.isEnabled = false
+            // these values are only for demonstration purpose
+            val permission = NetIdPermissionUpdate(
+                "VALID",
+                "CPdfZIAPdfZIACnABCDECbCkAP_AAAAAAAYgIzJd9D7dbXFDefx_SPt0OYwW0NBXCuQCChSAA2AFVAOQcLQA02EaMATAhiACEQIAolIBAAEEHAFEAECQQIAEAAHsAgSEhAAKIAJEEBEQAAIQAAoKAAAAAAAIgAABoASAmBiQS5bmRUCAOIAQRgBIgggBCIADAgMBBEAIABgIAIIIgSgAAQAAAKIAAAAAARAAAASGgFABcAEMAPwAgoBaQEiAJ2AUiAxgBnwqASAEMAJgAXABHAEcALSAkEBeYDPh0EIABYAFQAMgAcgA-AEAALgAZAA0AB4AD6AIYAigBMACfAFwAXQAxABmADeAHMAPwAhgBLACYAE0AKMAUoAsQBbgDDAGiAPaAfgB-gEDAIoARaAjgCOgEpALEAWmAuYC6gF5AMUAbQA3ABxADnAHUAPQAi8BIICRAE7AKHAXmAwYBjADJAGVAMsAZmAz4BrADiwHjgPrAg0BDkhAbAAWABkAFwAQwAmABcADEAGYAN4AjgBSgCxAIoARwAlIBaQC5gGKANoAc4A6gB6AEggJEAScAz4B45KBAAAgABYAGQAOAAfAB4AEQAJgAXAAxABmADaAIYARwAowBSgC3AH4ARwAk4BaQC6gGKANwAdQBF4CRAF5gMsAZ8A1gCGoSBeAAgABYAFQAMgAcgA8AEAAMgAaAA8gCGAIoATAAngBvADmAH4AQgAhgBHACWAE0AKUAW4AwwB7QD8AP0AgYBFICNAI4ASkAuYBigDaAG4AOIAegBIgCdgFDgKRAXmAwYBkgDPoGsAayA4IB44EOREAYAQwA_AEiAJ2AUiAz4ZAHACGAEwARwBHAEnALzAZ8UgXAALAAqABkADkAHwAgABkADQAHkAQwBFACYAE8AKQAYgAzABzAD8AIYAUYApQBYgC3AGjAPwA_QCLQEcAR0AlIBcwC8gGKANoAbgA9ACLwEiAJOATsAocBeYDGAGSAMsAZ9A1gDWQHBAPHAhm.f_gAAAAAAsgA"
+            )
+            NetIdService.updatePermission(this.applicationContext, permission, true)
+        }
+    }
+
     private fun setupEndSessionButton() {
         binding.activityMainButtonEndSession.setOnClickListener {
             it.isEnabled = false
@@ -95,12 +114,15 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
             serviceState == ServiceState.InitializationSuccessful || serviceState == ServiceState.AuthorizationFailed
         val isAuthorized =
             serviceState == ServiceState.AuthorizationSuccessful || serviceState == ServiceState.UserInfoFailed
-                    || serviceState == ServiceState.UserInfoSuccessful
+                    || serviceState == ServiceState.UserInfoSuccessful || serviceState == ServiceState.PermissionWriteSuccessful || serviceState == ServiceState.PermissionWriteFailed
+                    || serviceState == ServiceState.PermissionReadFailed || serviceState == ServiceState.PermissionReadSuccessful
 
         binding.activityMainButtonInitialize.isEnabled = isUninitialized
         binding.activityMainButtonAuthorize.isEnabled = isNotAuthorized
         binding.activityMainButtonUserInfo.isEnabled = isAuthorized
         binding.activityMainButtonEndSession.isEnabled = isAuthorized
+        binding.activityMainButtonPermissionWrite.isEnabled = isAuthorized
+        binding.activityMainButtonPermissionRead.isEnabled = isAuthorized
 
         updateStateColorElements()
     }
@@ -201,5 +223,30 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         }
         updateElementsForServiceState()
         bottomDialogFragment.dismiss()
+    }
+
+    override fun onPermissionUpdateFinishedWithError(error: NetIdError) {
+        appendLog("Net ID service permission -update failed with error: ${error.code}")
+        serviceState = ServiceState.PermissionWriteFailed
+        updateElementsForServiceState()
+    }
+
+    override fun onPermissionFetchFinishedWithError(error: NetIdError) {
+        appendLog("Net ID service permission -fetch failed with error: ${error.code}")
+        serviceState = ServiceState.PermissionReadFailed
+        updateElementsForServiceState()
+    }
+
+    override fun onPermissionFetchFinished(permissions: Permissions) {
+        appendLog("Net ID service permission -fetch finished successfully: $permissions")
+        serviceState = ServiceState.PermissionReadSuccessful
+        updateElementsForServiceState()
+
+    }
+
+    override fun onPermissionUpdateFinished() {
+        appendLog("Net ID service permission -update finished successfully.")
+        serviceState = ServiceState.PermissionWriteSuccessful
+        updateElementsForServiceState()
     }
 }

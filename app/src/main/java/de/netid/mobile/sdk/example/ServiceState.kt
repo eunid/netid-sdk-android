@@ -7,5 +7,9 @@ enum class ServiceState {
     AuthorizationFailed,
     AuthorizationSuccessful,
     UserInfoFailed,
-    UserInfoSuccessful
+    UserInfoSuccessful,
+    PermissionReadFailed,
+    PermissionReadSuccessful,
+    PermissionWriteFailed,
+    PermissionWriteSuccessful
 }
