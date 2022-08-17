@@ -2,25 +2,26 @@ package de.netid.mobile.sdk.ui
 
 import android.app.Activity
 import android.content.Intent
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.widget.ListView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.databinding.FragmentAuthorizationBinding
+import de.netid.mobile.sdk.model.AppDetailsAndroid
+import de.netid.mobile.sdk.model.AppDetailsIOS
 import de.netid.mobile.sdk.model.AppIdentifier
+import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapter
+
 
 class AuthorizationFragment(
     private val listener: AuthorizationFragmentListener,
-    private val appIdentifiers: List<AppIdentifier>,
+    private val appIdentifiers: MutableList<AppIdentifier> = mutableListOf(),
     private val authorizationIntent: Intent
 ) : Fragment() {
     companion object {
@@ -60,8 +61,14 @@ class AuthorizationFragment(
 
     private fun setupStandardButtons() {
         binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
-            resultLauncher.launch(authorizationIntent)
-//            openApp("com.example.auth.app")
+            val adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter
+            if (adapter?.selectedPosition != -1) {
+                adapter?.getItem(adapter.selectedPosition)?.android?.applicationId?.let { application ->
+                    openApp(application)
+                }
+            } else {
+                resultLauncher.launch(authorizationIntent)
+            }
         }
 
         binding.fragmentAuthorizationButtonClose.setOnClickListener {
@@ -70,29 +77,9 @@ class AuthorizationFragment(
     }
 
     private fun setupAppButtons() {
-        appIdentifiers.forEachIndexed { index, appIdentifier ->
-            val appButton = MaterialButton(requireContext(), null, com.google.android.material.R.attr.borderlessButtonStyle)
-            appButton.text = appIdentifier.name
-            appButton.setTextColor(Color.parseColor(appIdentifier.foregroundColor))
-            appButton.isAllCaps = false
-            appButton.typeface = ResourcesCompat.getFont(requireContext(), R.font.roboto_medium)
-            appButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.authorization_button_text_size))
-            appButton.setCornerRadiusResource(R.dimen.authorization_button_corner_radius)
-            appButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(appIdentifier.backgroundColor))
-
-            val letterSpacingValue = TypedValue()
-            resources.getValue(R.dimen.authorization_button_letter_spacing, letterSpacingValue, true)
-            appButton.letterSpacing = letterSpacingValue.float
-
-            val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-            appButton.layoutParams = layoutParams
-
-            appButton.setOnClickListener {
-                listener.onAppButtonClicked(appIdentifier)
-            }
-
-            binding.fragmentAuthorizationButtonContainerLayout.addView(appButton, index)
-        }
+        val listView: ListView = binding.fragmentAuthorizationAppCellContainer
+        val listAdapter = context?.let { AuthorizationAppListAdapter(it, appIdentifiers) }
+        listView.adapter = listAdapter
     }
 
     override fun onDestroyView() {
