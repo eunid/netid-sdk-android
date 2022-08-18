@@ -24,7 +24,7 @@ import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapter
 import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapterListener
 
 
-class AuthorizationFragment(
+class AuthorizationSoftFragment(
     private val listener: AuthorizationFragmentListener,
     private val appIdentifiers: MutableList<AppIdentifier> = mutableListOf(),
     private val authorizationIntent: Intent
@@ -90,7 +90,7 @@ class AuthorizationFragment(
                 getString(R.string.authorization_legal_info, appIdentifiers[0].name, "")
             return
         }
-        if (appIdentifiers.size >= 1){
+        if (appIdentifiers.size >= 1) {
             binding.fragmentAuthorizationLegalInfoTextView.text =
                 getString(R.string.authorization_legal_info, appIdentifiers[0].name, chooseString)
         } else {

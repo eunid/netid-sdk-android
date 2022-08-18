@@ -27,4 +27,6 @@ interface NetIdServiceListener {
     fun onPermissionFetchFinished(permissions: Permissions)
 
     fun onPermissionUpdateFinished()
+
+    fun onTransmittedInvalidToken()
 }

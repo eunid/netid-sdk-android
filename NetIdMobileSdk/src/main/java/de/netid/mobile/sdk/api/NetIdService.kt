@@ -14,13 +14,13 @@ import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.UserInfo
 import de.netid.mobile.sdk.permission.PermissionManager
 import de.netid.mobile.sdk.permission.PermissionManagerListener
-import de.netid.mobile.sdk.ui.AuthorizationFragment
+import de.netid.mobile.sdk.ui.AuthorizationSoftFragment
 import de.netid.mobile.sdk.ui.AuthorizationFragmentListener
 import de.netid.mobile.sdk.userinfo.UserInfoManager
 import de.netid.mobile.sdk.userinfo.UserInfoManagerListener
 import de.netid.mobile.sdk.util.JsonUtil
-import de.netid.mobile.sdk.util.PackageUtil
 import de.netid.mobile.sdk.util.ReachabilityUtil
+import de.netid.mobile.sdk.util.TokenUtil
 
 object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         UserInfoManagerListener, PermissionManagerListener {
@@ -57,6 +57,16 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
+    fun transmitToken(token: String) {
+        if (TokenUtil.isValidJwtToken(token)){
+            appAuthManager.setIdToken(token)
+        } else {
+            for (item in netIdServiceListeners) {
+                item.onTransmittedInvalidToken()
+            }
+        }
+    }
+
     fun getAuthorizationFragment(activity: Activity): Fragment? {
         checkAvailableNetIdApplications(activity)
         netIdConfig?.let { config ->
@@ -65,7 +75,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                     config.redirectUri,
                     activity
             )?.let {
-                AuthorizationFragment(
+                AuthorizationSoftFragment(
                         this, availableAppIdentifiers, it
                 )
             }
