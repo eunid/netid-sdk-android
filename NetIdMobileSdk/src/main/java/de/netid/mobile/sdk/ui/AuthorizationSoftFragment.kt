@@ -67,14 +67,15 @@ class AuthorizationSoftFragment(
 
     private fun setupStandardButtons() {
         binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
-            val adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter
-            if (adapter?.selectedPosition != -1) {
-                adapter?.getItem(adapter.selectedPosition)?.android?.applicationId?.let { application ->
-                    openApp(application)
-                }
-            } else {
+            //TODO reactivate once app2app is working
+//            val adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter
+//            if (adapter?.selectedPosition != -1) {
+//                adapter?.getItem(adapter.selectedPosition)?.android?.applicationId?.let { application ->
+//                    openApp(application)
+//                }
+//            } else {
                 resultLauncher.launch(authorizationIntent)
-            }
+//            }
         }
 
         binding.fragmentAuthorizationButtonClose.setOnClickListener {
