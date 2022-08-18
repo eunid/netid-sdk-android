@@ -13,9 +13,13 @@ import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.model.AppIdentifier
 
 
-class AuthorizationAppListAdapter(val context: Context, private val items: List<AppIdentifier>) : BaseAdapter() {
+class AuthorizationAppListAdapter(
+    val context: Context,
+    private val items: List<AppIdentifier>,
+) : BaseAdapter() {
     private val layoutInflater = LayoutInflater.from(context)
-    var selectedPosition: Int = -1
+    var selectedPosition: Int = 0
+    var listener: AuthorizationAppListAdapterListener? = null
 
     override fun getCount(): Int {
         return items.size
@@ -49,6 +53,7 @@ class AuthorizationAppListAdapter(val context: Context, private val items: List<
         viewHolder.itemRadioButton.setOnCheckedChangeListener { _, isEnabled ->
             if (isEnabled) {
                 selectedPosition = position
+                listener?.onAppSelected(items[position].name)
                 notifyDataSetChanged()
             }
         }
