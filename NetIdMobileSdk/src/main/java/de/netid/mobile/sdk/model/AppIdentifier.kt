@@ -9,6 +9,7 @@ data class AppIdentifier(
     val backgroundColor: String,
     val foregroundColor: String,
     val icon: String,
+    val typeFaceIcon: String,
     val iOS: AppDetailsIOS,
     val android: AppDetailsAndroid,
 )

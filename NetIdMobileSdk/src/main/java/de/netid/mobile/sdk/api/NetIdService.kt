@@ -14,16 +14,18 @@ import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.UserInfo
 import de.netid.mobile.sdk.permission.PermissionManager
 import de.netid.mobile.sdk.permission.PermissionManagerListener
-import de.netid.mobile.sdk.ui.AuthorizationSoftFragment
 import de.netid.mobile.sdk.ui.AuthorizationFragmentListener
+import de.netid.mobile.sdk.ui.AuthorizationHardFragment
+import de.netid.mobile.sdk.ui.AuthorizationSoftFragment
 import de.netid.mobile.sdk.userinfo.UserInfoManager
 import de.netid.mobile.sdk.userinfo.UserInfoManagerListener
 import de.netid.mobile.sdk.util.JsonUtil
+import de.netid.mobile.sdk.util.PackageUtil
 import de.netid.mobile.sdk.util.ReachabilityUtil
 import de.netid.mobile.sdk.util.TokenUtil
 
 object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
-        UserInfoManagerListener, PermissionManagerListener {
+    UserInfoManagerListener, PermissionManagerListener {
 
     private const val appIdentifierFilename = "netIdAppIdentifiers.json"
     private var netIdConfig: NetIdConfig? = null
@@ -58,7 +60,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     }
 
     fun transmitToken(token: String) {
-        if (TokenUtil.isValidJwtToken(token)){
+        if (TokenUtil.isValidJwtToken(token)) {
             appAuthManager.setIdToken(token)
         } else {
             for (item in netIdServiceListeners) {
@@ -67,17 +69,25 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
-    fun getAuthorizationFragment(activity: Activity): Fragment? {
+    fun getAuthorizationFragment(activity: Activity, authFlow: NetIdAuthFlow): Fragment? {
         checkAvailableNetIdApplications(activity)
+
         netIdConfig?.let { config ->
             return appAuthManager.getWebAuthorizationIntent(
-                    config.clientId,
-                    config.redirectUri,
-                    activity
+                config.clientId,
+                config.redirectUri,
+                activity
             )?.let {
-                AuthorizationSoftFragment(
-                        this, availableAppIdentifiers, it
-                )
+                when (authFlow) {
+                    NetIdAuthFlow.Hard ->
+                        AuthorizationHardFragment(
+                            this, availableAppIdentifiers, it
+                        )
+                    NetIdAuthFlow.Soft ->
+                        AuthorizationSoftFragment(
+                            this, availableAppIdentifiers, it
+                        )
+                }
             }
         }
         //TODO optimise error handling
@@ -180,8 +190,8 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     private fun checkAvailableNetIdApplications(context: Context) {
         availableAppIdentifiers.clear()
         val appIdentifiers = JsonUtil.loadAppIdentifiers(appIdentifierFilename, context)
-//        val installedAppIdentifiers = PackageUtil.getInstalledPackages(appIdentifiers, context.packageManager)
-        availableAppIdentifiers.addAll(appIdentifiers)
+        val installedAppIdentifiers = PackageUtil.getInstalledPackages(appIdentifiers, context.packageManager)
+        availableAppIdentifiers.addAll(installedAppIdentifiers)
     }
 
 // AppAuthManagerListener functions
@@ -224,10 +234,10 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         } ?: run {
             for (item in netIdServiceListeners) {
                 item.onAuthenticationFinishedWithError(
-                        NetIdError(
-                                NetIdErrorProcess.Authentication,
-                                NetIdErrorCode.Unknown
-                        )
+                    NetIdError(
+                        NetIdErrorProcess.Authentication,
+                        NetIdErrorCode.Unknown
+                    )
                 )
             }
         }
@@ -241,10 +251,10 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         Log.i(javaClass.simpleName, "NetId Service close authentication")
         for (item in netIdServiceListeners) {
             item.onAuthenticationCanceled(
-                    NetIdError(
-                            NetIdErrorProcess.Authentication,
-                            NetIdErrorCode.AuthorizationCanceledByUser
-                    )
+                NetIdError(
+                    NetIdErrorProcess.Authentication,
+                    NetIdErrorCode.AuthorizationCanceledByUser
+                )
             )
         }
     }

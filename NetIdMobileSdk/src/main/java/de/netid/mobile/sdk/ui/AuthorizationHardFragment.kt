@@ -12,10 +12,11 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
-import de.netid.mobile.sdk.databinding.FragmentAuthorizationSoftBinding
+import de.netid.mobile.sdk.databinding.FragmentAuthorizationHardBinding
 import de.netid.mobile.sdk.model.AppIdentifier
 
 class AuthorizationHardFragment(
@@ -27,7 +28,7 @@ class AuthorizationHardFragment(
         private const val netIdScheme = "scheme"
     }
 
-    private var _binding: FragmentAuthorizationSoftBinding? = null
+    private var _binding: FragmentAuthorizationHardBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
@@ -47,7 +48,7 @@ class AuthorizationHardFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentAuthorizationSoftBinding.inflate(inflater, container, false)
+        _binding = FragmentAuthorizationHardBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -59,20 +60,40 @@ class AuthorizationHardFragment(
     }
 
     private fun setupStandardButtons() {
-        binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
-            resultLauncher.launch(authorizationIntent)
-//            openApp("com.example.auth.app")
+        var currentAppName = "App"
+        if (context?.applicationInfo?.name.toString() == "NULL") {
+            currentAppName = context?.applicationInfo?.name.toString()
         }
-
+        val continueString = getString(R.string.authorization_hard_continue, currentAppName)
+        binding.fragmentAuthorizationButtonClose.text = continueString.uppercase()
         binding.fragmentAuthorizationButtonClose.setOnClickListener {
             listener.onCloseClicked()
         }
     }
 
     private fun setupAppButtons() {
+        if (appIdentifiers.size == 1) {
+            context?.let { context ->
+                val resourceId =
+                    context.resources?.getIdentifier(appIdentifiers[0].typeFaceIcon, "drawable", context.opPackageName)
+                binding.fragmentAuthorizationBrandLogoImageView.setImageDrawable(
+                    resourceId?.let {
+                        ResourcesCompat.getDrawable(
+                            context.resources,
+                            it,
+                            null
+                        )
+                    }
+                )
+            }
+        } else {
+            binding.fragmentAuthorizationBrandLogoImageView.isVisible = false
+        }
+
         appIdentifiers.forEachIndexed { index, appIdentifier ->
             val appButton = MaterialButton(requireContext(), null, com.google.android.material.R.attr.borderlessButtonStyle)
-            appButton.text = appIdentifier.name
+            val continueString = getString(R.string.authorization_hard_continue, appIdentifier.name)
+            appButton.text = continueString.uppercase()
             appButton.setTextColor(Color.parseColor(appIdentifier.foregroundColor))
             appButton.isAllCaps = false
             appButton.typeface = ResourcesCompat.getFont(requireContext(), R.font.roboto_medium)
@@ -88,7 +109,9 @@ class AuthorizationHardFragment(
             appButton.layoutParams = layoutParams
 
             appButton.setOnClickListener {
-                listener.onAppButtonClicked(appIdentifier)
+                resultLauncher.launch(authorizationIntent)
+                //TODO reactivate once app2app flow is ready to use
+//                listener.onAppButtonClicked(appIdentifier)
             }
 
             binding.fragmentAuthorizationButtonContainerLayout.addView(appButton, index)
