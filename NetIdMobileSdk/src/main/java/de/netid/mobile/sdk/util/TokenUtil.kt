@@ -29,5 +29,9 @@ class TokenUtil {
                 return permissions?.get(accessTokenKey) as? String
             }
         }
+
+        fun isValidJwtToken(token: String): Boolean {
+            return decode(token).size == 3
+        }
     }
 }

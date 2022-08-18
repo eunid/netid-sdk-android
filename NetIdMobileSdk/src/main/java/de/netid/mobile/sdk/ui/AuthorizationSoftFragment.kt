@@ -24,7 +24,7 @@ import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapter
 import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapterListener
 
 
-class AuthorizationFragment(
+class AuthorizationSoftFragment(
     private val listener: AuthorizationFragmentListener,
     private val appIdentifiers: MutableList<AppIdentifier> = mutableListOf(),
     private val authorizationIntent: Intent
@@ -67,14 +67,15 @@ class AuthorizationFragment(
 
     private fun setupStandardButtons() {
         binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
-            val adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter
-            if (adapter?.selectedPosition != -1) {
-                adapter?.getItem(adapter.selectedPosition)?.android?.applicationId?.let { application ->
-                    openApp(application)
-                }
-            } else {
+            //TODO reactivate once app2app is working
+//            val adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter
+//            if (adapter?.selectedPosition != -1) {
+//                adapter?.getItem(adapter.selectedPosition)?.android?.applicationId?.let { application ->
+//                    openApp(application)
+//                }
+//            } else {
                 resultLauncher.launch(authorizationIntent)
-            }
+//            }
         }
 
         binding.fragmentAuthorizationButtonClose.setOnClickListener {
@@ -90,7 +91,7 @@ class AuthorizationFragment(
                 getString(R.string.authorization_legal_info, appIdentifiers[0].name, "")
             return
         }
-        if (appIdentifiers.size >= 1){
+        if (appIdentifiers.size >= 1) {
             binding.fragmentAuthorizationLegalInfoTextView.text =
                 getString(R.string.authorization_legal_info, appIdentifiers[0].name, chooseString)
         } else {

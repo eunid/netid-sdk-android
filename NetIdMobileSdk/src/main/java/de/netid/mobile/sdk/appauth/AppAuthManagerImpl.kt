@@ -28,13 +28,18 @@ class AppAuthManagerImpl : AppAuthManager {
     private var authorizationServiceConfiguration: AuthorizationServiceConfiguration? = null
     private var authState: AuthState? = null
     private var authService: AuthorizationService? = null
+    private var idToken: String? = null
 
     override fun getAccessToken(): String? {
         return authState?.accessToken
     }
 
     override fun getIdToken(): String? {
-        return authState?.idToken
+        return idToken
+    }
+
+    override fun setIdToken(token: String) {
+        idToken = token
     }
 
     override fun getPermissionToken(): String? {
@@ -117,6 +122,7 @@ class AppAuthManagerImpl : AppAuthManager {
             } ?: run {
                 response?.let { tokenResponse ->
                     Log.i(javaClass.simpleName, "Received token response: ${tokenResponse.accessToken}")
+                    idToken = tokenResponse.idToken
                     listener?.onAuthorizationSuccessful()
                 }
             }

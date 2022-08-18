@@ -21,5 +21,7 @@ interface AppAuthManager {
 
     fun getPermissionToken(): String?
 
+    fun setIdToken(token: String)
+
     fun getIdToken(): String?
 }
