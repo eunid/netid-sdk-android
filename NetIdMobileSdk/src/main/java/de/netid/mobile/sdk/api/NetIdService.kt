@@ -244,7 +244,14 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     }
 
     override fun onAuthenticationFailed() {
-        TODO("Not yet implemented")
+        for (item in netIdServiceListeners) {
+            item.onAuthenticationCanceled(
+                NetIdError(
+                    NetIdErrorProcess.Authentication,
+                    NetIdErrorCode.AuthorizationCanceledByUser
+                )
+            )
+        }
     }
 
     override fun onCloseClicked() {
