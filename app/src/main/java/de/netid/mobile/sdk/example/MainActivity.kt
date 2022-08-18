@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
                 bottomDialogFragment.sdkContentFragment = NetIdService.getAuthorizationFragment(this, NetIdAuthFlow.Soft)
                 bottomDialogFragment.show(supportFragmentManager, null)
             }
-            builder.setNegativeButton(R.string.net_id_service_login_hard) { _, _ ->
+            builder.setNeutralButton(R.string.net_id_service_login_hard) { _, _ ->
                 bottomDialogFragment.sdkContentFragment = NetIdService.getAuthorizationFragment(this, NetIdAuthFlow.Hard)
                 bottomDialogFragment.show(supportFragmentManager, null)
             }
