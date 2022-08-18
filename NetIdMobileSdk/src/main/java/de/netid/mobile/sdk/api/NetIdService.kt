@@ -170,8 +170,8 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     private fun checkAvailableNetIdApplications(context: Context) {
         availableAppIdentifiers.clear()
         val appIdentifiers = JsonUtil.loadAppIdentifiers(appIdentifierFilename, context)
-        val installedAppIdentifiers = PackageUtil.getInstalledPackages(appIdentifiers, context.packageManager)
-        availableAppIdentifiers.addAll(installedAppIdentifiers)
+//        val installedAppIdentifiers = PackageUtil.getInstalledPackages(appIdentifiers, context.packageManager)
+        availableAppIdentifiers.addAll(appIdentifiers)
     }
 
 // AppAuthManagerListener functions
