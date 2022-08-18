@@ -61,9 +61,19 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     private fun setupAuthorizeButton() {
         binding.activityMainButtonAuthorize.setOnClickListener {
             it.isEnabled = false
+
+            val builder = AlertDialog.Builder(this)
             bottomDialogFragment = SdkContentBottomDialogFragment()
-            bottomDialogFragment.sdkContentFragment = NetIdService.getAuthorizationFragment(this)
-            bottomDialogFragment.show(supportFragmentManager, null)
+            builder.setTitle(R.string.net_id_service_choose_auth_way)
+            builder.setPositiveButton(R.string.net_id_service_login_soft) { _, _ ->
+                bottomDialogFragment.sdkContentFragment = NetIdService.getAuthorizationFragment(this, NetIdAuthFlow.Soft)
+                bottomDialogFragment.show(supportFragmentManager, null)
+            }
+            builder.setNeutralButton(R.string.net_id_service_login_hard) { _, _ ->
+                bottomDialogFragment.sdkContentFragment = NetIdService.getAuthorizationFragment(this, NetIdAuthFlow.Hard)
+                bottomDialogFragment.show(supportFragmentManager, null)
+            }
+            builder.show()
         }
     }
 
@@ -248,5 +258,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         appendLog("Net ID service permission -update finished successfully.")
         serviceState = ServiceState.PermissionWriteSuccessful
         updateElementsForServiceState()
+    }
+
+    override fun onTransmittedInvalidToken() {
+        appendLog("Net ID service token transmit failed.")
     }
 }

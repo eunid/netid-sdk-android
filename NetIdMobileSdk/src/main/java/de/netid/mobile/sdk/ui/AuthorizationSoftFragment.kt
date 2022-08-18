@@ -18,7 +18,7 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import de.netid.mobile.sdk.R
-import de.netid.mobile.sdk.databinding.FragmentAuthorizationBinding
+import de.netid.mobile.sdk.databinding.FragmentAuthorizationSoftBinding
 import de.netid.mobile.sdk.model.AppIdentifier
 import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapter
 import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapterListener
@@ -33,7 +33,7 @@ class AuthorizationSoftFragment(
         private const val netIdScheme = "scheme"
     }
 
-    private var _binding: FragmentAuthorizationBinding? = null
+    private var _binding: FragmentAuthorizationSoftBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
@@ -53,7 +53,7 @@ class AuthorizationSoftFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentAuthorizationBinding.inflate(inflater, container, false)
+        _binding = FragmentAuthorizationSoftBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -66,6 +66,7 @@ class AuthorizationSoftFragment(
     }
 
     private fun setupStandardButtons() {
+        binding.fragmentAuthorizationButtonAgreeAndContinue.text = getString(R.string.authorization_soft_agree_and_continue_with_net_id).uppercase()
         binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
             //TODO reactivate once app2app is working
 //            val adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter
@@ -77,26 +78,26 @@ class AuthorizationSoftFragment(
                 resultLauncher.launch(authorizationIntent)
 //            }
         }
-
+        binding.fragmentAuthorizationButtonClose.text = getString(R.string.authorization_soft_close).uppercase()
         binding.fragmentAuthorizationButtonClose.setOnClickListener {
             listener.onCloseClicked()
         }
     }
 
     private fun setupAppButtons() {
-        val netIdString = getString(R.string.authorization_net_id)
-        val chooseString = getString(R.string.authorization_choose_partner)
+        val netIdString = getString(R.string.authorization_soft_net_id)
+        val chooseString = getString(R.string.authorization_soft_choose_partner)
         if (appIdentifiers.size == 1) {
             binding.fragmentAuthorizationLegalInfoTextView.text =
-                getString(R.string.authorization_legal_info, appIdentifiers[0].name, "")
+                getString(R.string.authorization_soft_legal_info, appIdentifiers[0].name, "")
             return
         }
         if (appIdentifiers.size >= 1) {
             binding.fragmentAuthorizationLegalInfoTextView.text =
-                getString(R.string.authorization_legal_info, appIdentifiers[0].name, chooseString)
+                getString(R.string.authorization_soft_legal_info, appIdentifiers[0].name, chooseString)
         } else {
             binding.fragmentAuthorizationLegalInfoTextView.text =
-                getString(R.string.authorization_legal_info, netIdString, chooseString)
+                getString(R.string.authorization_soft_legal_info, netIdString, chooseString)
         }
         binding.fragmentAuthorizationLegalInfoTextView.makeLinks(
             Pair(chooseString, View.OnClickListener {
@@ -148,8 +149,8 @@ class AuthorizationSoftFragment(
     }
 
     override fun onAppSelected(name: String) {
-        val chooseString = getString(R.string.authorization_choose_partner)
+        val chooseString = getString(R.string.authorization_soft_choose_partner)
         binding.fragmentAuthorizationLegalInfoTextView.text =
-            getString(R.string.authorization_legal_info, name, chooseString)
+            getString(R.string.authorization_soft_legal_info, name, chooseString)
     }
 }
