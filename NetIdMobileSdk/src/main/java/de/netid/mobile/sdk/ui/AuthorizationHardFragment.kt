@@ -15,7 +15,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
-import de.netid.mobile.sdk.databinding.FragmentAuthorizationBinding
+import de.netid.mobile.sdk.databinding.FragmentAuthorizationSoftBinding
 import de.netid.mobile.sdk.model.AppIdentifier
 
 class AuthorizationHardFragment(
@@ -27,7 +27,7 @@ class AuthorizationHardFragment(
         private const val netIdScheme = "scheme"
     }
 
-    private var _binding: FragmentAuthorizationBinding? = null
+    private var _binding: FragmentAuthorizationSoftBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
@@ -47,7 +47,7 @@ class AuthorizationHardFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentAuthorizationBinding.inflate(inflater, container, false)
+        _binding = FragmentAuthorizationSoftBinding.inflate(inflater, container, false)
         return binding.root
     }
 
