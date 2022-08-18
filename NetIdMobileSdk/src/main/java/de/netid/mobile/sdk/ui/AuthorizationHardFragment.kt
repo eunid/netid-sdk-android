@@ -61,7 +61,7 @@ class AuthorizationHardFragment(
 
     private fun setupStandardButtons() {
         var currentAppName = "App"
-        if (context?.applicationInfo?.name.toString() != "NULL") {
+        if (context?.applicationInfo?.name.toString().uppercase() != "NULL") {
             currentAppName = context?.applicationInfo?.name.toString()
         }
         val continueString = getString(R.string.authorization_hard_continue, currentAppName)

@@ -14,7 +14,21 @@
       "android": {
         "applicationId": "de.gmx.mobile.android.mail"
       }
-
+    },
+    {
+      "id": 2,
+      "name": "WEB.DE",
+      "backgroundColor": "#FFFFD800",
+      "foregroundColor": "#FF212121",
+      "icon": "logo_web_de",
+      "typeFaceIcon": "typeface_webde",
+      "iOS": {
+        "bundleIdentifier": "de.web.mobile.ios.mail",
+        "scheme": "webdemail"
+      },
+      "android": {
+        "applicationId": "de.web.mobile.android.mail"
+      }
     }
   ]
 }
