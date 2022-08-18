@@ -12,7 +12,7 @@
     <string name="net_id_service_logs">Logs:\n\n</string>
     <string name="net_id_service_login_soft">Soft-Login</string>
     <string name="net_id_service_login_hard">Hard-Login</string>
-    <string name="net_id_service_choose_auth_way">Bitte wähle Deinen Authentifizierungsprozess.</string>
+    <string name="net_id_service_choose_auth_way">Bitte wähle Deinen Authorisierungsprozess.</string>
     <string name="network_error_alert_title">Netzwerkfehler</string>
     <string name="network_error_alert_description">Bitte stelle sicher, dass eine Netzwerkverbindung besteht.</string>
     <string name="network_error_alert_action">Verstanden</string>
