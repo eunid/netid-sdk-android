@@ -1,5 +1,11 @@
+code_analysis:
+  danger:
+    # Override the credentials from where to get the user api token to access your git hosting platform
+    # As we use gitlab.com in this project, we switch to those credentials
+    credentials_id: jenkins-github-token-for-netid
 android:
-  publications:
-    - publication: release
-      repository: maven
-      branch: develop
+  release:
+    - build_type: release
+      branch: master
+      apk: true
+  legacy_plugin: true
