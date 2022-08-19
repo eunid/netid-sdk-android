@@ -95,18 +95,18 @@ class AuthorizationSoftFragment(
         if (appIdentifiers.size >= 1) {
             binding.fragmentAuthorizationLegalInfoTextView.text =
                 getString(R.string.authorization_soft_legal_info, appIdentifiers[0].name, chooseString)
+            binding.fragmentAuthorizationLegalInfoTextView.makeLinks(
+                Pair(chooseString, View.OnClickListener {
+                    val listView: ListView = binding.fragmentAuthorizationAppCellContainer
+                    val listAdapter = context?.let { AuthorizationAppListAdapter(it, appIdentifiers) }
+                    listAdapter?.listener = this
+                    listView.adapter = listAdapter
+                }),
+            )
         } else {
             binding.fragmentAuthorizationLegalInfoTextView.text =
-                getString(R.string.authorization_soft_legal_info, netIdString, chooseString)
+                getString(R.string.authorization_soft_legal_info, netIdString, "")
         }
-        binding.fragmentAuthorizationLegalInfoTextView.makeLinks(
-            Pair(chooseString, View.OnClickListener {
-                val listView: ListView = binding.fragmentAuthorizationAppCellContainer
-                val listAdapter = context?.let { AuthorizationAppListAdapter(it, appIdentifiers) }
-                listAdapter?.listener = this
-                listView.adapter = listAdapter
-            }),
-        )
     }
 
     override fun onDestroyView() {
