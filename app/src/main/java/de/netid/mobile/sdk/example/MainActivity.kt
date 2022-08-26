@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     private fun setupNetIdConfig() {
-        netIdConfig = NetIdConfig(host, clientId, redirectUri)
+        netIdConfig = NetIdConfig(host, clientId, redirectUri, "", emptyMap())
         NetIdService.addListener(this)
     }
 
