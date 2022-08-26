@@ -11,3 +11,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AuthorizationView screen design alignment
 - API function to transmit a id token
 - Hard-Login flow implementation
+- Fixed UserInfo json parser error
