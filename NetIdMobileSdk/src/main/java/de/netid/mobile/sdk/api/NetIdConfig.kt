@@ -17,5 +17,7 @@ package de.netid.mobile.sdk.api
 data class NetIdConfig(
     val host: String,
     val clientId: String,
-    val redirectUri: String
+    val redirectUri: String,
+    val originUrlScheme: String,
+    val claims: Map<String, String>
 )

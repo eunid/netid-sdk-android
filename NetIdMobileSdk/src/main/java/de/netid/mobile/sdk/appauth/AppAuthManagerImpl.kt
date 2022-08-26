@@ -83,6 +83,7 @@ class AppAuthManagerImpl : AppAuthManager {
     override fun getWebAuthorizationIntent(
         clientId: String,
         redirectUri: String,
+        claims: Map<String, String>?,
         activity: Activity
     ): Intent? {
         authorizationServiceConfiguration?.let { serviceConfiguration ->
@@ -96,7 +97,7 @@ class AppAuthManagerImpl : AppAuthManager {
                     AuthorizationRequest.Scope.OPENID,
                     AuthorizationRequest.Scope.PROFILE,
                     scopePermissionManagement
-                )
+                ).setAdditionalParameters(claims)
             val authRequest = authRequestBuilder.build()
 
             authService = AuthorizationService(activity)

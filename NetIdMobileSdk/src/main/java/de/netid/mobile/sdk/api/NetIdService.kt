@@ -90,6 +90,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             return appAuthManager.getWebAuthorizationIntent(
                 config.clientId,
                 config.redirectUri,
+                config.claims,
                 activity
             )?.let {
                 when (authFlow) {

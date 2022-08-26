@@ -26,6 +26,7 @@ interface AppAuthManager {
     fun getWebAuthorizationIntent(
         clientId: String,
         redirectUri: String,
+        claims: Map<String, String>?,
         activity: Activity
     ): Intent?
 
