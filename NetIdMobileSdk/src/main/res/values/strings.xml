@@ -18,6 +18,6 @@
 
 
     <!-- Content descriptions -->
-    <string name="authorization_logo_content_description">NetID logo</string>
+    <string name="authorization_logo_content_description">netID logo</string>
     <string name="authorization_cell_use_app_text">%1$s verwenden</string>
 </resources>

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">NetIdMobileSdk-App</string>
 
-    <string name="net_id_service">NetID Service</string>
+    <string name="net_id_service">netID Service</string>
     <string name="net_id_service_permission_title">Permission Management</string>
     <string name="net_id_service_initialize">SDK initialisieren</string>
     <string name="net_id_service_authorize">Authorisieren</string>
@@ -18,5 +18,5 @@
     <string name="network_error_alert_action">Verstanden</string>
 
     <!-- Content descriptions -->
-    <string name="service_logo_content_description">NetID logo</string>
+    <string name="service_logo_content_description">netID logo</string>
 </resources>
