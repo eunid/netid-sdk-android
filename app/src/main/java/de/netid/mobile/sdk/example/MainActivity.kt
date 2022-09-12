@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     private fun setupEndSessionButton() {
         binding.activityMainButtonEndSession.setOnClickListener {
             it.isEnabled = false
-            appendLog("Net ID service session finished successfully")
+            appendLog("netID service session finished successfully")
             serviceState = ServiceState.InitializationSuccessful
             updateElementsForServiceState()
         }
@@ -181,47 +181,47 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
     override fun onInitializationFinishedWithError(error: NetIdError?) {
         error?.let {
-            appendLog("Net ID service initialization failed: ${it.code}, ${it.process}")
+            appendLog("netID service initialization failed: ${it.code}, ${it.process}")
             serviceState = ServiceState.InitializationFailed
         } ?: run {
-            appendLog("Net ID service initialized successfully")
+            appendLog("netID service initialized successfully")
             serviceState = ServiceState.InitializationSuccessful
         }
         updateElementsForServiceState()
     }
 
     override fun onAuthenticationFinished(accessToken: String) {
-        appendLog("Net ID service authorized successfully\nAccess Token:\n$accessToken")
+        appendLog("netID service authorized successfully\nAccess Token:\n$accessToken")
         serviceState = ServiceState.AuthorizationSuccessful
         bottomDialogFragment.dismiss()
         updateElementsForServiceState()
     }
 
     override fun onAuthenticationFinishedWithError(error: NetIdError) {
-        appendLog("Net ID service authorization failed: ${error.code}, ${error.process}")
+        appendLog("netID service authorization failed: ${error.code}, ${error.process}")
         serviceState = ServiceState.AuthorizationFailed
         updateElementsForServiceState()
         bottomDialogFragment.dismiss()
     }
 
     override fun onUserInfoFinished(userInfo: UserInfo) {
-        appendLog("Net ID service user info -fetch finished successfully: $userInfo")
+        appendLog("netID service user info -fetch finished successfully: $userInfo")
         serviceState = ServiceState.UserInfoSuccessful
         updateElementsForServiceState()
     }
 
     override fun onUserInfoFetchedWithError(error: NetIdError) {
-        appendLog("Net ID service user info failed: ${error.code}, ${error.process}")
+        appendLog("netID service user info failed: ${error.code}, ${error.process}")
         serviceState = ServiceState.UserInfoFailed
         updateElementsForServiceState()
     }
 
     override fun onSessionEnd() {
-        appendLog("Net ID service session end")
+        appendLog("netID service session end")
     }
 
     override fun onEncounteredNetworkError(error: NetIdError) {
-        appendLog("Net ID service user info failed: ${error.code}, ${error.process}")
+        appendLog("netID service user info failed: ${error.code}, ${error.process}")
         val builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.network_error_alert_title)
         builder.setMessage(R.string.network_error_alert_description)
@@ -238,7 +238,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     override fun onAuthenticationCanceled(error: NetIdError) {
-        appendLog("Net ID service user canceled authentication in process: ${error.process}")
+        appendLog("netID service user canceled authentication in process: ${error.process}")
         serviceState = when (error.process) {
             NetIdErrorProcess.Configuration -> ServiceState.InitializationFailed
             NetIdErrorProcess.Authentication -> ServiceState.AuthorizationFailed
@@ -250,31 +250,31 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     override fun onPermissionUpdateFinishedWithError(error: NetIdError) {
-        appendLog("Net ID service permission -update failed with error: ${error.code}")
+        appendLog("netID service permission -update failed with error: ${error.code}")
         serviceState = ServiceState.PermissionWriteFailed
         updateElementsForServiceState()
     }
 
     override fun onPermissionFetchFinishedWithError(error: NetIdError) {
-        appendLog("Net ID service permission -fetch failed with error: ${error.code}")
+        appendLog("netID service permission -fetch failed with error: ${error.code}")
         serviceState = ServiceState.PermissionReadFailed
         updateElementsForServiceState()
     }
 
     override fun onPermissionFetchFinished(permissions: Permissions) {
-        appendLog("Net ID service permission -fetch finished successfully: $permissions")
+        appendLog("netID service permission -fetch finished successfully: $permissions")
         serviceState = ServiceState.PermissionReadSuccessful
         updateElementsForServiceState()
 
     }
 
     override fun onPermissionUpdateFinished() {
-        appendLog("Net ID service permission -update finished successfully.")
+        appendLog("netID service permission -update finished successfully.")
         serviceState = ServiceState.PermissionWriteSuccessful
         updateElementsForServiceState()
     }
 
     override fun onTransmittedInvalidToken() {
-        appendLog("Net ID service token transmit failed.")
+        appendLog("netID service token transmit failed.")
     }
 }

@@ -14,3 +14,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed UserInfo json parser error
 - Copyright 
 - Possibility to transfer claims via the sdk interface
+- Renamed NetID to net ID
