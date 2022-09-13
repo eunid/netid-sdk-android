@@ -15,16 +15,11 @@
 package de.netid.mobile.sdk.example
 
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import de.netid.mobile.sdk.api.*
-import de.netid.mobile.sdk.example.SdkContentBottomDialogFragment
 import de.netid.mobile.sdk.example.databinding.ActivityMainBinding
 import de.netid.mobile.sdk.model.Permissions
 import de.netid.mobile.sdk.model.UserInfo
@@ -58,6 +53,20 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         setupPermissionManagementButtons()
         setupEndSessionButton()
         updateElementsForServiceState()
+
+        // If we have a saved state then we can restore it now
+        if (savedInstanceState != null) {
+            val keys = savedInstanceState.keySet()
+
+            serviceState = savedInstanceState.getSerializable("serviceState") as ServiceState
+
+            updateElementsForServiceState()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putSerializable("serviceState", serviceState)
     }
 
     private fun setupNetIdConfig() {
