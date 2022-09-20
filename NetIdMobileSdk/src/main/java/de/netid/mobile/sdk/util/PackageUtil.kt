@@ -35,7 +35,7 @@ class PackageUtil {
         fun getInstalledPackages(appIdentifiers: List<AppIdentifier>, packageManager: PackageManager): List<AppIdentifier> {
             val installedAppIdentifiers = mutableListOf<AppIdentifier>()
             for (item in appIdentifiers) {
-                if (isPackageInstalled(item.android.applicationId, packageManager)) {
+                if (isPackageInstalled(item.android.applicationId, item.android.activityFilter, packageManager)) {
                     installedAppIdentifiers.add(item)
                 }
             }
@@ -44,16 +44,26 @@ class PackageUtil {
         }
 
         /**
-         * Checks, if a given package name is installed on the current device.
+         * Checks, if a given package name with a certain activity is installed on the current device.
          *
          * @param packageName the package name
+         * @param activityName the activity name
          * @param packageManager the [PackageManager] instance with which the check is processed
          *
          * @return `true`, if the application related to the given package name is installed; `false` otherwise
          */
-        private fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
+        private fun isPackageInstalled(packageName: String, activityName: String, packageManager: PackageManager): Boolean {
             return try {
-                packageManager.getPackageInfo(packageName, 0)
+                val info = packageManager.getPackageInfo(packageName, 0)
+                // Todo: Filter for specific activity
+                if (info.activities != null) {
+                    info.activities.forEach {
+                        if (it.packageName.equals(activityName)) {
+                            true
+                        }
+                    }
+                }
+                // Todo: Change this to false once we have agreed on an activity name
                 true
             } catch (exception: PackageManager.NameNotFoundException) {
                 false
