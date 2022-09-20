@@ -5,7 +5,7 @@ code_analysis:
     credentials_id: jenkins-github-token-for-netid
 android:
   release:
-    - build_type: production
+    - build_type: release
       branch: master
       play:
         enabled: false
