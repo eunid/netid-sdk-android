@@ -83,14 +83,14 @@ class AuthorizationSoftFragment(
         binding.fragmentAuthorizationButtonAgreeAndContinue.text = getString(R.string.authorization_soft_agree_and_continue_with_net_id).uppercase()
         binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
             //TODO reactivate once app2app is working
-//            val adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter
-//            if (adapter?.selectedPosition != -1) {
-//                adapter?.getItem(adapter.selectedPosition)?.android?.applicationId?.let { application ->
-//                    openApp(application)
-//                }
-//            } else {
+            val adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter
+            if ((adapter != null) && (adapter?.selectedPosition != -1)) {
+                adapter?.getItem(adapter.selectedPosition)?.android?.applicationId?.let { application ->
+                    openApp(application)
+                }
+            } else {
                 resultLauncher.launch(authorizationIntent)
-//            }
+            }
         }
         binding.fragmentAuthorizationButtonClose.text = getString(R.string.authorization_soft_close).uppercase()
         binding.fragmentAuthorizationButtonClose.setOnClickListener {

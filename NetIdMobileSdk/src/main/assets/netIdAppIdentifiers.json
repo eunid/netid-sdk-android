@@ -9,10 +9,13 @@
       "foregroundColor": "#FFFFFFFF",
       "iOS": {
         "bundleIdentifier": "de.gmx.mobile.ios.mail",
-        "scheme": "gmxmail"
+        "scheme": "gmxmail",
+        "universalLink": "https://sso.gmx.net/authorize-app2app"
       },
       "android": {
-        "applicationId": "de.gmx.mobile.android.mail"
+        "applicationId": "de.gmx.mobile.android.mail",
+        "verifiedAppLink": "https://sso.gmx.net/authorize-app2app",
+        "activityFilter": "de.gmx.mobile.android.mail.NetIdActivityV1"
       }
     },
     {
@@ -24,10 +27,13 @@
       "typeFaceIcon": "typeface_webde",
       "iOS": {
         "bundleIdentifier": "de.web.mobile.ios.mail",
-        "scheme": "webdemail"
+        "scheme": "webdemail",
+        "universalLink": "https://sso.web.de/authorize-app2app"
       },
       "android": {
-        "applicationId": "de.web.mobile.android.mail"
+        "applicationId": "de.web.mobile.android.mail",
+        "verifiedAppLink": "https://sso.web.de/authorize-app2app",
+        "activityFilter": "de.web.mobile.android.mail.NetIdActivityV1"
       }
     }
   ]
