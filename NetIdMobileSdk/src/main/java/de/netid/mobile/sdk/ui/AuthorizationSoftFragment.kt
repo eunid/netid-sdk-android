@@ -16,6 +16,7 @@ package de.netid.mobile.sdk.ui
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Selection
 import android.text.Spannable
@@ -86,8 +87,8 @@ class AuthorizationSoftFragment(
             if (adapter == null) adapter = context?.let { AuthorizationAppListAdapter(it, appIdentifiers) }
             if ((adapter != null) && (adapter?.selectedPosition != -1) && (appIdentifiers.size != 0)) {
                 println(adapter?.selectedPosition)
-                adapter?.getItem(adapter.selectedPosition)?.android?.applicationId?.let { application ->
-                    openApp(application)
+                adapter?.getItem(adapter.selectedPosition)?.android?.verifiedAppLink?.let { verifiedAppLink ->
+                    openApp(verifiedAppLink)
                 }
             } else {
                 resultLauncher.launch(authorizationIntent)
@@ -132,9 +133,9 @@ class AuthorizationSoftFragment(
         super.onDestroyView()
     }
 
-    private fun openApp(packageName: String) {
-        val intent = context?.packageManager?.getLaunchIntentForPackage(packageName)
-        intent?.putExtra(netIdScheme, context?.applicationInfo?.packageName)
+    private fun openApp(verifiedAppLink: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(verifiedAppLink))
+        intent?.putExtra(AuthorizationSoftFragment.netIdScheme, context?.applicationInfo?.packageName)
         intent.let {
             context?.startActivity(intent)
         }
