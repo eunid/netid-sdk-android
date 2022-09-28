@@ -18,6 +18,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -124,9 +125,8 @@ class AuthorizationHardFragment(
 
             appButton.setOnClickListener {
                 resultLauncher.launch(authorizationIntent)
-                //TODO reactivate once app2app flow is ready to use
                 listener.onAppButtonClicked(appIdentifier)
-                openApp(appIdentifier.android.applicationId)
+                openApp(appIdentifier.android.verifiedAppLink)
             }
 
             binding.fragmentAuthorizationButtonContainerLayout.addView(appButton, index)
@@ -138,16 +138,11 @@ class AuthorizationHardFragment(
         super.onDestroyView()
     }
 
-    private fun openApp(packageName: String) {
-        val intent = context?.packageManager?.getLaunchIntentForPackage(packageName)
+    private fun openApp(verifiedAppLink: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(verifiedAppLink))
         intent?.putExtra(netIdScheme, context?.applicationInfo?.packageName)
         intent.let {
             context?.startActivity(intent)
         }
-
-
-/*        val intent2 = Intent(Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
-            Uri.parse("package:${context.packageName}"))
-        context?.startActivity(intent2)*/
     }
 }

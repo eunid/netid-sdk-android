@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Renamed NetID to netID
+- Changed call for opening id app
 
 ### Fixed
 - Fixed UserInfo json parser error
