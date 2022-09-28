@@ -81,7 +81,6 @@ class AuthorizationSoftFragment(
     private fun setupStandardButtons() {
         binding.fragmentAuthorizationButtonAgreeAndContinue.text = getString(R.string.authorization_soft_agree_and_continue_with_net_id).uppercase()
         binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
-            //TODO reactivate once app2app is working
             var adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter
             // If we only have one app or the user did not make changes to the default, use the standard one.
             if (adapter == null) adapter = context?.let { AuthorizationAppListAdapter(it, appIdentifiers) }
