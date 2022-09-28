@@ -76,15 +76,17 @@ class AuthorizationSoftFragment(
 
         setupStandardButtons()
         setupAppButtons()
-
     }
 
     private fun setupStandardButtons() {
         binding.fragmentAuthorizationButtonAgreeAndContinue.text = getString(R.string.authorization_soft_agree_and_continue_with_net_id).uppercase()
         binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
             //TODO reactivate once app2app is working
-            val adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter
-            if ((adapter != null) && (adapter?.selectedPosition != -1)) {
+            var adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter
+            // If we only have one app or the user did not make changes to the default, use the standard one.
+            if (adapter == null) adapter = context?.let { AuthorizationAppListAdapter(it, appIdentifiers) }
+            if ((adapter != null) && (adapter?.selectedPosition != -1) && (appIdentifiers.size != 0)) {
+                println(adapter?.selectedPosition)
                 adapter?.getItem(adapter.selectedPosition)?.android?.applicationId?.let { application ->
                     openApp(application)
                 }
@@ -101,25 +103,28 @@ class AuthorizationSoftFragment(
     private fun setupAppButtons() {
         val netIdString = getString(R.string.authorization_soft_net_id)
         val chooseString = getString(R.string.authorization_soft_choose_partner)
-        if (appIdentifiers.size == 1) {
-            binding.fragmentAuthorizationLegalInfoTextView.text =
-                getString(R.string.authorization_soft_legal_info, appIdentifiers[0].name, "")
-            return
-        }
-        if (appIdentifiers.size >= 1) {
-            binding.fragmentAuthorizationLegalInfoTextView.text =
-                getString(R.string.authorization_soft_legal_info, appIdentifiers[0].name, chooseString)
-            binding.fragmentAuthorizationLegalInfoTextView.makeLinks(
-                Pair(chooseString, View.OnClickListener {
-                    val listView: ListView = binding.fragmentAuthorizationAppCellContainer
-                    val listAdapter = context?.let { AuthorizationAppListAdapter(it, appIdentifiers) }
-                    listAdapter?.listener = this
-                    listView.adapter = listAdapter
-                }),
-            )
-        } else {
-            binding.fragmentAuthorizationLegalInfoTextView.text =
+        when (appIdentifiers.size) {
+            0 -> binding.fragmentAuthorizationLegalInfoTextView.text =
                 getString(R.string.authorization_soft_legal_info, netIdString, "")
+            1 -> binding.fragmentAuthorizationLegalInfoTextView.text =
+                getString(R.string.authorization_soft_legal_info, appIdentifiers[0].name, "")
+            else -> {
+                binding.fragmentAuthorizationLegalInfoTextView.text =
+                    getString(
+                        R.string.authorization_soft_legal_info,
+                        appIdentifiers[0].name,
+                        chooseString
+                    )
+                binding.fragmentAuthorizationLegalInfoTextView.makeLinks(
+                    Pair(chooseString, View.OnClickListener {
+                        val listView: ListView = binding.fragmentAuthorizationAppCellContainer
+                        val listAdapter =
+                            context?.let { AuthorizationAppListAdapter(it, appIdentifiers) }
+                        listAdapter?.listener = this
+                        listView.adapter = listAdapter
+                    }),
+                )
+            }
         }
     }
 
@@ -152,10 +157,14 @@ class AuthorizationSoftFragment(
                 }
             }
             startIndexOfLink = this.text.toString().indexOf(link.first, startIndexOfLink + 1)
-            spannableString.setSpan(
-                clickableSpan, startIndexOfLink, startIndexOfLink + link.first.length,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
+            // We only need to add the link to the text, if we have more than one id app installed.
+            // Otherwise, we leave the text as it is.
+            if (startIndexOfLink != -1) {
+                spannableString.setSpan(
+                    clickableSpan, startIndexOfLink, startIndexOfLink + link.first.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
         }
         this.movementMethod =
             LinkMovementMethod.getInstance()

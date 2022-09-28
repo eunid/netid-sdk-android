@@ -88,6 +88,5 @@ class AuthorizationAppListAdapter(
         val itemName = view?.findViewById(R.id.netidAppCellTextView) as TextView
         val itemImage = view?.findViewById(R.id.netidAppCellImageView) as ImageView
         val itemRadioButton = view?.findViewById(R.id.netidAppCellRadioButton) as RadioButton
-
     }
 }
