@@ -59,12 +59,11 @@ class PackageUtil {
                 if (info.activities != null) {
                     info.activities.forEach {
                         if (it.name.equals(activityName)) {
-                                true
+                            return@isPackageInstalled true
                         }
                     }
                 }
-                // Todo: Change this to false once we have agreed on an activity name
-                true
+                false
             } catch (exception: PackageManager.NameNotFoundException) {
                 false
             }
