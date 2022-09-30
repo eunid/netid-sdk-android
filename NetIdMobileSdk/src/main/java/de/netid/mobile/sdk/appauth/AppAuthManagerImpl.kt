@@ -89,13 +89,14 @@ class AppAuthManagerImpl : AppAuthManager {
         activity: Activity
     ): Intent? {
         authorizationServiceConfiguration?.let { serviceConfiguration ->
-            var scopes = listOf<String>(scopePermissionManagement)
+            var scopes = mutableListOf<String>()
             when (flow) {
                 NetIdAuthFlow.Hard -> {
-                    scopes.plus(AuthorizationRequest.Scope.OPENID)
-                    scopes.plus(AuthorizationRequest.Scope.PROFILE)
+                    scopes.add(AuthorizationRequest.Scope.OPENID)
+                    scopes.add(AuthorizationRequest.Scope.PROFILE)
                 }
                 NetIdAuthFlow.Soft -> {
+                    scopes.add(scopePermissionManagement)
                 }
             }
 
