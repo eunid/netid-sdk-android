@@ -31,11 +31,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
-import de.netid.mobile.sdk.api.NetIdConfig
 import de.netid.mobile.sdk.databinding.FragmentAuthorizationHardBinding
 import de.netid.mobile.sdk.model.AppIdentifier
-import de.netid.mobile.sdk.util.UriUtil
-import java.net.URL
 
 class AuthorizationHardFragment(
     private val listener: AuthorizationFragmentListener,
