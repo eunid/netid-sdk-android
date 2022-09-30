@@ -91,6 +91,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                 config.clientId,
                 config.redirectUri,
                 config.claims,
+                authFlow,
                 activity
             )?.let {
                 when (authFlow) {
