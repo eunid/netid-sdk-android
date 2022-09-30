@@ -136,7 +136,7 @@ class AuthorizationSoftFragment(
     private fun openApp(verifiedAppLink: String) {
         val authIntent = authorizationIntent.extras?.get("authIntent")as Intent
         val authUri = authIntent.data as Uri
-        val uri = authUri.toString().replaceBefore("?", verifiedAppLink)
+        val uri = authUri.toString().replaceBefore("?", verifiedAppLink) + "&flow=soft"
 
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
 //        intent?.putExtra(netIdScheme, context?.applicationInfo?.packageName)

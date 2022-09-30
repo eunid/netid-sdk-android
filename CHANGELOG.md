@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Save states when switching orientation
 - Enabled app2app workflow
 - Fixed a bug with the soft flow if only one app was installed
+- Added parameter for kind of flow to the verified app link
 
 ### Changed
 - Renamed NetID to netID
