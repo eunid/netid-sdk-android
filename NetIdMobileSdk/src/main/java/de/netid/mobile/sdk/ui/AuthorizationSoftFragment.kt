@@ -134,8 +134,12 @@ class AuthorizationSoftFragment(
     }
 
     private fun openApp(verifiedAppLink: String) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(verifiedAppLink))
-        intent?.putExtra(AuthorizationSoftFragment.netIdScheme, context?.applicationInfo?.packageName)
+        val authIntent = authorizationIntent.extras?.get("authIntent")as Intent
+        val authUri = authIntent.data as Uri
+        val uri = authUri.toString().replaceBefore("?", verifiedAppLink)
+
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+//        intent?.putExtra(netIdScheme, context?.applicationInfo?.packageName)
         intent.let {
             context?.startActivity(intent)
         }

@@ -31,8 +31,11 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
+import de.netid.mobile.sdk.api.NetIdConfig
 import de.netid.mobile.sdk.databinding.FragmentAuthorizationHardBinding
 import de.netid.mobile.sdk.model.AppIdentifier
+import de.netid.mobile.sdk.util.UriUtil
+import java.net.URL
 
 class AuthorizationHardFragment(
     private val listener: AuthorizationFragmentListener,
@@ -139,8 +142,12 @@ class AuthorizationHardFragment(
     }
 
     private fun openApp(verifiedAppLink: String) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(verifiedAppLink))
-        intent?.putExtra(netIdScheme, context?.applicationInfo?.packageName)
+        val authIntent = authorizationIntent.extras?.get("authIntent")as Intent
+        val authUri = authIntent.data as Uri
+        val uri = authUri.toString().replaceBefore("?", verifiedAppLink)
+
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+//        intent?.putExtra(netIdScheme, context?.applicationInfo?.packageName)
         intent.let {
             context?.startActivity(intent)
         }
