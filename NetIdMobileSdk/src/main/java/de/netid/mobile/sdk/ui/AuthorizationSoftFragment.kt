@@ -85,9 +85,8 @@ class AuthorizationSoftFragment(
             var adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter
             // If we only have one app or the user did not make changes to the default, use the standard one.
             if (adapter == null) adapter = context?.let { AuthorizationAppListAdapter(it, appIdentifiers) }
-            if ((adapter != null) && (adapter?.selectedPosition != -1) && (appIdentifiers.size != 0)) {
-                println(adapter?.selectedPosition)
-                adapter?.getItem(adapter.selectedPosition)?.android?.verifiedAppLink?.let { verifiedAppLink ->
+            if ((adapter != null) && (adapter.selectedPosition != -1) && (appIdentifiers.size != 0)) {
+                adapter.getItem(adapter.selectedPosition).android?.verifiedAppLink?.let { verifiedAppLink ->
                     openApp(verifiedAppLink)
                 }
             } else {

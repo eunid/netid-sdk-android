@@ -26,4 +26,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed UserInfo json parser error
 - Fixed a bug with the soft flow if only one app was installed
 - Fixed a problem with finding the activities of a package
+- Fixed wrong scopes for hard/soft flow
 
