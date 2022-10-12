@@ -15,6 +15,7 @@
 package de.netid.mobile.sdk.example
 
 import android.content.res.ColorStateList
+import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -36,8 +37,8 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     companion object {
         private const val clientId = "082531ba-1b22-4381-81b1-64add4b85b8a"
         private const val host = "broker.netid.de"
-        private const val redirectUri =
-            "de.netid.mobile.sdk.netidmobilesdk:/oauth2redirect/example-provider"
+        private const val redirectUri = "https://netid-sdk-web.letsdev.de/redirect"
+//        private const val redirectUri = "de.netid.mobile.sdk.netidmobilesdk:/oauth2redirect/example-provider"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,12 +57,32 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
         // If we have a saved state then we can restore it now
         if (savedInstanceState != null) {
-            val keys = savedInstanceState.keySet()
-
             serviceState = savedInstanceState.getSerializable("serviceState") as ServiceState
 
             updateElementsForServiceState()
         }
+
+        // Did we get called from another app? E.g. as a callback.
+        val action: String? = intent?.action
+        val data: Uri? = intent?.data
+        if ((action.equals("android.intent.action.VIEW")) && (data != null)) {
+            val keys = data.queryParameterNames
+            if (keys.contains("token")) {
+                val token = data.getQueryParameter("token")
+                if (token != null) {
+                    onAuthenticationFinished(token)
+                } else {
+                    onAuthenticationFinishedWithError(NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.UnsupportedResponseType))
+                }
+            }
+            updateElementsForServiceState()
+        }
+
+    }
+
+    override fun onRestoreInstanceState(inState: Bundle) {
+        super.onRestoreInstanceState(inState)
+        serviceState = inState.getSerializable("serviceState") as ServiceState
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -202,7 +223,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     override fun onAuthenticationFinished(accessToken: String) {
         appendLog("netID service authorized successfully\nAccess Token:\n$accessToken")
         serviceState = ServiceState.AuthorizationSuccessful
-        bottomDialogFragment.dismiss()
+        if (this::bottomDialogFragment.isInitialized) {
+            bottomDialogFragment.dismiss()
+        }
         updateElementsForServiceState()
     }
 
@@ -210,7 +233,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         appendLog("netID service authorization failed: ${error.code}, ${error.process}")
         serviceState = ServiceState.AuthorizationFailed
         updateElementsForServiceState()
-        bottomDialogFragment.dismiss()
+        if (this::bottomDialogFragment.isInitialized) {
+            bottomDialogFragment.dismiss()
+        }
     }
 
     override fun onUserInfoFinished(userInfo: UserInfo) {

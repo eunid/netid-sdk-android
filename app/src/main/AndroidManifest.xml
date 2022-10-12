@@ -27,6 +27,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" />
                 <data android:host="netid-sdk-web.letsdev.de" />
+                <data android:path="/redirect" />
             </intent-filter>
         </activity>
     </application>
