@@ -66,15 +66,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         val action: String? = intent?.action
         val data: Uri? = intent?.data
         if ((action.equals("android.intent.action.VIEW")) && (data != null)) {
-            val keys = data.queryParameterNames
-            if (keys.contains("token")) {
-                val token = data.getQueryParameter("token")
-                if (token != null) {
-                    onAuthenticationFinished(token)
-                } else {
-                    onAuthenticationFinishedWithError(NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.UnsupportedResponseType))
-                }
-            }
+            NetIdService.onAuthenticationFinished(intent)
             updateElementsForServiceState()
         }
 
