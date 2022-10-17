@@ -16,6 +16,7 @@ package de.netid.mobile.sdk.appauth
 
 import android.app.Activity
 import android.content.Intent
+import de.netid.mobile.sdk.api.NetIdAuthFlow
 
 interface AppAuthManager {
 
@@ -27,6 +28,7 @@ interface AppAuthManager {
         clientId: String,
         redirectUri: String,
         claims: Map<String, String>?,
+        flow: NetIdAuthFlow,
         activity: Activity
     ): Intent?
 

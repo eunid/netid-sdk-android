@@ -227,9 +227,9 @@ object WebserviceApi {
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (response.isSuccessful) {
-                        val response = Json.decodeFromString<PermissionUpdateResponse>(response.body?.string() ?: "")
+                        val permissonResponse = Json.decodeFromString<PermissionUpdateResponse>(response.body?.string() ?: "")
                         Handler(Looper.getMainLooper()).post {
-                            permissionUpdateCallback.onPermissionUpdated(response.subjectIdentifiers)
+                            permissionUpdateCallback.onPermissionUpdated(permissonResponse.subjectIdentifiers)
                         }
                     } else {
                         Handler(Looper.getMainLooper()).post {

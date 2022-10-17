@@ -11,10 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AuthorizationView screen design alignment
 - API function to transmit a id token
 - Hard-Login flow implementation
-- Fixed UserInfo json parser error
 - Copyright 
 - Possibility to transfer claims via the sdk interface
-- Renamed NetID to net ID
 - Save states when switching orientation
 - Enabled app2app workflow
+- Enabled handling of redirect uri
+
+### Changed
+- Renamed NetID to netID
+- Changed call for opening id app
+- Added parameters to verified app link
+
+### Fixed
+- Fixed UserInfo json parser error
+- Fixed a bug with the soft flow if only one app was installed
+- Fixed a problem with finding the activities of a package
+- Fixed wrong scopes for hard/soft flow
+- Fixed a bug with the soft flow if only one app was installed
 

@@ -54,17 +54,16 @@ class PackageUtil {
          */
         private fun isPackageInstalled(packageName: String, activityName: String, packageManager: PackageManager): Boolean {
             return try {
-                val info = packageManager.getPackageInfo(packageName, 0)
-                // Todo: Filter for specific activity
+                val info = packageManager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
+                // Filter for specific activity
                 if (info.activities != null) {
                     info.activities.forEach {
-                        if (it.packageName.equals(activityName)) {
-                            true
+                        if (it.name.equals(activityName)) {
+                            return@isPackageInstalled true
                         }
                     }
                 }
-                // Todo: Change this to false once we have agreed on an activity name
-                true
+                false
             } catch (exception: PackageManager.NameNotFoundException) {
                 false
             }

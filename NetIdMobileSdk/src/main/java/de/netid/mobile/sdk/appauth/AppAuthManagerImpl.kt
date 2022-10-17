@@ -18,6 +18,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import de.netid.mobile.sdk.api.NetIdAuthFlow
 import de.netid.mobile.sdk.api.NetIdError
 import de.netid.mobile.sdk.api.NetIdErrorCode
 import de.netid.mobile.sdk.api.NetIdErrorProcess
@@ -84,19 +85,28 @@ class AppAuthManagerImpl : AppAuthManager {
         clientId: String,
         redirectUri: String,
         claims: Map<String, String>?,
+        flow: NetIdAuthFlow,
         activity: Activity
     ): Intent? {
         authorizationServiceConfiguration?.let { serviceConfiguration ->
+            var scopes = mutableListOf<String>()
+            when (flow) {
+                NetIdAuthFlow.Hard -> {
+                    scopes.add(AuthorizationRequest.Scope.OPENID)
+                    scopes.add(AuthorizationRequest.Scope.PROFILE)
+                }
+                NetIdAuthFlow.Soft -> {
+                    scopes.add(scopePermissionManagement)
+                }
+            }
+
             val authRequestBuilder =
                 AuthorizationRequest.Builder(
                     serviceConfiguration,
                     clientId,
                     ResponseTypeValues.CODE,
                     Uri.parse(redirectUri)
-                ).setScopes(
-                    AuthorizationRequest.Scope.OPENID,
-                    AuthorizationRequest.Scope.PROFILE,
-                    scopePermissionManagement
+                ).setScopes(scopes
                 ).setAdditionalParameters(claims)
             val authRequest = authRequestBuilder.build()
 
