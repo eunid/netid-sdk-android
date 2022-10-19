@@ -5,7 +5,7 @@
       "name": "GMX",
       "icon": "logo_gmx",
       "typeFaceIcon": "typeface_gmx",
-      "backgroundColor": "#FF467DCD",
+      "backgroundColor": "#FF1E50A0",
       "foregroundColor": "#FFFFFFFF",
       "iOS": {
         "bundleIdentifier": "de.gmx.mobile.ios.mail",

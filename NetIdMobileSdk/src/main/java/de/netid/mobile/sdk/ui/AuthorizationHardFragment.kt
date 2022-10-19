@@ -27,7 +27,6 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
@@ -37,7 +36,10 @@ import de.netid.mobile.sdk.model.AppIdentifier
 class AuthorizationHardFragment(
     private val listener: AuthorizationFragmentListener,
     private val appIdentifiers: List<AppIdentifier>,
-    private val authorizationIntent: Intent
+    private val authorizationIntent: Intent,
+    private val headlineText: String = "",
+    private val loginText: String = "",
+    private val continueText: String = ""
 ) : Fragment() {
     companion object {
         private const val netIdScheme = "scheme"
@@ -72,6 +74,9 @@ class AuthorizationHardFragment(
 
         setupStandardButtons()
         setupAppButtons()
+        if (headlineText.isNotEmpty()) {
+            binding.fragmentAuthorizationTitleTextView.text = headlineText
+        }
     }
 
     private fun setupStandardButtons() {
@@ -79,15 +84,15 @@ class AuthorizationHardFragment(
         if (context?.applicationInfo?.name.toString().uppercase() != "NULL") {
             currentAppName = context?.applicationInfo?.name.toString()
         }
-        val continueString = getString(R.string.authorization_hard_continue, currentAppName)
-        binding.fragmentAuthorizationButtonClose.text = continueString.uppercase()
+//        val continueString = getString(R.string.authorization_hard_continue, currentAppName)
+//        binding.fragmentAuthorizationButtonClose.text = continueString.uppercase()
         binding.fragmentAuthorizationButtonClose.setOnClickListener {
             listener.onCloseClicked()
         }
     }
 
     private fun setupAppButtons() {
-        if (appIdentifiers.size == 1) {
+/*        if (appIdentifiers.size == 1) {
             context?.let { context ->
                 val resourceId =
                     context.resources?.getIdentifier(appIdentifiers[0].typeFaceIcon, "drawable", context.opPackageName)
@@ -103,11 +108,34 @@ class AuthorizationHardFragment(
             }
         } else {
             binding.fragmentAuthorizationBrandLogoImageView.isVisible = false
-        }
+        }*/
 
         appIdentifiers.forEachIndexed { index, appIdentifier ->
             val appButton = MaterialButton(requireContext(), null, com.google.android.material.R.attr.borderlessButtonStyle)
-            val continueString = getString(R.string.authorization_hard_continue, appIdentifier.name)
+            val continueString = if (loginText.isEmpty()) {
+                getString(R.string.authorization_hard_continue, appIdentifier.name)
+            } else {
+                String.format(loginText, appIdentifier.name)
+            }
+            context?.let { context ->
+                val resourceId =
+                    context.resources?.getIdentifier(
+                        appIdentifier.typeFaceIcon,
+                        "drawable",
+                        context.opPackageName
+                    )
+                resourceId?.let {
+                    val drawable = ResourcesCompat.getDrawable(
+                        context.resources,
+                        it,
+                        null
+                    )
+                    val factor = (drawable?.minimumWidth!!).toFloat() / drawable.minimumHeight
+                    drawable.setBounds(0, 0, (64 * factor).toInt(), 64)
+                    appButton.setCompoundDrawables(drawable, null, null, null)
+                }
+            }
+
             appButton.text = continueString.uppercase()
             appButton.setTextColor(Color.parseColor(appIdentifier.foregroundColor))
             appButton.isAllCaps = false
@@ -130,6 +158,9 @@ class AuthorizationHardFragment(
             }
 
             binding.fragmentAuthorizationButtonContainerLayout.addView(appButton, index)
+        }
+        if (continueText.isNotEmpty()) {
+            binding.fragmentAuthorizationButtonClose.text = continueText
         }
     }
 

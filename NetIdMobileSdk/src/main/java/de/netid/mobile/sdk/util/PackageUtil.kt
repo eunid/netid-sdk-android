@@ -63,7 +63,7 @@ class PackageUtil {
                         }
                     }
                 }
-                false
+                true
             } catch (exception: PackageManager.NameNotFoundException) {
                 false
             }
