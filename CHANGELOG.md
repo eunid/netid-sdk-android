@@ -16,11 +16,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Save states when switching orientation
 - Enabled app2app workflow
 - Enabled handling of redirect uri
+- Added third flow option login + permission
+- Added parameter to forece app2app flow
 
 ### Changed
 - Renamed NetID to netID
 - Changed call for opening id app
 - Added parameters to verified app link
+- Renamed hard and soft flow to login and permission
 
 ### Fixed
 - Fixed UserInfo json parser error
