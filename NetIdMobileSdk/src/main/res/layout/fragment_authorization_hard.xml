@@ -83,7 +83,6 @@
             android:text="@string/authorization_soft_agree_and_continue_with_net_id"
             android:textColor="@android:color/white"
             android:textAllCaps="true"
-            android:fontFamily="@font/roboto_medium"
             android:textSize="@dimen/authorization_button_text_size"
             android:letterSpacing="@dimen/authorization_button_letter_spacing"
             app:cornerRadius="@dimen/authorization_button_corner_radius"

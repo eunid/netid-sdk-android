@@ -103,6 +103,7 @@ class AuthorizationHardFragment(
             binding.fragmentAuthorizationButtonAgreeAndContinue.visibility = View.VISIBLE
         }
 
+        /*
         if (appIdentifiers.size == 1) {
             context?.let { context ->
                 val resourceId =
@@ -137,7 +138,6 @@ class AuthorizationHardFragment(
         appButton.text = continueString.uppercase()
         appButton.setTextColor(Color.parseColor(appIdentifier.foregroundColor))
         appButton.isAllCaps = false
-        appButton.typeface = ResourcesCompat.getFont(requireContext(), R.font.roboto_medium)
         appButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.authorization_button_text_size))
         appButton.setCornerRadiusResource(R.dimen.authorization_button_corner_radius)
         appButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(appIdentifier.backgroundColor))
