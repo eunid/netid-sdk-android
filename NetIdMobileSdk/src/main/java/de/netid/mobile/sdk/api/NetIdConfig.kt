@@ -15,16 +15,15 @@
 package de.netid.mobile.sdk.api
 
 data class PermissionLayerConfig(
-    val logoId: String,
-    val headlineText: String,
-    val legalText: String,
-    val continueText: String
-)
+    val logoId: String = "",
+    val headlineText: String = "",
+    val legalText: String = "",
+    val continueText: String = "")
 
 data class LoginLayerConfig(
-    val headlineText: String,
-    val loginText: String,
-    val continueText: String
+    val headlineText: String = "",
+    val loginText: String = "",
+    val continueText: String = ""
 )
 
 data class NetIdConfig(
@@ -33,6 +32,6 @@ data class NetIdConfig(
     val redirectUri: String,
     val originUrlScheme: String,
     val claims: Map<String, String>,
-    val permissionLayerConfig: PermissionLayerConfig,
-    val loginLayerConfig: LoginLayerConfig,
+    val permissionLayerConfig: PermissionLayerConfig = PermissionLayerConfig(),
+    val loginLayerConfig: LoginLayerConfig = LoginLayerConfig()
 )

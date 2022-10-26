@@ -9,6 +9,7 @@
     <!-- Soft Authorization -->
     <dimen name="authorization_logo_soft_width">100dp</dimen>
     <dimen name="authorization_logo_soft_height">40dp</dimen>
+    <dimen name="authorization_title_soft_text_size">16sp</dimen>
 
     <!-- Hard Authorization -->
     <dimen name="authorization_logo_hard_width">20dp</dimen>
