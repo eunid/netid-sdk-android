@@ -27,7 +27,6 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
@@ -40,7 +39,10 @@ import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapter
 class AuthorizationHardFragment(
     private val listener: AuthorizationFragmentListener,
     private val appIdentifiers: List<AppIdentifier>,
-    private val authorizationIntent: Intent
+    private val authorizationIntent: Intent,
+    private val headlineText: String = "",
+    private val loginText: String = "",
+    private val continueText: String = ""
 ) : Fragment() {
     companion object {
         private const val netIdScheme = "scheme"
@@ -75,6 +77,9 @@ class AuthorizationHardFragment(
 
         setupStandardButtons()
         setupAppButtons()
+        if (headlineText.isNotEmpty()) {
+            binding.fragmentAuthorizationTitleTextView.text = headlineText
+        }
     }
 
     private fun setupStandardButtons() {
@@ -82,8 +87,8 @@ class AuthorizationHardFragment(
         if (context?.applicationInfo?.name.toString().uppercase() != "NULL") {
             currentAppName = context?.applicationInfo?.name.toString()
         }
-        val continueString = getString(R.string.authorization_hard_continue, currentAppName)
-        binding.fragmentAuthorizationButtonClose.text = continueString.uppercase()
+//        val continueString = getString(R.string.authorization_hard_continue, currentAppName)
+//        binding.fragmentAuthorizationButtonClose.text = continueString.uppercase()
         binding.fragmentAuthorizationButtonClose.setOnClickListener {
             listener.onCloseClicked()
         }
@@ -98,6 +103,7 @@ class AuthorizationHardFragment(
             binding.fragmentAuthorizationButtonAgreeAndContinue.visibility = View.VISIBLE
         }
 
+        /*
         if (appIdentifiers.size == 1) {
             context?.let { context ->
                 val resourceId =
@@ -114,12 +120,15 @@ class AuthorizationHardFragment(
             }
         } else {
             binding.fragmentAuthorizationBrandLogoImageView.isVisible = false
-        }
+        }*/
 
         appIdentifiers.forEachIndexed { index, appIdentifier ->
             val appButton = createButton(appIdentifier)
 
             binding.fragmentAuthorizationButtonContainerLayout.addView(appButton, index)
+        }
+        if (continueText.isNotEmpty()) {
+            binding.fragmentAuthorizationButtonClose.text = continueText
         }
     }
 
@@ -129,7 +138,6 @@ class AuthorizationHardFragment(
         appButton.text = continueString.uppercase()
         appButton.setTextColor(Color.parseColor(appIdentifier.foregroundColor))
         appButton.isAllCaps = false
-        appButton.typeface = ResourcesCompat.getFont(requireContext(), R.font.roboto_medium)
         appButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.authorization_button_text_size))
         appButton.setCornerRadiusResource(R.dimen.authorization_button_corner_radius)
         appButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(appIdentifier.backgroundColor))

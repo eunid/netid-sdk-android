@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed call for opening id app
 - Added parameters to verified app link
 - Renamed hard and soft flow to login and permission
+- Implemented new design
 
 ### Fixed
 - Fixed UserInfo json parser error

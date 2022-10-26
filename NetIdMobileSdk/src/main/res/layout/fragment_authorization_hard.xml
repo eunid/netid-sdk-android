@@ -6,40 +6,64 @@
         android:layout_height="match_parent"
         android:padding="@dimen/authorization_outer_padding">
 
-    <ImageView
-            android:id="@+id/fragmentAuthorizationNetidLogoImageView"
-            android:layout_width="@dimen/authorization_logo_hard_width"
-            android:layout_height="@dimen/authorization_logo_hard_height"
-            android:src="@drawable/ic_logo_net_id"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintHorizontal_bias="1"
-            android:contentDescription="@string/authorization_logo_content_description" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/fragmentAuthorizationTitleContainerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="26dp"
+        android:layout_marginTop="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <ImageView
-            android:id="@+id/fragmentAuthorizationBrandLogoImageView"
-            android:layout_width="@dimen/authorization_brand_logo_hard_width"
-            android:layout_height="@dimen/authorization_brand_logo_hard_height"
-            android:src="@drawable/logo_gmx"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/fragmentAuthorizationNetidLogoImageView"
-            android:contentDescription="@string/authorization_logo_content_description" />
+        <ImageView
+                android:id="@+id/fragmentAuthorizationNetidLogoImageView"
+                android:layout_width="@dimen/authorization_logo_hard_width"
+                android:layout_height="@dimen/authorization_logo_hard_height"
+                android:src="@drawable/ic_netid_logo_small"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                android:contentDescription="@string/authorization_logo_content_description" />
 
-    <TextView
-            android:id="@+id/fragmentAuthorizationTitleTextView"
+        <TextView
+            android:id="@+id/fragmentAuthorizationNetidTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/authorization_vertical_margin"
-            android:gravity="center"
+            android:layout_marginTop="0dp"
+            android:gravity="left"
             android:text="@string/authorization_hard_title_text"
-            android:fontFamily="@font/ibm_plex_sans_semi_bold"
-            android:textSize="@dimen/authorization_title_text_size"
-            android:textColor="@color/authorization_title_text_color"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textColor="@color/authorization_title_logo_color"
+            android:textSize="@dimen/authorization_title_logo_size"
+            android:paddingLeft="5dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/fragmentAuthorizationBrandLogoImageView" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/fragmentAuthorizationNetidLogoImageView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+        android:id="@+id/fragmentAuthorizationDivider"
+        style="@style/Divider"
+        android:layout_marginTop="@dimen/authorization_vertical_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fragmentAuthorizationTitleContainerLayout" />
+
+    <TextView
+        android:id="@+id/fragmentAuthorizationTitleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="left"
+        android:text="@string/authorization_hard_login_text"
+        android:textColor="@color/authorization_title_text_color"
+        android:textSize="@dimen/authorization_title_text_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fragmentAuthorizationDivider" />
+
     <LinearLayout
             android:id="@+id/fragmentAuthorizationButtonContainerLayout"
             android:layout_width="match_parent"
@@ -59,7 +83,6 @@
             android:text="@string/authorization_soft_agree_and_continue_with_net_id"
             android:textColor="@android:color/white"
             android:textAllCaps="true"
-            android:fontFamily="@font/roboto_medium"
             android:textSize="@dimen/authorization_button_text_size"
             android:letterSpacing="@dimen/authorization_button_letter_spacing"
             app:cornerRadius="@dimen/authorization_button_corner_radius"
@@ -70,12 +93,12 @@
                 android:id="@+id/fragmentAuthorizationButtonClose"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/authorization_vertical_margin"
-                android:text="@string/authorization_hard_continue"
+                android:layout_marginTop="0dp"
+                android:height="36dp"
+                android:text="@string/authorization_hard_continue_other"
                 android:textColor="@color/authorization_close_button_color"
                 android:textSize="@dimen/authorization_button_text_size"
-                android:textAllCaps="false"
-                android:fontFamily="@font/roboto_medium"
+                android:textAllCaps="true"
                 android:letterSpacing="@dimen/authorization_button_letter_spacing"
                 app:backgroundTint="@android:color/white"
                 app:cornerRadius="@dimen/authorization_button_corner_radius"

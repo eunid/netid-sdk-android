@@ -16,6 +16,7 @@ package de.netid.mobile.sdk.ui
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.text.Selection
@@ -42,7 +43,11 @@ import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapterListener
 class AuthorizationSoftFragment(
     private val listener: AuthorizationFragmentListener,
     private val appIdentifiers: MutableList<AppIdentifier> = mutableListOf(),
-    private val authorizationIntent: Intent
+    private val authorizationIntent: Intent,
+    private val logoId: String = "",
+    private val headlineText: String = "",
+    private val legalText: String = "",
+    private val continueText: String = ""
 ) : Fragment(), AuthorizationAppListAdapterListener {
     companion object {
         private const val netIdScheme = "scheme"
@@ -77,6 +82,19 @@ class AuthorizationSoftFragment(
 
         setupStandardButtons()
         setupAppButtons()
+        if (logoId.isNotEmpty()) {
+            var logo = context?.resources?.getIdentifier(logoId, "drawable", context?.opPackageName)
+                ?.let { context?.getDrawable(it) }
+            if (logo != null) {
+                binding.fragmentAuthorizationLogoImageView.setImageDrawable(logo)
+            }
+        }
+        if (headlineText.isNotEmpty()) {
+            binding.fragmentAuthorizationTitleTextView.text = headlineText
+        }
+        if (continueText.isNotEmpty()) {
+            binding.fragmentAuthorizationButtonAgreeAndContinue.text = continueText
+        }
     }
 
     private fun setupStandardButtons() {
@@ -93,7 +111,6 @@ class AuthorizationSoftFragment(
                 resultLauncher.launch(authorizationIntent)
             }
         }
-        binding.fragmentAuthorizationButtonClose.text = getString(R.string.authorization_soft_close).uppercase()
         binding.fragmentAuthorizationButtonClose.setOnClickListener {
             listener.onCloseClicked()
         }
@@ -103,17 +120,25 @@ class AuthorizationSoftFragment(
         val netIdString = getString(R.string.authorization_soft_net_id)
         val chooseString = getString(R.string.authorization_soft_choose_partner)
         when (appIdentifiers.size) {
-            0 -> binding.fragmentAuthorizationLegalInfoTextView.text =
-                getString(R.string.authorization_soft_legal_info, netIdString, "")
-            1 -> binding.fragmentAuthorizationLegalInfoTextView.text =
-                getString(R.string.authorization_soft_legal_info, appIdentifiers[0].name, "")
+            0 -> binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
+                getString(R.string.authorization_soft_legal_info, netIdString) + getString(R.string.authorization_soft_legal_info_fixed, netIdString, "")
+            } else {
+                String.format(legalText, netIdString) + getString(R.string.authorization_soft_legal_info_fixed, netIdString, "")
+            }
+            1 -> binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
+                getString(R.string.authorization_soft_legal_info, appIdentifiers[0].name) + getString(R.string.authorization_soft_legal_info_fixed, appIdentifiers[0].name, "")
+            } else {
+                String.format(legalText, appIdentifiers[0].name) + getString(R.string.authorization_soft_legal_info_fixed, appIdentifiers[0].name, "")
+            }
             else -> {
-                binding.fragmentAuthorizationLegalInfoTextView.text =
+                binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
                     getString(
                         R.string.authorization_soft_legal_info,
-                        appIdentifiers[0].name,
-                        chooseString
-                    )
+                        appIdentifiers[0].name
+                    ) + getString(R.string.authorization_soft_legal_info_fixed, appIdentifiers[0].name, chooseString)
+                } else {
+                    String.format(legalText, appIdentifiers[0].name) + getString(R.string.authorization_soft_legal_info_fixed, appIdentifiers[0].name, chooseString)
+                }
                 binding.fragmentAuthorizationLegalInfoTextView.makeLinks(
                     Pair(chooseString, View.OnClickListener {
                         val listView: ListView = binding.fragmentAuthorizationAppCellContainer
@@ -176,7 +201,13 @@ class AuthorizationSoftFragment(
 
     override fun onAppSelected(name: String) {
         val chooseString = getString(R.string.authorization_soft_choose_partner)
-        binding.fragmentAuthorizationLegalInfoTextView.text =
-            getString(R.string.authorization_soft_legal_info, name, chooseString)
+        binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
+            getString(
+                R.string.authorization_soft_legal_info,
+                appIdentifiers[0].name
+            ) + getString(R.string.authorization_soft_legal_info_fixed, appIdentifiers[0].name, chooseString)
+        } else {
+            String.format(legalText, appIdentifiers[0].name) + getString(R.string.authorization_soft_legal_info_fixed, appIdentifiers[0].name, chooseString)
+        }
     }
 }
