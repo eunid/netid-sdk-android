@@ -83,8 +83,13 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
-    fun getAuthorizationFragment(activity: Activity, authFlow: NetIdAuthFlow): Fragment? {
+    fun getAuthorizationFragment(activity: Activity, authFlow: NetIdAuthFlow, forceApp2App: Boolean = false): Fragment? {
         checkAvailableNetIdApplications(activity)
+        // If there are no ID apps installed, but forceApp2App is true, return with an error.
+        if ((availableAppIdentifiers.isEmpty()) && forceApp2App) {
+            this.onAuthorizationFailed(NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.NoIdAppInstalled))
+            return null
+        }
 
         netIdConfig?.let { config ->
             return appAuthManager.getWebAuthorizationIntent(
@@ -95,11 +100,11 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                 activity
             )?.let {
                 when (authFlow) {
-                    NetIdAuthFlow.Hard ->
+                    NetIdAuthFlow.Login, NetIdAuthFlow.LoginPermission ->
                         AuthorizationHardFragment(
                             this, availableAppIdentifiers, it, config.loginLayerConfig.headlineText, config.loginLayerConfig.loginText, config.loginLayerConfig.continueText
                         )
-                    NetIdAuthFlow.Soft ->
+                    NetIdAuthFlow.Permission ->
                         AuthorizationSoftFragment(
                             this, availableAppIdentifiers, it, config.permissionLayerConfig.logoId, config.permissionLayerConfig.headlineText, config.permissionLayerConfig.legalText, config.permissionLayerConfig.continueText
                         )

@@ -101,13 +101,20 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
             val builder = AlertDialog.Builder(this)
             bottomDialogFragment = SdkContentBottomDialogFragment()
             builder.setTitle(R.string.net_id_service_choose_auth_way)
-            builder.setPositiveButton(R.string.net_id_service_login_soft) { _, _ ->
-                bottomDialogFragment.sdkContentFragment = NetIdService.getAuthorizationFragment(this, NetIdAuthFlow.Soft)
-                bottomDialogFragment.show(supportFragmentManager, null)
+            builder.setPositiveButton(R.string.net_id_service_auth_permission) { _, _ ->
+                bottomDialogFragment.sdkContentFragment = NetIdService.getAuthorizationFragment(this, NetIdAuthFlow.Permission)
+                if (bottomDialogFragment.sdkContentFragment != null)
+                    bottomDialogFragment.show(supportFragmentManager, null)
             }
-            builder.setNeutralButton(R.string.net_id_service_login_hard) { _, _ ->
-                bottomDialogFragment.sdkContentFragment = NetIdService.getAuthorizationFragment(this, NetIdAuthFlow.Hard)
-                bottomDialogFragment.show(supportFragmentManager, null)
+            builder.setNegativeButton(R.string.net_id_service_auth_login) { _, _ ->
+                bottomDialogFragment.sdkContentFragment = NetIdService.getAuthorizationFragment(this, NetIdAuthFlow.Login)
+                if (bottomDialogFragment.sdkContentFragment != null)
+                    bottomDialogFragment.show(supportFragmentManager, null)
+            }
+            builder.setNeutralButton(R.string.net_id_service_auth_login_permission) { _, _ ->
+                bottomDialogFragment.sdkContentFragment = NetIdService.getAuthorizationFragment(this, NetIdAuthFlow.LoginPermission)
+                if (bottomDialogFragment.sdkContentFragment != null)
+                    bottomDialogFragment.show(supportFragmentManager, null)
             }
             builder.show()
         }
@@ -224,14 +231,14 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     override fun onAuthenticationFinishedWithError(error: NetIdError) {
         appendLog("netID service authorization failed: ${error.code}, ${error.process}")
         serviceState = ServiceState.AuthorizationFailed
-        updateElementsForServiceState()
-        if (this::bottomDialogFragment.isInitialized) {
+        if ((this::bottomDialogFragment.isInitialized) && (bottomDialogFragment.isAdded)) {
             bottomDialogFragment.dismiss()
         }
+        updateElementsForServiceState()
     }
 
     override fun onUserInfoFinished(userInfo: UserInfo) {
-        appendLog("netID service user info -fetch finished successfully: $userInfo")
+        appendLog("netID service user info - fetch finished successfully: $userInfo")
         serviceState = ServiceState.UserInfoSuccessful
         updateElementsForServiceState()
     }

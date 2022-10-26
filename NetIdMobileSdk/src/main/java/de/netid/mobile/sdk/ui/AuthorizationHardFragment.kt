@@ -31,7 +31,10 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.databinding.FragmentAuthorizationHardBinding
+import de.netid.mobile.sdk.model.AppDetailsAndroid
+import de.netid.mobile.sdk.model.AppDetailsIOS
 import de.netid.mobile.sdk.model.AppIdentifier
+import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapter
 
 class AuthorizationHardFragment(
     private val listener: AuthorizationFragmentListener,
@@ -89,10 +92,18 @@ class AuthorizationHardFragment(
         binding.fragmentAuthorizationButtonClose.setOnClickListener {
             listener.onCloseClicked()
         }
+        binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
+            resultLauncher.launch(authorizationIntent)
+        }
     }
 
     private fun setupAppButtons() {
-/*        if (appIdentifiers.size == 1) {
+        // If there are no apps installed, display a standard button to enable app2web flow
+        if (appIdentifiers.size == 0) {
+            binding.fragmentAuthorizationButtonAgreeAndContinue.visibility = View.VISIBLE
+        }
+
+        if (appIdentifiers.size == 1) {
             context?.let { context ->
                 val resourceId =
                     context.resources?.getIdentifier(appIdentifiers[0].typeFaceIcon, "drawable", context.opPackageName)
@@ -111,56 +122,40 @@ class AuthorizationHardFragment(
         }*/
 
         appIdentifiers.forEachIndexed { index, appIdentifier ->
-            val appButton = MaterialButton(requireContext(), null, com.google.android.material.R.attr.borderlessButtonStyle)
-            val continueString = if (loginText.isEmpty()) {
-                getString(R.string.authorization_hard_continue, appIdentifier.name)
-            } else {
-                String.format(loginText, appIdentifier.name)
-            }
-            context?.let { context ->
-                val resourceId =
-                    context.resources?.getIdentifier(
-                        appIdentifier.typeFaceIcon,
-                        "drawable",
-                        context.opPackageName
-                    )
-                resourceId?.let {
-                    val drawable = ResourcesCompat.getDrawable(
-                        context.resources,
-                        it,
-                        null
-                    )
-                    val factor = (drawable?.minimumWidth!!).toFloat() / drawable.minimumHeight
-                    drawable.setBounds(0, 0, (64 * factor).toInt(), 64)
-                    appButton.setCompoundDrawables(drawable, null, null, null)
-                }
-            }
-
-            appButton.text = continueString.uppercase()
-            appButton.setTextColor(Color.parseColor(appIdentifier.foregroundColor))
-            appButton.isAllCaps = false
-            appButton.setTextSize(TypedValue.COMPLEX_UNIT_PX,resources.getDimension(R.dimen.authorization_button_text_size))
-            appButton.setCornerRadiusResource(R.dimen.authorization_button_corner_radius)
-            appButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(appIdentifier.backgroundColor))
-
-            val letterSpacingValue = TypedValue()
-            resources.getValue(R.dimen.authorization_button_letter_spacing, letterSpacingValue, true)
-            appButton.letterSpacing = letterSpacingValue.float
-
-            val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-            appButton.layoutParams = layoutParams
-
-            appButton.setOnClickListener {
-                resultLauncher.launch(authorizationIntent)
-                listener.onAppButtonClicked(appIdentifier)
-                openApp(appIdentifier.android.verifiedAppLink)
-            }
+            val appButton = createButton(appIdentifier)
 
             binding.fragmentAuthorizationButtonContainerLayout.addView(appButton, index)
         }
         if (continueText.isNotEmpty()) {
             binding.fragmentAuthorizationButtonClose.text = continueText
         }
+    }
+
+    private fun createButton(appIdentifier: AppIdentifier): MaterialButton {
+        val appButton = MaterialButton(requireContext(), null, com.google.android.material.R.attr.borderlessButtonStyle)
+        val continueString = getString(R.string.authorization_hard_continue, appIdentifier.name)
+        appButton.text = continueString.uppercase()
+        appButton.setTextColor(Color.parseColor(appIdentifier.foregroundColor))
+        appButton.isAllCaps = false
+        appButton.typeface = ResourcesCompat.getFont(requireContext(), R.font.roboto_medium)
+        appButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.authorization_button_text_size))
+        appButton.setCornerRadiusResource(R.dimen.authorization_button_corner_radius)
+        appButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(appIdentifier.backgroundColor))
+
+        val letterSpacingValue = TypedValue()
+        resources.getValue(R.dimen.authorization_button_letter_spacing, letterSpacingValue, true)
+        appButton.letterSpacing = letterSpacingValue.float
+
+        val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        appButton.layoutParams = layoutParams
+
+        appButton.setOnClickListener {
+            resultLauncher.launch(authorizationIntent)
+            listener.onAppButtonClicked(appIdentifier)
+            openApp(appIdentifier.android.verifiedAppLink)
+        }
+
+        return appButton
     }
 
     override fun onDestroyView() {

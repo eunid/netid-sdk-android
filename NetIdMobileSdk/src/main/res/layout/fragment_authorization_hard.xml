@@ -75,6 +75,21 @@
             app:layout_constraintTop_toBottomOf="@id/fragmentAuthorizationTitleTextView">
 
         <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+            android:id="@+id/fragmentAuthorizationButtonAgreeAndContinue"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/authorization_soft_agree_and_continue_with_net_id"
+            android:textColor="@android:color/white"
+            android:textAllCaps="true"
+            android:fontFamily="@font/roboto_medium"
+            android:textSize="@dimen/authorization_button_text_size"
+            android:letterSpacing="@dimen/authorization_button_letter_spacing"
+            app:cornerRadius="@dimen/authorization_button_corner_radius"
+            app:backgroundTint="@color/authorization_net_id_button_color" />
+
+        <com.google.android.material.button.MaterialButton
                 style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                 android:id="@+id/fragmentAuthorizationButtonClose"
                 android:layout_width="match_parent"

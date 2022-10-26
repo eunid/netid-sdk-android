@@ -31,5 +31,6 @@ enum class NetIdErrorCode {
     ServerError,
     TemporarilyUnavailable,
     ClientError,
-    StateMismatch
+    StateMismatch,
+    NoIdAppInstalled
 }
