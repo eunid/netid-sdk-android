@@ -160,6 +160,7 @@ class AppAuthManagerImpl : AppAuthManager {
     }
 
     private fun createNetIdErrorForAuthorizationException(authorizationException: AuthorizationException): NetIdError {
+        val msg = authorizationException.error + " - " + authorizationException.errorDescription
         return when (authorizationException) {
             AuthorizationException.GeneralErrors.NETWORK_ERROR -> NetIdError(
                 NetIdErrorProcess.Configuration,
@@ -169,13 +170,11 @@ class AppAuthManagerImpl : AppAuthManager {
                 NetIdError(
                     NetIdErrorProcess.Configuration,
                     NetIdErrorCode.JsonDeserializationError
-
             )
             AuthorizationException.GeneralErrors.INVALID_DISCOVERY_DOCUMENT ->
                 NetIdError(
                     NetIdErrorProcess.Configuration,
                     NetIdErrorCode.InvalidDiscoveryDocument
-
             )
             AuthorizationException.AuthorizationRequestErrors.INVALID_REQUEST -> NetIdError(
                 NetIdErrorProcess.Authentication,
@@ -190,10 +189,8 @@ class AppAuthManagerImpl : AppAuthManager {
                 NetIdErrorCode.AccessDenied
             )
             AuthorizationException.AuthorizationRequestErrors.UNSUPPORTED_RESPONSE_TYPE -> NetIdError(
-
                     NetIdErrorProcess.Authentication,
                     NetIdErrorCode.UnsupportedResponseType
-
             )
             AuthorizationException.AuthorizationRequestErrors.INVALID_SCOPE -> NetIdError(
                 NetIdErrorProcess.Authentication,
@@ -204,10 +201,8 @@ class AppAuthManagerImpl : AppAuthManager {
                 NetIdErrorCode.ServerError
             )
             AuthorizationException.AuthorizationRequestErrors.TEMPORARILY_UNAVAILABLE -> NetIdError(
-
                     NetIdErrorProcess.Authentication,
                     NetIdErrorCode.TemporarilyUnavailable
-
             )
             AuthorizationException.AuthorizationRequestErrors.CLIENT_ERROR -> NetIdError(
                 NetIdErrorProcess.Authentication,
@@ -225,7 +220,16 @@ class AppAuthManagerImpl : AppAuthManager {
                 NetIdErrorProcess.Authentication,
                 NetIdErrorCode.AuthorizationCanceledByUser
             )
-            else -> NetIdError(NetIdErrorProcess.Configuration, NetIdErrorCode.Unknown)
+            AuthorizationException.GeneralErrors.PROGRAM_CANCELED_AUTH_FLOW -> NetIdError(
+                NetIdErrorProcess.Authentication,
+                NetIdErrorCode.AuthorizationCanceledByProgram
+            )
+            AuthorizationException.TokenRequestErrors.OTHER -> NetIdError(
+                NetIdErrorProcess.CodeExchange,
+                NetIdErrorCode.Other,
+                msg
+            )
+            else -> NetIdError(NetIdErrorProcess.Configuration, NetIdErrorCode.Unknown, msg)
         }
     }
 }
