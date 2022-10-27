@@ -30,6 +30,7 @@ import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ResponseTypeValues
+import org.json.JSONObject
 
 class AppAuthManagerImpl : AppAuthManager {
 
@@ -84,7 +85,7 @@ class AppAuthManagerImpl : AppAuthManager {
     override fun getWebAuthorizationIntent(
         clientId: String,
         redirectUri: String,
-        claims: Map<String, String>?,
+        claims: String,
         flow: NetIdAuthFlow,
         activity: Activity
     ): Intent? {
@@ -105,6 +106,7 @@ class AppAuthManagerImpl : AppAuthManager {
                 }
             }
 
+            val claimsJSON = if(claims.isEmpty() ) null else JSONObject(claims)
             val authRequestBuilder =
                 AuthorizationRequest.Builder(
                     serviceConfiguration,
@@ -112,7 +114,7 @@ class AppAuthManagerImpl : AppAuthManager {
                     ResponseTypeValues.CODE,
                     Uri.parse(redirectUri)
                 ).setScopes(scopes
-                ).setAdditionalParameters(claims)
+                ).setClaims(claimsJSON)
             val authRequest = authRequestBuilder.build()
 
             authService = AuthorizationService(activity)
