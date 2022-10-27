@@ -22,6 +22,7 @@ enum class NetIdErrorCode {
     InvalidDiscoveryDocument,
     Unknown,
     AuthorizationCanceledByUser,
+    AuthorizationCanceledByProgram,
     MissingBrowser,
     InvalidRequest,
     UnauthorizedClient,
@@ -32,5 +33,6 @@ enum class NetIdErrorCode {
     TemporarilyUnavailable,
     ClientError,
     StateMismatch,
-    NoIdAppInstalled
+    NoIdAppInstalled,
+    Other
 }

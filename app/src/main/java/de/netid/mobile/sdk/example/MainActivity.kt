@@ -229,7 +229,11 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     override fun onAuthenticationFinishedWithError(error: NetIdError) {
-        appendLog("netID service authorization failed: ${error.code}, ${error.process}")
+        if (error.msg?.isNotEmpty() == true) {
+            appendLog("netID service authorization failed: ${error.code}, ${error.process}, ${error.msg}")
+        } else {
+            appendLog("netID service authorization failed: ${error.code}, ${error.process}")
+        }
         serviceState = ServiceState.AuthorizationFailed
         if ((this::bottomDialogFragment.isInitialized) && (bottomDialogFragment.isAdded)) {
             bottomDialogFragment.dismiss()
@@ -244,7 +248,11 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     override fun onUserInfoFetchedWithError(error: NetIdError) {
-        appendLog("netID service user info failed: ${error.code}, ${error.process}")
+        if (error.msg?.isNotEmpty() == true) {
+            appendLog("netID service user info failed: ${error.code}, ${error.process}, ${error.msg}")
+        } else {
+            appendLog("netID service user info failed: ${error.code}, ${error.process}")
+        }
         serviceState = ServiceState.UserInfoFailed
         updateElementsForServiceState()
     }
@@ -254,7 +262,11 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     override fun onEncounteredNetworkError(error: NetIdError) {
-        appendLog("netID service user info failed: ${error.code}, ${error.process}")
+        if (error.msg?.isNotEmpty() == true) {
+            appendLog("netID service user info failed: ${error.code}, ${error.process}, ${error.msg}")
+        } else {
+            appendLog("netID service user info failed: ${error.code}, ${error.process}")
+        }
         val builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.network_error_alert_title)
         builder.setMessage(R.string.network_error_alert_description)
