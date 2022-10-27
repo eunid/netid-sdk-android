@@ -31,7 +31,7 @@ data class NetIdConfig(
     val clientId: String,
     val redirectUri: String,
     val originUrlScheme: String,
-    val claims: Map<String, String>,
+    val claims: String,
     val permissionLayerConfig: PermissionLayerConfig = PermissionLayerConfig(),
     val loginLayerConfig: LoginLayerConfig = LoginLayerConfig()
 )
