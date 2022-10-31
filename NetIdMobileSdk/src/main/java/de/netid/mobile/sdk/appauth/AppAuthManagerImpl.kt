@@ -23,14 +23,9 @@ import de.netid.mobile.sdk.api.NetIdError
 import de.netid.mobile.sdk.api.NetIdErrorCode
 import de.netid.mobile.sdk.api.NetIdErrorProcess
 import de.netid.mobile.sdk.util.TokenUtil
-import net.openid.appauth.AuthState
-import net.openid.appauth.AuthorizationException
-import net.openid.appauth.AuthorizationRequest
-import net.openid.appauth.AuthorizationResponse
-import net.openid.appauth.AuthorizationService
-import net.openid.appauth.AuthorizationServiceConfiguration
-import net.openid.appauth.ResponseTypeValues
+import net.openid.appauth.*
 import org.json.JSONObject
+
 
 class AppAuthManagerImpl : AppAuthManager {
 
@@ -45,6 +40,7 @@ class AppAuthManagerImpl : AppAuthManager {
     private var authState: AuthState? = null
     private var authService: AuthorizationService? = null
     private var idToken: String? = null
+    private var authRequest: AuthorizationRequest? = null
 
     override fun getAccessToken(): String? {
         return authState?.accessToken
@@ -115,10 +111,10 @@ class AppAuthManagerImpl : AppAuthManager {
                     Uri.parse(redirectUri)
                 ).setScopes(scopes
                 ).setClaims(claimsJSON)
-            val authRequest = authRequestBuilder.build()
+            authRequest = authRequestBuilder.build()
 
             authService = AuthorizationService(activity)
-            return authService?.getAuthorizationRequestIntent(authRequest)
+            return authService?.getAuthorizationRequestIntent(authRequest!!)
         } ?: run {
             Log.e(javaClass.simpleName, "No authorization service configuration available")
             return null
@@ -126,7 +122,7 @@ class AppAuthManagerImpl : AppAuthManager {
     }
 
     override fun processAuthorizationIntent(data: Intent) {
-        val authorizationResponse = AuthorizationResponse.fromIntent(data)
+        val authorizationResponse = AuthorizationResponse.Builder(authRequest!!).fromUri(data.data!!).build()
         val authorizationException = AuthorizationException.fromIntent(data)
 
         authState?.update(authorizationResponse, authorizationException)
@@ -137,7 +133,6 @@ class AppAuthManagerImpl : AppAuthManager {
         } ?: run {
             authorizationResponse?.let {
                 processTokenExchange(it)
-
             } ?: run {
                 val netIdError =
                     NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.Unknown)
