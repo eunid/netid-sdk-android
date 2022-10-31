@@ -223,9 +223,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     override fun onAuthenticationFinished(accessToken: String) {
         appendLog("netID service authorized successfully\nAccess Token:\n$accessToken")
         serviceState = ServiceState.AuthorizationSuccessful
-        if (this::bottomDialogFragment.isInitialized) {
+/*        if ((this::bottomDialogFragment.isInitialized) && (bottomDialogFragment.isAdded)) {
             bottomDialogFragment.dismiss()
-        }
+        }*/
         updateElementsForServiceState()
     }
 

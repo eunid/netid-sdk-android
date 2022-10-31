@@ -26,20 +26,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
+import de.netid.mobile.sdk.api.NetIdAuthFlow
 import de.netid.mobile.sdk.databinding.FragmentAuthorizationHardBinding
-import de.netid.mobile.sdk.model.AppDetailsAndroid
-import de.netid.mobile.sdk.model.AppDetailsIOS
 import de.netid.mobile.sdk.model.AppIdentifier
-import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapter
 
 class AuthorizationHardFragment(
     private val listener: AuthorizationFragmentListener,
     private val appIdentifiers: List<AppIdentifier>,
     private val authorizationIntent: Intent,
+    private val authFlow: NetIdAuthFlow,
     private val headlineText: String = "",
     private val loginText: String = "",
     private val continueText: String = ""

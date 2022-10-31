@@ -102,7 +102,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                 when (authFlow) {
                     NetIdAuthFlow.Login, NetIdAuthFlow.LoginPermission ->
                         AuthorizationHardFragment(
-                            this, availableAppIdentifiers, it, config.loginLayerConfig.headlineText, config.loginLayerConfig.loginText, config.loginLayerConfig.continueText
+                            this, availableAppIdentifiers, it, authFlow, config.loginLayerConfig.headlineText, config.loginLayerConfig.loginText, config.loginLayerConfig.continueText
                         )
                     NetIdAuthFlow.Permission ->
                         AuthorizationSoftFragment(
