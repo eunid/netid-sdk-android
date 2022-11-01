@@ -161,12 +161,15 @@ class AuthorizationSoftFragment(
         val authIntent = authorizationIntent.extras?.get("authIntent")as Intent
         val authUri = authIntent.data as Uri
         val uri = authUri.toString().replaceBefore("?", verifiedAppLink)
-
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
-//        intent?.putExtra(netIdScheme, context?.applicationInfo?.packageName)
-        intent.let {
-            context?.startActivity(intent)
+        //TODO Works but maybe there are more elegant ways
+        authorizationIntent.extras?.apply {
+            val i = getParcelable<Intent>("authIntent") ?: return@apply
+            //TODO should be set to app package
+            i.setPackage(null)
+            i.data = Uri.parse(uri)
+            putParcelable("authIntent", i)
         }
+        resultLauncher.launch(authorizationIntent)
     }
 
     private fun TextView.makeLinks(vararg links: Pair<String, View.OnClickListener>) {
