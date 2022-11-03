@@ -17,6 +17,7 @@ package de.netid.mobile.sdk.util
 import android.util.Base64
 import org.json.JSONObject
 import java.nio.charset.StandardCharsets
+//import java.util.Base64
 
 class TokenUtil {
 
@@ -29,7 +30,7 @@ class TokenUtil {
             val decodedString: MutableList<String> = mutableListOf()
             parts.forEachIndexed { index, part ->
                 if (index < 2) {
-                    val bytes: ByteArray = Base64.decode(part, Base64.DEFAULT)
+                    val bytes: ByteArray = Base64.decode(part, Base64.URL_SAFE)
                     decodedString.add(String(bytes, StandardCharsets.UTF_8))
                 }
             }

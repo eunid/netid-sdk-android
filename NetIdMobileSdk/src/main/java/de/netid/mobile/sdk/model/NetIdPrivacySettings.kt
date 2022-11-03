@@ -16,16 +16,20 @@ package de.netid.mobile.sdk.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Serializable
 data class NetIdPrivacySettings(
     val type: String,
-    val status: String = "",
-    val value: String = "",
+    val status: String? = null,
+    val value: String? = null,
     @SerialName("changed_at")
     val changedAt: String
 ) {
     override fun toString(): String {
-        return "NetIdPrivacySettings(type='$type', status='$status', value='$value', changedAt='$changedAt')"
+        val format = Json { encodeDefaults = false }
+        return format.encodeToString(this)
+        //return "NetIdPrivacySettings(type='$type', status='$status', value='$value', changedAt='$changedAt')"
     }
 }

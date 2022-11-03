@@ -20,7 +20,7 @@
             android:layout_height="32dp"
             android:contentDescription="@string/authorization_logo_content_description"
             android:scaleType="fitStart"
-            android:src="@drawable/ic_logo_net_id"
+            android:src="@drawable/logo_na"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -28,11 +28,11 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/fragmentAuthorizationButtonClose"
             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:contentDescription="@string/authorization_soft_close"
             android:scaleType="fitCenter"
-            app:icon="@android:drawable/ic_menu_close_clear_cancel"
+            app:icon="@drawable/ic_baseline_close_24"
             app:cornerRadius="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
