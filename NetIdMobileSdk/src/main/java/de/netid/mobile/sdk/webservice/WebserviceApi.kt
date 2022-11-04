@@ -19,12 +19,13 @@ import android.os.Looper
 import de.netid.mobile.sdk.api.NetIdError
 import de.netid.mobile.sdk.api.NetIdErrorCode
 import de.netid.mobile.sdk.api.NetIdErrorProcess
-import de.netid.mobile.sdk.api.NetIdPermissionUpdate
+import de.netid.mobile.sdk.model.NetIdPermissionUpdate
 import de.netid.mobile.sdk.constants.WebserviceConstants
 import de.netid.mobile.sdk.model.PermissionUpdateResponse
 import de.netid.mobile.sdk.model.Permissions
 import de.netid.mobile.sdk.model.UserInfo
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import okhttp3.Call
@@ -182,7 +183,9 @@ object WebserviceApi {
         collapseSyncId: Boolean,
         permissionUpdateCallback: PermissionUpdateCallback
     ) {
-        val jsonElement = Json.encodeToJsonElement(permissionUpdate)
+        // disable serialization of default values
+        val format = Json { encodeDefaults = false }
+        val jsonElement = format.encodeToJsonElement(permissionUpdate)
         val mediaType = "application/vnd.netid.permission-center.netid-permissions-v2+json".toMediaType()
         val byteArray = jsonElement.toString().toByteArray()
         val body = byteArray.toRequestBody(mediaType)
@@ -199,7 +202,7 @@ object WebserviceApi {
         if (collapseSyncId) {
             requestBuilder.header(
                 WebserviceConstants.ACCEPT_HEADER_KEY,
-             WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE
+                WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE
             )
         } else {
             requestBuilder.header(

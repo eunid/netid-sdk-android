@@ -26,22 +26,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.databinding.FragmentAuthorizationHardBinding
-import de.netid.mobile.sdk.model.AppDetailsAndroid
-import de.netid.mobile.sdk.model.AppDetailsIOS
 import de.netid.mobile.sdk.model.AppIdentifier
-import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapter
+import net.openid.appauth.AuthorizationManagementActivity
 
 class AuthorizationHardFragment(
     private val listener: AuthorizationFragmentListener,
     private val appIdentifiers: List<AppIdentifier>,
     private val authorizationIntent: Intent,
     private val headlineText: String = "",
-    private val loginText: String = "",
     private val continueText: String = ""
 ) : Fragment() {
     companion object {
@@ -87,8 +83,6 @@ class AuthorizationHardFragment(
         if (context?.applicationInfo?.name.toString().uppercase() != "NULL") {
             currentAppName = context?.applicationInfo?.name.toString()
         }
-//        val continueString = getString(R.string.authorization_hard_continue, currentAppName)
-//        binding.fragmentAuthorizationButtonClose.text = continueString.uppercase()
         binding.fragmentAuthorizationButtonClose.setOnClickListener {
             listener.onCloseClicked()
         }
@@ -102,29 +96,8 @@ class AuthorizationHardFragment(
         if (appIdentifiers.size == 0) {
             binding.fragmentAuthorizationButtonAgreeAndContinue.visibility = View.VISIBLE
         }
-
-        /*
-        if (appIdentifiers.size == 1) {
-            context?.let { context ->
-                val resourceId =
-                    context.resources?.getIdentifier(appIdentifiers[0].typeFaceIcon, "drawable", context.opPackageName)
-                binding.fragmentAuthorizationBrandLogoImageView.setImageDrawable(
-                    resourceId?.let {
-                        ResourcesCompat.getDrawable(
-                            context.resources,
-                            it,
-                            null
-                        )
-                    }
-                )
-            }
-        } else {
-            binding.fragmentAuthorizationBrandLogoImageView.isVisible = false
-        }*/
-
         appIdentifiers.forEachIndexed { index, appIdentifier ->
             val appButton = createButton(appIdentifier)
-
             binding.fragmentAuthorizationButtonContainerLayout.addView(appButton, index)
         }
         if (continueText.isNotEmpty()) {
@@ -163,16 +136,10 @@ class AuthorizationHardFragment(
     }
 
     private fun openApp(verifiedAppLink: String) {
-        val authIntent = authorizationIntent.extras?.get("authIntent")as Intent
-        val authUri = authIntent.data as Uri
-        val uri = authUri.toString().replaceBefore("?", verifiedAppLink)
-        //TODO Works but maybe there are more elegant ways
-        authorizationIntent.extras?.apply {
-            val i = getParcelable<Intent>("authIntent") ?: return@apply
-            //TODO should be set to app package
+        authorizationIntent?.extras?.apply {
+            val i = getParcelable<Intent> ("authIntent") ?: return@apply
+            i.data = Uri.parse(i.data.toString().replaceBefore("?",verifiedAppLink))
             i.setPackage(null)
-            i.data = Uri.parse(uri)
-            putParcelable("authIntent", i)
         }
         resultLauncher.launch(authorizationIntent)
     }

@@ -22,10 +22,7 @@ import androidx.fragment.app.Fragment
 import de.netid.mobile.sdk.appauth.AppAuthManager
 import de.netid.mobile.sdk.appauth.AppAuthManagerFactory
 import de.netid.mobile.sdk.appauth.AppAuthManagerListener
-import de.netid.mobile.sdk.model.AppIdentifier
-import de.netid.mobile.sdk.model.Permissions
-import de.netid.mobile.sdk.model.SubjectIdentifiers
-import de.netid.mobile.sdk.model.UserInfo
+import de.netid.mobile.sdk.model.*
 import de.netid.mobile.sdk.permission.PermissionManager
 import de.netid.mobile.sdk.permission.PermissionManagerListener
 import de.netid.mobile.sdk.ui.AuthorizationFragmentListener
@@ -102,11 +99,21 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                 when (authFlow) {
                     NetIdAuthFlow.Login, NetIdAuthFlow.LoginPermission ->
                         AuthorizationHardFragment(
-                            this, availableAppIdentifiers, it, config.loginLayerConfig.headlineText, config.loginLayerConfig.loginText, config.loginLayerConfig.continueText
+                            this,
+                            availableAppIdentifiers,
+                            it,
+                            config.loginLayerConfig.headlineText,
+                            config.loginLayerConfig.continueText
                         )
                     NetIdAuthFlow.Permission ->
                         AuthorizationSoftFragment(
-                            this, availableAppIdentifiers, it, config.permissionLayerConfig.logoId, config.permissionLayerConfig.headlineText, config.permissionLayerConfig.legalText, config.permissionLayerConfig.continueText
+                            this,
+                            availableAppIdentifiers,
+                            it,
+                            config.permissionLayerConfig.logoId,
+                            config.permissionLayerConfig.headlineText,
+                            config.permissionLayerConfig.legalText,
+                            config.permissionLayerConfig.continueText
                         )
                 }
             }
@@ -160,7 +167,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
-    fun fetchPermissions(context: Context, collapseSyncId: Boolean) {
+    fun fetchPermissions(context: Context, collapseSyncId: Boolean = true) {
         if (handleConnection(context, NetIdErrorProcess.PermissionRead)) {
             var error: NetIdError? = null
             appAuthManager.getPermissionToken()?.let { token ->
@@ -177,7 +184,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     }
 
 
-    fun updatePermission(context: Context, permission: NetIdPermissionUpdate, collapseSyncId: Boolean) {
+    fun updatePermission(context: Context, permission: NetIdPermissionUpdate, collapseSyncId: Boolean = true) {
         if (handleConnection(context, NetIdErrorProcess.PermissionWrite)) {
             var error: NetIdError? = null
             appAuthManager.getPermissionToken()?.let { token ->

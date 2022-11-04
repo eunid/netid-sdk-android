@@ -158,16 +158,10 @@ class AuthorizationSoftFragment(
     }
 
     private fun openApp(verifiedAppLink: String) {
-        val authIntent = authorizationIntent.extras?.get("authIntent")as Intent
-        val authUri = authIntent.data as Uri
-        val uri = authUri.toString().replaceBefore("?", verifiedAppLink)
-        //TODO Works but maybe there are more elegant ways
-        authorizationIntent.extras?.apply {
+        authorizationIntent?.extras?.apply {
             val i = getParcelable<Intent>("authIntent") ?: return@apply
-            //TODO should be set to app package
+            i.data = Uri.parse(i.data.toString().replaceBefore("?",verifiedAppLink))
             i.setPackage(null)
-            i.data = Uri.parse(uri)
-            putParcelable("authIntent", i)
         }
         resultLauncher.launch(authorizationIntent)
     }
