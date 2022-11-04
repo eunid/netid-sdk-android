@@ -59,7 +59,15 @@ class AppAuthManagerImpl : AppAuthManager {
     }
 
     override fun getPermissionToken(): String? {
-        return getIdToken()?.let { TokenUtil.getPermissionTokenFrom(it) }
+        // Check if authorized, i.e. there is an ID token and/or access token available
+        if (authState?.isAuthorized == true){
+            authState?.idToken?.run{
+                // In case an ID token is available the permission token is contained, return extracted token
+                return TokenUtil.getPermissionTokenFrom(this)
+            }
+            return authState?.accessToken
+        }
+        return null
     }
 
     override fun fetchAuthorizationServiceConfiguration(host: String) {
@@ -91,22 +99,21 @@ class AppAuthManagerImpl : AppAuthManager {
     ): Intent? {
         authorizationServiceConfiguration?.let { serviceConfiguration ->
             var scopes = mutableListOf<String>()
+            var claimsJSON: JSONObject? = null
             when (flow) {
                 NetIdAuthFlow.Login -> {
                     scopes.add(AuthorizationRequest.Scope.OPENID)
-                    scopes.add(AuthorizationRequest.Scope.PROFILE)
+                    claimsJSON = if(claims.isEmpty() ) null else JSONObject(claims)
                 }
                 NetIdAuthFlow.LoginPermission -> {
                     scopes.add(AuthorizationRequest.Scope.OPENID)
-                    scopes.add(AuthorizationRequest.Scope.PROFILE)
                     scopes.add(scopePermissionManagement)
+                    claimsJSON = if(claims.isEmpty() ) null else JSONObject(claims)
                 }
                 NetIdAuthFlow.Permission -> {
                     scopes.add(scopePermissionManagement)
                 }
             }
-
-            val claimsJSON = if(claims.isEmpty() ) null else JSONObject(claims)
             val authRequestBuilder =
                 AuthorizationRequest.Builder(
                     serviceConfiguration,

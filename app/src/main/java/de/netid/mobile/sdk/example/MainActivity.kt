@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         private const val host = "broker.netid.de"
         private const val redirectUri = "https://netid-sdk-web.letsdev.de/redirect"
 //        private const val redirectUri = "de.netid.mobile.sdk.netidmobilesdk:/oauth2redirect/example-provider"
-        private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
+        private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}, \"shipping_address\": {\"essential\": true}}}"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     private fun setupNetIdConfig() {
-        netIdConfig = NetIdConfig(host, clientId, redirectUri, "", "")
+        netIdConfig = NetIdConfig(host, clientId, redirectUri, claims)
         NetIdService.addListener(this)
     }
 

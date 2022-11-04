@@ -39,9 +39,12 @@ class TokenUtil {
 
         fun getPermissionTokenFrom(token: String): String? {
             decode(token)[1].let { permissionClaim ->
+                var permissionsToken: JSONObject? = null
                 val json = JSONObject(permissionClaim)
-                val permissions: JSONObject? = json.get(claimPermissionManagement) as? JSONObject
-                return permissions?.get(accessTokenKey) as? String
+                if (json.has(claimPermissionManagement))
+                     permissionsToken = json.get(claimPermissionManagement) as? JSONObject
+
+                return permissionsToken?.get(accessTokenKey) as? String
             }
         }
 
