@@ -17,8 +17,13 @@ package de.netid.mobile.sdk.api
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.util.Log
+import android.widget.Button
 import androidx.fragment.app.Fragment
+import com.google.android.material.button.MaterialButton
+import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.appauth.AppAuthManager
 import de.netid.mobile.sdk.appauth.AppAuthManagerFactory
 import de.netid.mobile.sdk.appauth.AppAuthManagerListener
@@ -114,6 +119,61 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         //TODO optimise error handling
         return null
     }
+
+    fun continueButtonPermissionFlow(activity: Activity, authFlow: NetIdAuthFlow): MaterialButton {
+        val button = MaterialButton(activity.applicationContext)
+
+        button.id = R.id.fragmentAuthorizationButtonAgreeAndContinue
+        button.letterSpacing = Resources.getSystem().getDimension(R.dimen.authorization_button_letter_spacing)
+        button.text = Resources.getSystem().getText(R.string.authorization_soft_agree_and_continue_with_net_id)
+        button.textSize = Resources.getSystem().getDimension(R.dimen.authorization_button_text_size)
+        button.icon = Resources.getSystem().getDrawable(R.drawable.ic_netid_logo_small)
+        button.iconSize = 20
+        button.iconTint = null
+        button.cornerRadius = Resources.getSystem().getDimension(R.dimen.authorization_button_corner_radius).toInt()
+        button.strokeColor = Resources.getSystem().getColorStateList(R.color.authorization_close_button_color)
+        button.strokeWidth =
+            Resources.getSystem().getDimension(R.dimen.authorization_close_button_stroke_width).toInt()
+        button.rippleColor =  Resources.getSystem().getColorStateList(R.color.authorization_close_button_color)
+
+        return button
+    }
+/*
+    <com.google.android.material.button.MaterialButton
+    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textColor="@android:color/white"
+    android:textAllCaps="true"
+    android:letterSpacing="@dimen/authorization_button_letter_spacing"
+     />*/
+
+    fun continueButtonLoginFlow(activity: Activity, authFlow: NetIdAuthFlow): MaterialButton {
+        val button = MaterialButton(activity.applicationContext)
+
+        button.id = R.id.fragmentAuthorizationButtonAgreeAndContinue
+        button.letterSpacing = Resources.getSystem().getDimension(R.dimen.authorization_button_letter_spacing)
+        button.text = Resources.getSystem().getText(R.string.authorization_soft_agree_and_continue_with_net_id)
+        button.textSize = Resources.getSystem().getDimension(R.dimen.authorization_button_text_size)
+        button.cornerRadius = Resources.getSystem().getDimension(R.dimen.authorization_button_corner_radius).toInt()
+        button.backgroundTintList = Resources.getSystem().getColorStateList(R.color.authorization_net_id_button_color)
+
+        return button
+    }
+
+    fun permissionButtonForIdApp(activity: Activity, index: Int): MaterialButton? {
+        val button = MaterialButton(activity.applicationContext)
+        checkAvailableNetIdApplications(activity)
+        // If there are no ID apps installed, return with an error.
+        if (availableAppIdentifiers.isEmpty() || (index >= availableAppIdentifiers.count())) {
+            this.onAuthorizationFailed(NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.NoIdAppInstalled))
+            return null
+        }
+        val result = availableAppIdentifiers[index]
+
+        return button
+    }
+
 
     private fun handleConnection(context: Context, process: NetIdErrorProcess): Boolean {
         return if (ReachabilityUtil.hasConnection(context)) {
