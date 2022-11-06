@@ -90,11 +90,9 @@ class AppAuthManagerImpl : AppAuthManager {
             when (flow) {
                 NetIdAuthFlow.Login -> {
                     scopes.add(AuthorizationRequest.Scope.OPENID)
-                    scopes.add(AuthorizationRequest.Scope.PROFILE)
                 }
                 NetIdAuthFlow.LoginPermission -> {
                     scopes.add(AuthorizationRequest.Scope.OPENID)
-                    scopes.add(AuthorizationRequest.Scope.PROFILE)
                     scopes.add(scopePermissionManagement)
                 }
                 NetIdAuthFlow.Permission -> {
