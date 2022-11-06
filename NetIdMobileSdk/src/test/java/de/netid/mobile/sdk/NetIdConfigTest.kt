@@ -15,7 +15,6 @@
 package de.netid.mobile.sdk
 
 import de.netid.mobile.sdk.api.NetIdConfig
-import de.netid.mobile.sdk.api.NetIdService
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -31,7 +30,7 @@ class NetIdConfigTest {
 
     @Test
     fun initializeNetIdConfig() {
-        val netIdConfig = NetIdConfig(host, clientId, redirectUri, "", claims)
+        val netIdConfig = NetIdConfig(host, clientId, redirectUri, claims)
         assertEquals(netIdConfig.clientId, clientId)
         assertEquals(netIdConfig.host, host)
         assertEquals(netIdConfig.redirectUri, redirectUri)

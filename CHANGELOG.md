@@ -38,4 +38,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a bug with cathcing the redirect
 - Fixed a bug with too many scopes
 - Fixed a bug with not setting the istandard claims
+- Fixed a bug when not some claims were missing
 
