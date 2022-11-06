@@ -14,6 +14,7 @@
 
 package de.netid.mobile.sdk.webservice
 
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import de.netid.mobile.sdk.api.NetIdError
@@ -57,11 +58,11 @@ object WebserviceApi {
      */
     fun performUserInfoRequest(
         accessToken: String,
-        host: String,
+        uri: Uri,
         userInfoCallback: UserInfoCallback
     ) {
         val request = Request.Builder()
-            .url(WebserviceConstants.HTTPS_PROTOCOL + host + WebserviceConstants.USER_INFO_PATH)
+            .url(uri.toString())
             .method(WebserviceConstants.GET_METHOD, null)
             .header(
                 WebserviceConstants.AUTHORIZATION_HEADER,
