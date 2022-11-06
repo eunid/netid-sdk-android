@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implemented new design
 - Claims are now a string
 - Reworked redirect handling, now working with beta id app
+- Removed deprecated variable
 
 ### Fixed
 - Fixed UserInfo json parser error

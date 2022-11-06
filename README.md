@@ -24,7 +24,6 @@ The parameters have the following meaning:
 | host | The name of the broker for the SSO service. This Parameter is optional. If omitted, this is set to the default broker broker.netid.de |
 | clientId | The client id of your application. You can retrieve it from the netID Developer portal. This parameter is mandatory. |
 | redirectUri | An URI that is used by your application to catch callbacks. You can retrieve it from the netID Developer portal. This parameter is mandatory. |
-| originUrlScheme | Used for creating deep links, not in use anymore (will be removed) |
 | claims | An array of strings, denoting additional claims that should be set during authorization. Can be nil. |
 | loginLayerConfig | A set of strings, that can be used to customize the appearance of the layer for the login flow. Can be nil. |
 | permissionLayerConfig | A set of strings, that can be used to customize the appearance of the layer for the permission flow. Can be nil. |
