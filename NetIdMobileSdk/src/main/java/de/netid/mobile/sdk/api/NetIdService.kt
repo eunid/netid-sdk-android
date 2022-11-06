@@ -126,18 +126,6 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
-    //TODO
-//    fun authorize(packageName: String?, activity: Activity): Intent? {
-//        if (handleConnection(activity.applicationContext, NetIdErrorProcess.Authentication)) {
-//            packageName?.let { applicationId ->
-//                openApp(activity.applicationContext, applicationId)
-//            } ?: run {
-//
-//            }
-//        }
-//        return null
-//    }
-
     fun fetchUserInfo(context: Context) {
         if (handleConnection(context, NetIdErrorProcess.UserInfo)) {
             var error: NetIdError? = null
@@ -175,7 +163,6 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             }
         }
     }
-
 
     fun updatePermission(context: Context, permission: NetIdPermissionUpdate, collapseSyncId: Boolean) {
         if (handleConnection(context, NetIdErrorProcess.PermissionWrite)) {
