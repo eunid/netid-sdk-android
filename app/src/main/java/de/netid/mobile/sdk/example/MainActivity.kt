@@ -38,7 +38,6 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         private const val clientId = "082531ba-1b22-4381-81b1-64add4b85b8a"
         private const val host = "broker.netid.de"
         private const val redirectUri = "https://netid-sdk-web.letsdev.de/redirect"
-//        private const val redirectUri = "de.netid.mobile.sdk.netidmobilesdk:/oauth2redirect/example-provider"
         private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
     }
 
@@ -84,7 +83,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     private fun setupNetIdConfig() {
-        netIdConfig = NetIdConfig(host, clientId, redirectUri, "", "")
+        netIdConfig = NetIdConfig(host, clientId, redirectUri, "", claims)
         NetIdService.addListener(this)
     }
 
