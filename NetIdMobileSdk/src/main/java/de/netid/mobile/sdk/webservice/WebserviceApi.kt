@@ -14,6 +14,7 @@
 
 package de.netid.mobile.sdk.webservice
 
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import de.netid.mobile.sdk.api.NetIdError
@@ -25,7 +26,6 @@ import de.netid.mobile.sdk.model.PermissionUpdateResponse
 import de.netid.mobile.sdk.model.Permissions
 import de.netid.mobile.sdk.model.UserInfo
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import okhttp3.Call
@@ -58,11 +58,11 @@ object WebserviceApi {
      */
     fun performUserInfoRequest(
         accessToken: String,
-        host: String,
+        uri: Uri?,
         userInfoCallback: UserInfoCallback
     ) {
         val request = Request.Builder()
-            .url(WebserviceConstants.HTTPS_PROTOCOL + host + WebserviceConstants.USER_INFO_PATH)
+            .url(uri.toString())
             .method(WebserviceConstants.GET_METHOD, null)
             .header(
                 WebserviceConstants.AUTHORIZATION_HEADER,

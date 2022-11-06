@@ -50,14 +50,6 @@ class AppAuthManagerImpl : AppAuthManager {
         return authState?.accessToken
     }
 
-    override fun getIdToken(): String? {
-        return idToken
-    }
-
-    override fun setIdToken(token: String) {
-        idToken = token
-    }
-
     override fun getPermissionToken(): String? {
         // Check if authorized, i.e. there is an ID token and/or access token available
         if (authState?.isAuthorized == true){
@@ -68,6 +60,10 @@ class AppAuthManagerImpl : AppAuthManager {
             return authState?.accessToken
         }
         return null
+    }
+
+    override fun getAuthState(): AuthState?{
+        return authState
     }
 
     override fun fetchAuthorizationServiceConfiguration(host: String) {

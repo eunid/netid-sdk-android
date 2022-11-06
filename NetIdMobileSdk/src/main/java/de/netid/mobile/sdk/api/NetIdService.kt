@@ -33,7 +33,6 @@ import de.netid.mobile.sdk.userinfo.UserInfoManagerListener
 import de.netid.mobile.sdk.util.JsonUtil
 import de.netid.mobile.sdk.util.PackageUtil
 import de.netid.mobile.sdk.util.ReachabilityUtil
-import de.netid.mobile.sdk.util.TokenUtil
 
 object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     UserInfoManagerListener, PermissionManagerListener {
@@ -67,16 +66,6 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             setupAuthManagerAndFetchConfiguration(netIdConfig.host)
             setupUserInfoManager()
             setupPermissionManager()
-        }
-    }
-
-    fun transmitToken(token: String) {
-        if (TokenUtil.isValidJwtToken(token)) {
-            appAuthManager.setIdToken(token)
-        } else {
-            for (item in netIdServiceListeners) {
-                item.onTransmittedInvalidToken()
-            }
         }
     }
 
@@ -151,7 +140,9 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
 
             netIdConfig?.let { config ->
                 appAuthManager.getAccessToken()?.let { token ->
-                    userInfoManager.fetchUserInfo(config.host, token)
+                    userInfoManager.fetchUserInfo(
+                        appAuthManager.getAuthState()?.authorizationServiceConfiguration?.discoveryDoc?.userinfoEndpoint,
+                        token)
                 } ?: {
                     error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.UnauthorizedClient)
                 }
