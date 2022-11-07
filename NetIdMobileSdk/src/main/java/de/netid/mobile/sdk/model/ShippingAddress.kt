@@ -16,6 +16,8 @@ package de.netid.mobile.sdk.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Serializable
 data class ShippingAddress(
@@ -29,6 +31,7 @@ data class ShippingAddress(
 
     ) {
     override fun toString(): String {
-        return "ShippingAddress(streetAddress='$streetAddress', country='$country', formatted='$formatted', locality='$locality', recipient='$recipient', postal_code='$postal_code')"
+        val format = Json { encodeDefaults = false }
+        return format.encodeToString(this)
     }
 }
