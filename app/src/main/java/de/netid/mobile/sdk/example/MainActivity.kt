@@ -284,6 +284,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
     override fun onAuthenticationCanceled(error: NetIdError) {
         appendLog("netID service user canceled authentication in process: ${error.process}")
+        if (error.msg?.isNotEmpty() == true) {
+            appendLog("original error message: ${error.msg}")
+        }
         serviceState = when (error.process) {
             NetIdErrorProcess.Configuration -> ServiceState.InitializationFailed
             NetIdErrorProcess.Authentication -> ServiceState.AuthorizationFailed
@@ -296,12 +299,18 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
     override fun onPermissionUpdateFinishedWithError(error: NetIdError) {
         appendLog("netID service permission -update failed with error: ${error.code}")
+        if (error.msg?.isNotEmpty() == true) {
+            appendLog("original error message: ${error.msg}")
+        }
         serviceState = ServiceState.PermissionWriteFailed
         updateElementsForServiceState()
     }
 
     override fun onPermissionFetchFinishedWithError(error: NetIdError) {
         appendLog("netID service permission -fetch failed with error: ${error.code}")
+        if (error.msg?.isNotEmpty() == true) {
+            appendLog("original error message: ${error.msg}")
+        }
         serviceState = ServiceState.PermissionReadFailed
         updateElementsForServiceState()
     }

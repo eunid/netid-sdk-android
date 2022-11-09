@@ -55,7 +55,9 @@ class AppAuthManagerImpl : AppAuthManager {
     }
 
     override fun getPermissionToken(): String? {
-        return getIdToken()?.let { TokenUtil.getPermissionTokenFrom(it) }
+        // Fallback for getting a permission token as long as there is no refresh token flow (and only permission scope was requested).
+        val token = getIdToken() ?: return getAccessToken()
+        return TokenUtil.getPermissionTokenFrom(token)
     }
 
     override fun fetchAuthorizationServiceConfiguration(host: String) {

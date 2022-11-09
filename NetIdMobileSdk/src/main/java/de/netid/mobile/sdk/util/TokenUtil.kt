@@ -15,6 +15,7 @@
 package de.netid.mobile.sdk.util
 
 import android.util.Base64
+import org.json.JSONException
 import org.json.JSONObject
 import java.nio.charset.StandardCharsets
 
@@ -38,9 +39,14 @@ class TokenUtil {
 
         fun getPermissionTokenFrom(token: String): String? {
             decode(token)[1].let { permissionClaim ->
-                val json = JSONObject(permissionClaim)
-                val permissions: JSONObject? = json.get(claimPermissionManagement) as? JSONObject
-                return permissions?.get(accessTokenKey) as? String
+                return try {
+                    val json = JSONObject(permissionClaim)
+                    val permissions: JSONObject? =
+                        json.get(claimPermissionManagement) as? JSONObject
+                    permissions?.get(accessTokenKey) as? String
+                } catch (jse: JSONException) {
+                    null
+                }
             }
         }
 
