@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reworked redirect handling, now working with beta id app
 - Removed deprecated variable
 - Do not display empty values in userinfo
+- Remove debug flag to find id apps regardless if they are usable or not
 
 ### Fixed
 - Fixed UserInfo json parser error
@@ -40,4 +41,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a bug with too many scopes
 - Fixed a bug with not setting the istandard claims
 - Fixed a bug when some claims were missing
+- Only set claims in login and login+permission flows
+- Make get/update permission possible in permission flow
  
