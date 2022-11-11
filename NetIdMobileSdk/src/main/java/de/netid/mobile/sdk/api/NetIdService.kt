@@ -116,7 +116,6 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                 }
             }
         }
-        //TODO optimise error handling
         return null
     }
 

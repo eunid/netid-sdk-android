@@ -222,9 +222,6 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     override fun onAuthenticationFinished(accessToken: String) {
         appendLog("netID service authorized successfully\nAccess Token:\n$accessToken")
         serviceState = ServiceState.AuthorizationSuccessful
-/*        if ((this::bottomDialogFragment.isInitialized) && (bottomDialogFragment.isAdded)) {
-            bottomDialogFragment.dismiss()
-        }*/
         updateElementsForServiceState()
     }
 
@@ -294,7 +291,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
             else -> ServiceState.Uninitialized
         }
         updateElementsForServiceState()
-        bottomDialogFragment.dismiss()
+        if ((this::bottomDialogFragment.isInitialized) && (bottomDialogFragment.isAdded)) {
+            bottomDialogFragment.dismiss()
+        }
     }
 
     override fun onPermissionUpdateFinishedWithError(error: NetIdError) {
