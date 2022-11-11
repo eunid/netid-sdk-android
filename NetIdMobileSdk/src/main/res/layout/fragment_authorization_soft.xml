@@ -20,7 +20,7 @@
             android:layout_height="32dp"
             android:contentDescription="@string/authorization_logo_content_description"
             android:scaleType="fitStart"
-            android:src="@drawable/ic_logo_net_id"
+            android:src="@drawable/ic_no_app_logo"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -37,9 +37,9 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:backgroundTint="@android:color/white"
-            app:strokeColor="@android:color/white"
-            app:rippleColor="@android:color/white"/>
+            app:backgroundTint="@color/authorization_close_button_background_color"
+            app:strokeColor="#AAAAAA"
+            app:rippleColor="#AAAAAA"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -60,6 +60,7 @@
         android:text="@string/authorization_soft_title_text"
         android:textColor="@color/authorization_title_text_color"
         android:textSize="@dimen/authorization_title_soft_text_size"
+        android:textFontWeight="600"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fragmentAuthorizationDivider" />
@@ -110,10 +111,12 @@
             android:text="@string/authorization_soft_agree_and_continue_with_net_id"
             android:textAllCaps="false"
             android:textSize="@dimen/authorization_button_text_size"
+            android:textColor="@color/authorization_agree_text_color"
             app:icon="@drawable/ic_netid_logo_small"
             app:iconSize="20dp"
             app:iconTint="@null"
-            app:backgroundTint="@android:color/white"
+            app:iconPadding="-20dp"
+            app:backgroundTint="@color/authorization_agree_button_color"
             app:cornerRadius="@dimen/authorization_button_corner_radius"
             app:strokeColor="@color/authorization_close_button_color"
             app:strokeWidth="@dimen/authorization_close_button_stroke_width"
