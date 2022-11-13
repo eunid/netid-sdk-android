@@ -12,19 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.sdk.api
+package de.netid.mobile.sdk.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Serializable
 data class NetIdPermissionUpdate(
     @SerialName("idconsent")
-    val idConsent: String,
+    val idConsent: String? = null,
     @SerialName("iab_tc_string")
-    val iabTc: String
+    val iabTc: String? = null
 ) {
     override fun toString(): String {
-        return "NetIdPermissionUpdate(idConsent='$idConsent', iabTc='$iabTc')"
+        val format = Json { encodeDefaults = false }
+        return format.encodeToString(this)
     }
 }

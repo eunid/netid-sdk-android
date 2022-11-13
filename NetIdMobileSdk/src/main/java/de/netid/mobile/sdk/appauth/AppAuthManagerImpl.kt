@@ -142,6 +142,17 @@ class AppAuthManagerImpl : AppAuthManager {
     }
 
     private fun processTokenExchange(authorizationResponse: AuthorizationResponse) {
+        if (authorizationResponse.authorizationCode == null) {
+            if (authorizationResponse.additionalParameters.containsKey("error_code")) {
+                authorizationResponse.additionalParameters["error_code"]?.let {
+                    Log.i(javaClass.simpleName,
+                        it
+                    )
+                    val exception = AuthorizationException.AuthorizationRequestErrors.byString(it)
+                    listener?.onAuthorizationFailed(createNetIdErrorForAuthorizationException(exception))
+                }
+            }
+        }
         authService?.performTokenRequest(authorizationResponse.createTokenExchangeRequest()) { response, exception ->
             authState?.update(response, exception)
             exception?.let { authException ->
@@ -208,6 +219,11 @@ class AppAuthManagerImpl : AppAuthManager {
             AuthorizationException.AuthorizationRequestErrors.STATE_MISMATCH -> NetIdError(
                 NetIdErrorProcess.Authentication,
                 NetIdErrorCode.StateMismatch
+            )
+            AuthorizationException.AuthorizationRequestErrors.OTHER -> NetIdError(
+                NetIdErrorProcess.Authentication,
+                NetIdErrorCode.Other,
+                msg
             )
             AuthorizationException.GeneralErrors.PROGRAM_CANCELED_AUTH_FLOW -> NetIdError(
                 NetIdErrorProcess.Authentication,

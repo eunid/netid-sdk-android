@@ -22,10 +22,7 @@ import androidx.fragment.app.Fragment
 import de.netid.mobile.sdk.appauth.AppAuthManager
 import de.netid.mobile.sdk.appauth.AppAuthManagerFactory
 import de.netid.mobile.sdk.appauth.AppAuthManagerListener
-import de.netid.mobile.sdk.model.AppIdentifier
-import de.netid.mobile.sdk.model.Permissions
-import de.netid.mobile.sdk.model.SubjectIdentifiers
-import de.netid.mobile.sdk.model.UserInfo
+import de.netid.mobile.sdk.model.*
 import de.netid.mobile.sdk.permission.PermissionManager
 import de.netid.mobile.sdk.permission.PermissionManagerListener
 import de.netid.mobile.sdk.ui.AuthorizationFragmentListener
@@ -62,7 +59,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     fun initialize(netIdConfig: NetIdConfig, context: Context) {
         if (handleConnection(context, NetIdErrorProcess.Configuration)) {
             if (this.netIdConfig != null) {
-                Log.w(javaClass.simpleName, "NetId Service configuration has been set already")
+                Log.w(javaClass.simpleName, "netId service configuration has been set already")
                 return
             }
 
@@ -152,7 +149,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
-    fun fetchPermissions(context: Context, collapseSyncId: Boolean) {
+    fun fetchPermissions(context: Context, collapseSyncId: Boolean = true) {
         if (handleConnection(context, NetIdErrorProcess.PermissionRead)) {
             var error: NetIdError? = null
             appAuthManager.getPermissionToken()?.let { token ->
@@ -168,7 +165,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
-    fun updatePermission(context: Context, permission: NetIdPermissionUpdate, collapseSyncId: Boolean) {
+    fun updatePermission(context: Context, permission: NetIdPermissionUpdate, collapseSyncId: Boolean = true) {
         if (handleConnection(context, NetIdErrorProcess.PermissionWrite)) {
             var error: NetIdError? = null
             appAuthManager.getPermissionToken()?.let { token ->
@@ -209,21 +206,21 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
 // AppAuthManagerListener functions
 
     override fun onAuthorizationServiceConfigurationFetchedSuccessfully() {
-        Log.i(javaClass.simpleName, "NetId Service Authorization Service Configuration fetched successfully")
+        Log.i(javaClass.simpleName, "netId service Authorization Service Configuration fetched successfully")
         for (item in netIdServiceListeners) {
             item.onInitializationFinishedWithError(null)
         }
     }
 
     override fun onAuthorizationServiceConfigurationFetchFailed(error: NetIdError) {
-        Log.e(javaClass.simpleName, "NetId Service Authorization Service Configuration fetch failed")
+        Log.e(javaClass.simpleName, "netId service Authorization Service Configuration fetch failed")
         for (item in netIdServiceListeners) {
             item.onInitializationFinishedWithError(error)
         }
     }
 
     override fun onAuthorizationSuccessful() {
-        Log.i(javaClass.simpleName, "NetId Service Authorization successful")
+        Log.i(javaClass.simpleName, "netId service Authorization successful")
         appAuthManager.getAccessToken()?.let {
             for (item in netIdServiceListeners) {
                 item.onAuthenticationFinished(it)
@@ -232,7 +229,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     }
 
     override fun onAuthorizationFailed(error: NetIdError) {
-        Log.e(javaClass.simpleName, "NetId Service Authorization failed")
+        Log.e(javaClass.simpleName, "netId service Authorization failed")
         for (item in netIdServiceListeners) {
             item.onAuthenticationFinishedWithError(error)
         }
@@ -267,7 +264,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     }
 
     override fun onCloseClicked() {
-        Log.i(javaClass.simpleName, "NetId Service close authentication")
+        Log.i(javaClass.simpleName, "netId service close authentication")
         for (item in netIdServiceListeners) {
             item.onAuthenticationCanceled(
                 NetIdError(
@@ -279,20 +276,20 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     }
 
     override fun onAppButtonClicked(appIdentifier: AppIdentifier) {
-        Log.i(javaClass.simpleName, "NetId Service will use app ${appIdentifier.name} for authentication")
+        Log.i(javaClass.simpleName, "netId service will use app ${appIdentifier.name} for authentication")
     }
 
 // UserInfoManagerListener functions
 
     override fun onUserInfoFetched(userInfo: UserInfo) {
-        Log.i(javaClass.simpleName, "NetId Service user info fetched successfully")
+        Log.i(javaClass.simpleName, "netId service user info fetched successfully")
         for (item in netIdServiceListeners) {
             item.onUserInfoFinished(userInfo)
         }
     }
 
     override fun onUserInfoFetchFailed(error: NetIdError) {
-        Log.e(javaClass.simpleName, "NetId Service user info fetch failed")
+        Log.e(javaClass.simpleName, "netId service user info fetch failed")
         for (item in netIdServiceListeners) {
             item.onUserInfoFetchedWithError(error)
         }
@@ -300,28 +297,28 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
 
     // PermissionManagerListener functions
     override fun onPermissionsFetched(permissions: Permissions) {
-        Log.i(javaClass.simpleName, "NetId Service permissions fetched successfully")
+        Log.i(javaClass.simpleName, "netId service permissions fetched successfully")
         for (item in netIdServiceListeners) {
             item.onPermissionFetchFinished(permissions)
         }
     }
 
     override fun onPermissionsFetchFailed(error: NetIdError) {
-        Log.e(javaClass.simpleName, "NetId Service permissions fetch failed")
+        Log.e(javaClass.simpleName, "netId service permissions fetch failed")
         for (item in netIdServiceListeners) {
             item.onPermissionFetchFinishedWithError(error)
         }
     }
 
     override fun onPermissionUpdated(subjectIdentifiers: SubjectIdentifiers) {
-        Log.i(javaClass.simpleName, "NetId Service permissions updated successfully")
+        Log.i(javaClass.simpleName, "netId service permissions updated successfully")
         for (item in netIdServiceListeners) {
             item.onPermissionUpdateFinished()
         }
     }
 
     override fun onPermissionUpdateFailed(error: NetIdError) {
-        Log.e(javaClass.simpleName, "NetId Service permission update failed")
+        Log.e(javaClass.simpleName, "netId service permission update failed")
         for (item in netIdServiceListeners) {
             item.onPermissionUpdateFinishedWithError(error)
         }
