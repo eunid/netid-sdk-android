@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Do not display empty values in userinfo
 - Remove debug flag to find id apps regardless if they are usable or not
 - Implement ui feedback
+- Refined JSON handling
 
 ### Fixed
 - Fixed UserInfo json parser error
