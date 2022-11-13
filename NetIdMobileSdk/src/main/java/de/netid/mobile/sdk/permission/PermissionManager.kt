@@ -15,7 +15,7 @@
 package de.netid.mobile.sdk.permission
 
 import de.netid.mobile.sdk.api.NetIdError
-import de.netid.mobile.sdk.api.NetIdPermissionUpdate
+import de.netid.mobile.sdk.model.NetIdPermissionUpdate
 import de.netid.mobile.sdk.model.Permissions
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.webservice.PermissionReadCallback

@@ -19,7 +19,7 @@ import android.os.Looper
 import de.netid.mobile.sdk.api.NetIdError
 import de.netid.mobile.sdk.api.NetIdErrorCode
 import de.netid.mobile.sdk.api.NetIdErrorProcess
-import de.netid.mobile.sdk.api.NetIdPermissionUpdate
+import de.netid.mobile.sdk.model.NetIdPermissionUpdate
 import de.netid.mobile.sdk.constants.WebserviceConstants
 import de.netid.mobile.sdk.model.PermissionUpdateResponse
 import de.netid.mobile.sdk.model.Permissions
@@ -84,6 +84,15 @@ object WebserviceApi {
                         val userInfo = Json.decodeFromString<UserInfo>(response.body?.string() ?: "")
                         Handler(Looper.getMainLooper()).post {
                             userInfoCallback.onUserInfoFetched(userInfo)
+                        }
+                    } else if (response.code == 401) {
+                        Handler(Looper.getMainLooper()).post {
+                            userInfoCallback.onUserInfoFetchFailed(
+                                NetIdError(
+                                    NetIdErrorProcess.UserInfo,
+                                    NetIdErrorCode.UnauthorizedClient
+                                )
+                            )
                         }
                     } else {
                         Handler(Looper.getMainLooper()).post {
