@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove debug flag to find id apps regardless if they are usable or not
 - Implement ui feedback
 - Refined JSON handling
+- Changed some wording
 
 ### Fixed
 - Fixed UserInfo json parser error
