@@ -103,25 +103,6 @@ class AuthorizationHardFragment(
             binding.fragmentAuthorizationButtonAgreeAndContinue.visibility = View.VISIBLE
         }
 
-        /*
-        if (appIdentifiers.size == 1) {
-            context?.let { context ->
-                val resourceId =
-                    context.resources?.getIdentifier(appIdentifiers[0].typeFaceIcon, "drawable", context.opPackageName)
-                binding.fragmentAuthorizationBrandLogoImageView.setImageDrawable(
-                    resourceId?.let {
-                        ResourcesCompat.getDrawable(
-                            context.resources,
-                            it,
-                            null
-                        )
-                    }
-                )
-            }
-        } else {
-            binding.fragmentAuthorizationBrandLogoImageView.isVisible = false
-        }*/
-
         appIdentifiers.forEachIndexed { index, appIdentifier ->
             val appButton = createButton(appIdentifier)
 
@@ -132,7 +113,7 @@ class AuthorizationHardFragment(
         }
     }
 
-    private fun createButton(appIdentifier: AppIdentifier): MaterialButton {
+    public fun createButton(appIdentifier: AppIdentifier): MaterialButton {
         val appButton = MaterialButton(requireContext(), null, com.google.android.material.R.attr.borderlessButtonStyle)
         val continueString = getString(R.string.authorization_hard_continue, appIdentifier.name)
         val resourceId =

@@ -16,6 +16,8 @@ package de.netid.mobile.sdk.ui
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.Selection
@@ -25,13 +27,17 @@ import android.text.Spanned
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
+import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.databinding.FragmentAuthorizationSoftBinding
 import de.netid.mobile.sdk.model.AppIdentifier
@@ -149,6 +155,43 @@ class AuthorizationSoftFragment(
                 )
             }
         }
+    }
+
+    public fun createButton(appIdentifier: AppIdentifier): MaterialButton {
+        val appButton = MaterialButton(requireContext(), null, com.google.android.material.R.attr.borderlessButtonStyle)
+        val continueString = getString(R.string.authorization_hard_continue, appIdentifier.name)
+        val resourceId =
+            context?.resources?.getIdentifier(appIdentifiers[0].typeFaceIcon, "drawable", requireContext().opPackageName)
+        appButton.icon = resourceId?.let {
+            ResourcesCompat.getDrawable(
+                requireContext().resources,
+                it,
+                null
+            )
+        }
+        appButton.iconTint = ColorStateList.valueOf(Color.parseColor(appIdentifier.foregroundColor))
+        appButton.iconPadding = -100
+        appButton.text = continueString.uppercase()
+        appButton.setTextColor(Color.parseColor(appIdentifier.foregroundColor))
+        appButton.isAllCaps = true
+        appButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.authorization_button_text_size))
+        appButton.setCornerRadiusResource(R.dimen.authorization_button_corner_radius)
+        appButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(appIdentifier.backgroundColor))
+
+        val letterSpacingValue = TypedValue()
+        resources.getValue(R.dimen.authorization_button_letter_spacing, letterSpacingValue, true)
+        appButton.letterSpacing = letterSpacingValue.float
+
+        val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        appButton.layoutParams = layoutParams
+
+        appButton.setOnClickListener {
+            resultLauncher.launch(authorizationIntent)
+            listener.onAppButtonClicked(appIdentifier)
+            openApp(appIdentifier.android.verifiedAppLink)
+        }
+
+        return appButton
     }
 
     override fun onDestroyView() {

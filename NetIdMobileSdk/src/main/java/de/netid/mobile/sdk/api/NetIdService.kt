@@ -33,6 +33,7 @@ import de.netid.mobile.sdk.permission.PermissionManagerListener
 import de.netid.mobile.sdk.ui.AuthorizationFragmentListener
 import de.netid.mobile.sdk.ui.AuthorizationHardFragment
 import de.netid.mobile.sdk.ui.AuthorizationSoftFragment
+import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapter
 import de.netid.mobile.sdk.userinfo.UserInfoManager
 import de.netid.mobile.sdk.userinfo.UserInfoManagerListener
 import de.netid.mobile.sdk.util.JsonUtil
@@ -139,15 +140,6 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
 
         return button
     }
-/*
-    <com.google.android.material.button.MaterialButton
-    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textColor="@android:color/white"
-    android:textAllCaps="true"
-    android:letterSpacing="@dimen/authorization_button_letter_spacing"
-     />*/
 
     fun continueButtonLoginFlow(activity: Activity, authFlow: NetIdAuthFlow): MaterialButton {
         val button = MaterialButton(activity.applicationContext)
@@ -162,6 +154,11 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         return button
     }
 
+    fun getCountOfIdApps(context: Context): Int {
+        checkAvailableNetIdApplications(context)
+        return availableAppIdentifiers.count()
+    }
+
     fun permissionButtonForIdApp(activity: Activity, index: Int): MaterialButton? {
         val button = MaterialButton(activity.applicationContext)
         checkAvailableNetIdApplications(activity)
@@ -171,8 +168,69 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             return null
         }
         val result = availableAppIdentifiers[index]
+        netIdConfig?.let { config ->
+            val authIntent = appAuthManager.getWebAuthorizationIntent(
+                config.clientId,
+                config.redirectUri,
+                config.claims,
+                NetIdAuthFlow.Permission,
+                activity
+            )
+
+            if (authIntent != null) {
+                val authFragment = AuthorizationSoftFragment(
+                    this,
+                    availableAppIdentifiers,
+                    authIntent,
+                    config.permissionLayerConfig.logoId,
+                    config.permissionLayerConfig.headlineText,
+                    config.permissionLayerConfig.legalText,
+                    config.permissionLayerConfig.continueText
+                )
+//                AuthorizationAppListAdapter(activity.applicationContext, availableAppIdentifiers).getView(index, )
+                return authFragment.createButton(availableAppIdentifiers[index])
+            }
+        }
+
 
         return button
+    }
+
+    fun loginButtonForIdApp(activity: Activity, index: Int, authFlow: NetIdAuthFlow): MaterialButton? {
+        checkAvailableNetIdApplications(activity)
+        // If there are no ID apps installed, return with an error.
+        if (availableAppIdentifiers.isEmpty() || (index >= availableAppIdentifiers.count())) {
+            this.onAuthorizationFailed(NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.NoIdAppInstalled))
+            return null
+        }
+
+        // Wrong auth flow for this type of button
+        if (authFlow == NetIdAuthFlow.Permission)
+            return null
+
+        netIdConfig?.let { config ->
+            val authIntent = appAuthManager.getWebAuthorizationIntent(
+                config.clientId,
+                config.redirectUri,
+                config.claims,
+                authFlow,
+                activity
+            )
+
+            if (authIntent != null) {
+                val authFragment = AuthorizationHardFragment(
+                    this,
+                    availableAppIdentifiers,
+                    authIntent,
+                    authFlow,
+                    config.loginLayerConfig.headlineText,
+                    config.loginLayerConfig.loginText,
+                    config.loginLayerConfig.continueText
+                )
+                return authFragment.createButton(availableAppIdentifiers[index])
+            }
+        }
+        return null
     }
 
 
