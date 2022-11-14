@@ -39,6 +39,8 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     UserInfoManagerListener, PermissionManagerListener {
 
     private const val appIdentifierFilename = "netIdAppIdentifiers.json"
+    private const val broker = "broker.netid.de"
+
     private var netIdConfig: NetIdConfig? = null
 
     private lateinit var appAuthManager: AppAuthManager
@@ -64,7 +66,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             }
 
             this.netIdConfig = netIdConfig
-            setupAuthManagerAndFetchConfiguration(netIdConfig.host)
+            setupAuthManagerAndFetchConfiguration(broker)
             setupUserInfoManager()
             setupPermissionManager()
         }
@@ -131,14 +133,10 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         if (handleConnection(context, NetIdErrorProcess.UserInfo)) {
             var error: NetIdError? = null
 
-            netIdConfig?.let { config ->
-                appAuthManager.getAccessToken()?.let { token ->
-                    userInfoManager.fetchUserInfo(config.host, token)
-                } ?: {
-                    error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.UnauthorizedClient)
-                }
+            appAuthManager.getAccessToken()?.let { token ->
+                userInfoManager.fetchUserInfo(broker, token)
             } ?: run {
-                error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.Uninitialized)
+                error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.UnauthorizedClient)
             }
 
             error?.let {
