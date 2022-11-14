@@ -30,7 +30,7 @@ class TokenUtil {
             val decodedString: MutableList<String> = mutableListOf()
             parts.forEachIndexed { index, part ->
                 if (index < 2) {
-                    val bytes: ByteArray = Base64.decode(part, Base64.DEFAULT)
+                    val bytes: ByteArray = Base64.decode(part, Base64.URL_SAFE)
                     decodedString.add(String(bytes, StandardCharsets.UTF_8))
                 }
             }
