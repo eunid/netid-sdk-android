@@ -16,7 +16,6 @@ package de.netid.mobile.sdk.ui
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.text.Selection
@@ -118,7 +117,7 @@ class AuthorizationSoftFragment(
 
     private fun setupAppButtons() {
         val netIdString = getString(R.string.authorization_soft_net_id)
-        val chooseString = getString(R.string.authorization_soft_choose_partner)
+        val chooseString = getString(R.string.authorization_soft_choose_account_provider)
         when (appIdentifiers.size) {
             0 -> binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
                 getString(R.string.authorization_soft_legal_info, netIdString) + getString(R.string.authorization_soft_legal_info_fixed, netIdString, "")
@@ -200,7 +199,7 @@ class AuthorizationSoftFragment(
     }
 
     override fun onAppSelected(name: String) {
-        val chooseString = getString(R.string.authorization_soft_choose_partner)
+        val chooseString = getString(R.string.authorization_soft_choose_account_provider)
         binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
             getString(
                 R.string.authorization_soft_legal_info,
