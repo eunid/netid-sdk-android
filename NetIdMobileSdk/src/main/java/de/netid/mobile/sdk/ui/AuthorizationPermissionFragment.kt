@@ -33,13 +33,13 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import de.netid.mobile.sdk.R
-import de.netid.mobile.sdk.databinding.FragmentAuthorizationSoftBinding
+import de.netid.mobile.sdk.databinding.FragmentAuthorizationPermissionBinding
 import de.netid.mobile.sdk.model.AppIdentifier
 import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapter
 import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapterListener
 
 
-class AuthorizationSoftFragment(
+class AuthorizationPermissionFragment(
     private val listener: AuthorizationFragmentListener,
     private val appIdentifiers: MutableList<AppIdentifier> = mutableListOf(),
     private val authorizationIntent: Intent,
@@ -52,7 +52,7 @@ class AuthorizationSoftFragment(
         private const val netIdScheme = "scheme"
     }
 
-    private var _binding: FragmentAuthorizationSoftBinding? = null
+    private var _binding: FragmentAuthorizationPermissionBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
@@ -72,7 +72,7 @@ class AuthorizationSoftFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentAuthorizationSoftBinding.inflate(inflater, container, false)
+        _binding = FragmentAuthorizationPermissionBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -97,7 +97,7 @@ class AuthorizationSoftFragment(
     }
 
     private fun setupStandardButtons() {
-        binding.fragmentAuthorizationButtonAgreeAndContinue.text = getString(R.string.authorization_soft_agree_and_continue_with_net_id).uppercase()
+        binding.fragmentAuthorizationButtonAgreeAndContinue.text = getString(R.string.authorization_permission_agree_and_continue_with_net_id).uppercase()
         binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
             var adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter
             // If we only have one app or the user did not make changes to the default, use the standard one.
@@ -116,27 +116,27 @@ class AuthorizationSoftFragment(
     }
 
     private fun setupAppButtons() {
-        val netIdString = getString(R.string.authorization_soft_net_id)
-        val chooseString = getString(R.string.authorization_soft_choose_account_provider)
+        val netIdString = getString(R.string.authorization_permission_net_id)
+        val chooseString = getString(R.string.authorization_permission_choose_account_provider)
         when (appIdentifiers.size) {
             0 -> binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
-                getString(R.string.authorization_soft_legal_info, netIdString) + getString(R.string.authorization_soft_legal_info_fixed, netIdString, "")
+                getString(R.string.authorization_permission_legal_info, netIdString) + getString(R.string.authorization_permission_legal_info_fixed, netIdString, "")
             } else {
-                String.format(legalText, netIdString) + getString(R.string.authorization_soft_legal_info_fixed, netIdString, "")
+                String.format(legalText, netIdString) + getString(R.string.authorization_permission_legal_info_fixed, netIdString, "")
             }
             1 -> binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
-                getString(R.string.authorization_soft_legal_info, appIdentifiers[0].name) + getString(R.string.authorization_soft_legal_info_fixed, appIdentifiers[0].name, "")
+                getString(R.string.authorization_permission_legal_info, appIdentifiers[0].name) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, "")
             } else {
-                String.format(legalText, appIdentifiers[0].name) + getString(R.string.authorization_soft_legal_info_fixed, appIdentifiers[0].name, "")
+                String.format(legalText, appIdentifiers[0].name) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, "")
             }
             else -> {
                 binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
                     getString(
-                        R.string.authorization_soft_legal_info,
+                        R.string.authorization_permission_legal_info,
                         appIdentifiers[0].name
-                    ) + getString(R.string.authorization_soft_legal_info_fixed, appIdentifiers[0].name, chooseString)
+                    ) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, chooseString)
                 } else {
-                    String.format(legalText, appIdentifiers[0].name) + getString(R.string.authorization_soft_legal_info_fixed, appIdentifiers[0].name, chooseString)
+                    String.format(legalText, appIdentifiers[0].name) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, chooseString)
                 }
                 binding.fragmentAuthorizationLegalInfoTextView.makeLinks(
                     Pair(chooseString, View.OnClickListener {
@@ -199,14 +199,14 @@ class AuthorizationSoftFragment(
     }
 
     override fun onAppSelected(name: String) {
-        val chooseString = getString(R.string.authorization_soft_choose_account_provider)
+        val chooseString = getString(R.string.authorization_permission_choose_account_provider)
         binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
             getString(
-                R.string.authorization_soft_legal_info,
+                R.string.authorization_permission_legal_info,
                 appIdentifiers[0].name
-            ) + getString(R.string.authorization_soft_legal_info_fixed, appIdentifiers[0].name, chooseString)
+            ) + getString(R.string.authorization_permission_legal_info_fixed, name, chooseString)
         } else {
-            String.format(legalText, appIdentifiers[0].name) + getString(R.string.authorization_soft_legal_info_fixed, appIdentifiers[0].name, chooseString)
+            String.format(legalText, name) + getString(R.string.authorization_permission_legal_info_fixed, name, chooseString)
         }
     }
 }
