@@ -32,13 +32,17 @@ class SdkContentBottomDialogFragment : BottomSheetDialogFragment() {
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
 
+    private var isClosed = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = BottomDialogSdkContentBinding.inflate(inflater, container, false)
+        isClosed = false
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        isClosed = false
 
         sdkContentFragment?.let { contentFragment ->
             childFragmentManager.beginTransaction().replace(binding.bottomDialogSdkContentContainerLayout.id, contentFragment).commit()
@@ -47,7 +51,14 @@ class SdkContentBottomDialogFragment : BottomSheetDialogFragment() {
 
     override fun onDestroyView() {
         _binding = null
-        NetIdService.onCloseClicked()
+        if (!isClosed)
+            NetIdService.onCloseClicked()
+        isClosed = true
         super.onDestroyView()
+    }
+
+    override fun dismiss() {
+        super.dismissAllowingStateLoss()
+        isClosed = true
     }
 }

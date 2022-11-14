@@ -152,23 +152,34 @@ class AppAuthManagerImpl : AppAuthManager {
                     listener?.onAuthorizationFailed(createNetIdErrorForAuthorizationException(exception))
                 }
             }
-        }
-        authService?.performTokenRequest(authorizationResponse.createTokenExchangeRequest()) { response, exception ->
-            authState?.update(response, exception)
-            exception?.let { authException ->
-                listener?.onAuthorizationFailed(createNetIdErrorForAuthorizationException(authException))
-            } ?: run {
-                response?.let { tokenResponse ->
-                    Log.i(javaClass.simpleName, "Received token response: ${tokenResponse.accessToken}")
-                    idToken = tokenResponse.idToken
-                    listener?.onAuthorizationSuccessful()
+        } else {
+            authService?.performTokenRequest(authorizationResponse.createTokenExchangeRequest()) { response, exception ->
+                authState?.update(response, exception)
+                exception?.let { authException ->
+                    listener?.onAuthorizationFailed(
+                        createNetIdErrorForAuthorizationException(
+                            authException
+                        )
+                    )
+                } ?: run {
+                    response?.let { tokenResponse ->
+                        Log.i(
+                            javaClass.simpleName,
+                            "Received token response: ${tokenResponse.accessToken}"
+                        )
+                        idToken = tokenResponse.idToken
+                        listener?.onAuthorizationSuccessful()
+                    }
                 }
             }
         }
     }
 
     private fun createNetIdErrorForAuthorizationException(authorizationException: AuthorizationException): NetIdError {
-        val msg = authorizationException.error + " - " + authorizationException.errorDescription
+        var msg = ""
+        if (authorizationException.error != null) {
+            msg = authorizationException.error + " - " + authorizationException.errorDescription
+        }
         return when (authorizationException) {
             AuthorizationException.GeneralErrors.NETWORK_ERROR -> NetIdError(
                 NetIdErrorProcess.Configuration,
