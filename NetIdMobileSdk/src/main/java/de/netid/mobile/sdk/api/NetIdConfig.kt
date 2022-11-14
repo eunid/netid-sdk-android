@@ -27,7 +27,6 @@ data class LoginLayerConfig(
 )
 
 data class NetIdConfig(
-    val host: String,
     val clientId: String,
     val redirectUri: String,
     val claims: String,
