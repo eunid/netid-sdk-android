@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implement ui feedback
 - Refined JSON handling
 - Changed some wording
+- Renamed soft/hard to permission/login
 
 ### Fixed
 - Fixed UserInfo json parser error
@@ -47,4 +48,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Only set claims in login and login+permission flows
 - Make get/update permission possible in permission flow
 - Fixed possible exception during permission fetch
+- Set correct value for app name
  

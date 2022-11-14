@@ -27,15 +27,14 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.content.res.ResourcesCompat.getDrawable
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.api.NetIdAuthFlow
-import de.netid.mobile.sdk.databinding.FragmentAuthorizationHardBinding
+import de.netid.mobile.sdk.databinding.FragmentAuthorizationLoginBinding
 import de.netid.mobile.sdk.model.AppIdentifier
 
-class AuthorizationHardFragment(
+class AuthorizationLoginFragment(
     private val listener: AuthorizationFragmentListener,
     private val appIdentifiers: List<AppIdentifier>,
     private val authorizationIntent: Intent,
@@ -48,7 +47,7 @@ class AuthorizationHardFragment(
         private const val netIdScheme = "scheme"
     }
 
-    private var _binding: FragmentAuthorizationHardBinding? = null
+    private var _binding: FragmentAuthorizationLoginBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
@@ -68,7 +67,7 @@ class AuthorizationHardFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentAuthorizationHardBinding.inflate(inflater, container, false)
+        _binding = FragmentAuthorizationLoginBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -87,7 +86,7 @@ class AuthorizationHardFragment(
         if (context?.applicationInfo?.name.toString().uppercase() != "NULL") {
             currentAppName = context?.applicationInfo?.name.toString()
         }
-//        val continueString = getString(R.string.authorization_hard_continue, currentAppName)
+//        val continueString = getString(R.string.authorization_login_continue, currentAppName)
 //        binding.fragmentAuthorizationButtonClose.text = continueString.uppercase()
         binding.fragmentAuthorizationButtonClose.setOnClickListener {
             listener.onCloseClicked()
@@ -134,7 +133,11 @@ class AuthorizationHardFragment(
 
     private fun createButton(appIdentifier: AppIdentifier): MaterialButton {
         val appButton = MaterialButton(requireContext(), null, com.google.android.material.R.attr.borderlessButtonStyle)
-        val continueString = getString(R.string.authorization_hard_continue, appIdentifier.name)
+        val continueString = if (loginText.isEmpty()) {
+            getString(R.string.authorization_login_continue, appIdentifier.name)
+        } else {
+            String.format(loginText, appIdentifier.name)
+        }
         val resourceId =
             context?.resources?.getIdentifier(appIdentifiers[0].typeFaceIcon, "drawable", requireContext().opPackageName)
         appButton.icon = resourceId?.let {

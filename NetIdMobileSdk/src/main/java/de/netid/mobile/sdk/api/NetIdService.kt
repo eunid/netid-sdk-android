@@ -26,8 +26,8 @@ import de.netid.mobile.sdk.model.*
 import de.netid.mobile.sdk.permission.PermissionManager
 import de.netid.mobile.sdk.permission.PermissionManagerListener
 import de.netid.mobile.sdk.ui.AuthorizationFragmentListener
-import de.netid.mobile.sdk.ui.AuthorizationHardFragment
-import de.netid.mobile.sdk.ui.AuthorizationSoftFragment
+import de.netid.mobile.sdk.ui.AuthorizationLoginFragment
+import de.netid.mobile.sdk.ui.AuthorizationPermissionFragment
 import de.netid.mobile.sdk.userinfo.UserInfoManager
 import de.netid.mobile.sdk.userinfo.UserInfoManagerListener
 import de.netid.mobile.sdk.util.JsonUtil
@@ -103,11 +103,11 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             )?.let {
                 when (authFlow) {
                     NetIdAuthFlow.Login, NetIdAuthFlow.LoginPermission ->
-                        AuthorizationHardFragment(
+                        AuthorizationLoginFragment(
                             this, availableAppIdentifiers, it, authFlow, config.loginLayerConfig.headlineText, config.loginLayerConfig.loginText, config.loginLayerConfig.continueText
                         )
                     NetIdAuthFlow.Permission ->
-                        AuthorizationSoftFragment(
+                        AuthorizationPermissionFragment(
                             this, availableAppIdentifiers, it, config.permissionLayerConfig.logoId, config.permissionLayerConfig.headlineText, config.permissionLayerConfig.legalText, config.permissionLayerConfig.continueText
                         )
                 }
