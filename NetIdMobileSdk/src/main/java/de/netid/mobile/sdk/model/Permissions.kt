@@ -16,6 +16,8 @@ package de.netid.mobile.sdk.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Serializable
 data class Permissions(
@@ -27,6 +29,7 @@ data class Permissions(
     val netIdPrivacySettings: List<NetIdPrivacySettings>
 ) {
     override fun toString(): String {
-        return "Permissions(statusCode=$statusCode, subjectIdentifiers=$subjectIdentifiers, netIdPrivacySettings=$netIdPrivacySettings)"
+        val format = Json { encodeDefaults = false }
+        return format.encodeToString(this)
     }
 }

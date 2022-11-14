@@ -7,7 +7,7 @@
     <string name="authorization_soft_agree_and_continue_with_net_id">Zustimmen mit netID</string>
     <string name="authorization_soft_close">Schließen</string>
     <string name="authorization_soft_net_id">netID</string>
-    <string name="authorization_soft_choose_partner">(anderen Partner hier auswählen)</string>
+    <string name="authorization_soft_choose_account_provider">(anderen netID Account Anbieter hier auswählen)</string>
 
     <!-- Hard authorization-->
     <string name="authorization_hard_title_text">Login mit netID</string>

@@ -26,6 +26,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.content.res.ResourcesCompat.getDrawable
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
@@ -133,9 +135,20 @@ class AuthorizationHardFragment(
     private fun createButton(appIdentifier: AppIdentifier): MaterialButton {
         val appButton = MaterialButton(requireContext(), null, com.google.android.material.R.attr.borderlessButtonStyle)
         val continueString = getString(R.string.authorization_hard_continue, appIdentifier.name)
+        val resourceId =
+            context?.resources?.getIdentifier(appIdentifiers[0].typeFaceIcon, "drawable", requireContext().opPackageName)
+        appButton.icon = resourceId?.let {
+            ResourcesCompat.getDrawable(
+                requireContext().resources,
+                it,
+                null
+            )
+        }
+        appButton.iconTint = ColorStateList.valueOf(Color.parseColor(appIdentifier.foregroundColor))
+        appButton.iconPadding = -100
         appButton.text = continueString.uppercase()
         appButton.setTextColor(Color.parseColor(appIdentifier.foregroundColor))
-        appButton.isAllCaps = false
+        appButton.isAllCaps = true
         appButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.authorization_button_text_size))
         appButton.setCornerRadiusResource(R.dimen.authorization_button_corner_radius)
         appButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(appIdentifier.backgroundColor))

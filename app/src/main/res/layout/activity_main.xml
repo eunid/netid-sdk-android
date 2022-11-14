@@ -13,10 +13,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/net_id_service"
+        android:textColor="@color/authorization_title_text_color"
         android:textSize="@dimen/net_id_service_title_text_size"
-        android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
