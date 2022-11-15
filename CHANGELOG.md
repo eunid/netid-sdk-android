@@ -37,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make subclaims optional, too
 - Broker/host is no longer configurable from the outside
 - Changes in calling verified app links
+- Use userinfo endpoint from discovery document
+- Get rid of copy of id token
 
 ### Fixed
 - Fixed UserInfo json parser error
