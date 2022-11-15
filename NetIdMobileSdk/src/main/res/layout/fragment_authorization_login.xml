@@ -85,6 +85,10 @@
             android:textAllCaps="true"
             android:textSize="@dimen/authorization_button_text_size"
             android:letterSpacing="@dimen/authorization_button_letter_spacing"
+            app:icon="@drawable/ic_netid_logo_small"
+            app:iconSize="20dp"
+            app:iconTint="@null"
+            app:iconPadding="-20dp"
             app:cornerRadius="@dimen/authorization_button_corner_radius"
             app:backgroundTint="@color/authorization_net_id_button_color" />
 

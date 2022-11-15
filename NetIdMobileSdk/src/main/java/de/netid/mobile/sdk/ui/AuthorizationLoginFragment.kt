@@ -102,25 +102,6 @@ class AuthorizationLoginFragment(
             binding.fragmentAuthorizationButtonAgreeAndContinue.visibility = View.VISIBLE
         }
 
-        /*
-        if (appIdentifiers.size == 1) {
-            context?.let { context ->
-                val resourceId =
-                    context.resources?.getIdentifier(appIdentifiers[0].typeFaceIcon, "drawable", context.opPackageName)
-                binding.fragmentAuthorizationBrandLogoImageView.setImageDrawable(
-                    resourceId?.let {
-                        ResourcesCompat.getDrawable(
-                            context.resources,
-                            it,
-                            null
-                        )
-                    }
-                )
-            }
-        } else {
-            binding.fragmentAuthorizationBrandLogoImageView.isVisible = false
-        }*/
-
         appIdentifiers.forEachIndexed { index, appIdentifier ->
             val appButton = createButton(appIdentifier)
 
@@ -164,7 +145,6 @@ class AuthorizationLoginFragment(
         appButton.layoutParams = layoutParams
 
         appButton.setOnClickListener {
-            resultLauncher.launch(authorizationIntent)
             listener.onAppButtonClicked(appIdentifier)
             openApp(appIdentifier.android.verifiedAppLink)
         }
@@ -178,14 +158,14 @@ class AuthorizationLoginFragment(
     }
 
     private fun openApp(verifiedAppLink: String) {
-        val authIntent = authorizationIntent.extras?.get("authIntent")as Intent
-        val authUri = authIntent.data as Uri
-        val uri = authUri.toString().replaceBefore("?", verifiedAppLink)
-
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
-//        intent?.putExtra(netIdScheme, context?.applicationInfo?.packageName)
-        intent.let {
-            context?.startActivity(intent)
+        authorizationIntent.extras?.apply {
+            val authIntent = getParcelable<Intent>("authIntent") ?: return@apply
+            val authUri = authIntent.data as Uri
+            val uri = authUri.toString().replaceBefore("?", verifiedAppLink)
+            authIntent.setPackage(null)
+            authIntent.data = Uri.parse(uri)
+            putParcelable("authIntent", authIntent)
         }
+        resultLauncher.launch(authorizationIntent)
     }
 }

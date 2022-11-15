@@ -6,8 +6,8 @@
     <color name="authorization_agree_text_color">#FFFFFF</color>
     <color name="authorization_agree_button_color">#525252</color>
 
-    <color name="authorization_net_id_button_color">#76B82A</color>
-    <color name="authorization_close_button_color">#525252</color>
+    <color name="authorization_net_id_button_color">#525252</color>
+    <color name="authorization_close_button_color">#99FFFFFF</color>
     <color name="authorization_app_button_color">#FFFFFF</color>
     <color name="authorization_close_button_background_color">#00000000</color>
 
