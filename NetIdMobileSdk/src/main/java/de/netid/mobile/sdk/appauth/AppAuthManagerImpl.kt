@@ -39,25 +39,20 @@ class AppAuthManagerImpl : AppAuthManager {
     private var authorizationServiceConfiguration: AuthorizationServiceConfiguration? = null
     private var authState: AuthState? = null
     private var authService: AuthorizationService? = null
-    private var idToken: String? = null
     private var authRequest: AuthorizationRequest? = null
 
     override fun getAccessToken(): String? {
         return authState?.accessToken
     }
 
-    override fun getIdToken(): String? {
-        return idToken
-    }
-
-    override fun setIdToken(token: String) {
-        idToken = token
-    }
-
     override fun getPermissionToken(): String? {
         // Fallback for getting a permission token as long as there is no refresh token flow (and only permission scope was requested).
-        val token = getIdToken() ?: return getAccessToken()
+        val token = authState?.idToken ?: return getAccessToken()
         return TokenUtil.getPermissionTokenFrom(token)
+    }
+
+    override fun getAuthState(): AuthState? {
+        return authState
     }
 
     override fun fetchAuthorizationServiceConfiguration(host: String) {
@@ -150,7 +145,6 @@ class AppAuthManagerImpl : AppAuthManager {
                         javaClass.simpleName,
                         "Received token response: ${tokenResponse.accessToken}"
                     )
-                    idToken = tokenResponse.idToken
                     listener?.onAuthorizationSuccessful()
                 }
             }

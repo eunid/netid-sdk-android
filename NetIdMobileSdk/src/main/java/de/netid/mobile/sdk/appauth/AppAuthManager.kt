@@ -17,6 +17,7 @@ package de.netid.mobile.sdk.appauth
 import android.app.Activity
 import android.content.Intent
 import de.netid.mobile.sdk.api.NetIdAuthFlow
+import net.openid.appauth.AuthState
 
 interface AppAuthManager {
 
@@ -38,7 +39,5 @@ interface AppAuthManager {
 
     fun getPermissionToken(): String?
 
-    fun setIdToken(token: String)
-
-    fun getIdToken(): String?
+    fun getAuthState(): AuthState?
 }
