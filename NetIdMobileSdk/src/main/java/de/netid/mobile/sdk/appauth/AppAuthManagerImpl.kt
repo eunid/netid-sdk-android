@@ -123,53 +123,35 @@ class AppAuthManagerImpl : AppAuthManager {
 
     override fun processAuthorizationIntent(data: Intent) {
         val authorizationResponse = AuthorizationResponse.Builder(authRequest!!).fromUri(data.data!!).build()
-        val authorizationException = AuthorizationException.fromIntent(data)
-
-        authState?.update(authorizationResponse, authorizationException)
+        var authorizationException = AuthorizationException.fromIntent(data)
 
         authorizationException?.let {
             val netIdError = createNetIdErrorForAuthorizationException(it)
             listener?.onAuthorizationFailed(netIdError)
         } ?: run {
-            authorizationResponse?.let {
+            authorizationResponse.let {
                 processTokenExchange(it)
-            } ?: run {
-                val netIdError =
-                    NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.Unknown)
-                listener?.onAuthorizationServiceConfigurationFetchFailed(netIdError)
             }
         }
     }
 
     private fun processTokenExchange(authorizationResponse: AuthorizationResponse) {
-        if (authorizationResponse.authorizationCode == null) {
-            if (authorizationResponse.additionalParameters.containsKey("error_code")) {
-                authorizationResponse.additionalParameters["error_code"]?.let {
-                    Log.i(javaClass.simpleName,
-                        it
+        authService?.performTokenRequest(authorizationResponse.createTokenExchangeRequest()) { response, exception ->
+            authState?.update(response, exception)
+            exception?.let { authException ->
+                listener?.onAuthorizationFailed(
+                    createNetIdErrorForAuthorizationException(
+                        authException
                     )
-                    val exception = AuthorizationException.AuthorizationRequestErrors.byString(it)
-                    listener?.onAuthorizationFailed(createNetIdErrorForAuthorizationException(exception))
-                }
-            }
-        } else {
-            authService?.performTokenRequest(authorizationResponse.createTokenExchangeRequest()) { response, exception ->
-                authState?.update(response, exception)
-                exception?.let { authException ->
-                    listener?.onAuthorizationFailed(
-                        createNetIdErrorForAuthorizationException(
-                            authException
-                        )
+                )
+            } ?: run {
+                response?.let { tokenResponse ->
+                    Log.i(
+                        javaClass.simpleName,
+                        "Received token response: ${tokenResponse.accessToken}"
                     )
-                } ?: run {
-                    response?.let { tokenResponse ->
-                        Log.i(
-                            javaClass.simpleName,
-                            "Received token response: ${tokenResponse.accessToken}"
-                        )
-                        idToken = tokenResponse.idToken
-                        listener?.onAuthorizationSuccessful()
-                    }
+                    idToken = tokenResponse.idToken
+                    listener?.onAuthorizationSuccessful()
                 }
             }
         }

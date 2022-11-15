@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Renamed soft/hard to permission/login
 - Make subclaims optional, too
 - Broker/host is no longer configurable from the outside
+- Changes in calling verified app links
 
 ### Fixed
 - Fixed UserInfo json parser error
