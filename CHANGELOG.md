@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changes in calling verified app links
 - Use userinfo endpoint from discovery document
 - Get rid of copy of id token
+- Cleaned up unused string resources
 
 ### Fixed
 - Fixed UserInfo json parser error
