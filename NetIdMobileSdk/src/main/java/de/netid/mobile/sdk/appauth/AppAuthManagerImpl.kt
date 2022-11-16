@@ -39,7 +39,6 @@ class AppAuthManagerImpl : AppAuthManager {
     private var authorizationServiceConfiguration: AuthorizationServiceConfiguration? = null
     private var authState: AuthState? = null
     private var authService: AuthorizationService? = null
-    private var authRequest: AuthorizationRequest? = null
 
     override fun getAccessToken(): String? {
         return authState?.accessToken
@@ -84,6 +83,7 @@ class AppAuthManagerImpl : AppAuthManager {
     ): Intent? {
         authorizationServiceConfiguration?.let { serviceConfiguration ->
             var scopes = mutableListOf<String>()
+            var claimsJSON: JSONObject? = if(claims.isEmpty()) null else JSONObject(claims)
             when (flow) {
                 NetIdAuthFlow.Login -> {
                     scopes.add(AuthorizationRequest.Scope.OPENID)
@@ -93,11 +93,11 @@ class AppAuthManagerImpl : AppAuthManager {
                     scopes.add(scopePermissionManagement)
                 }
                 NetIdAuthFlow.Permission -> {
+                    // remove claims, not relevant for this flow
+                    claimsJSON = null
                     scopes.add(scopePermissionManagement)
                 }
             }
-
-            val claimsJSON = if(claims.isEmpty() ) null else JSONObject(claims)
             val authRequestBuilder =
                 AuthorizationRequest.Builder(
                     serviceConfiguration,
@@ -106,10 +106,9 @@ class AppAuthManagerImpl : AppAuthManager {
                     Uri.parse(redirectUri)
                 ).setScopes(scopes
                 ).setClaims(claimsJSON)
-            authRequest = authRequestBuilder.build()
-
+            val authRequest = authRequestBuilder.build()
             authService = AuthorizationService(activity)
-            return authService?.getAuthorizationRequestIntent(authRequest!!)
+            return authService?.getAuthorizationRequestIntent(authRequest)
         } ?: run {
             Log.e(javaClass.simpleName, "No authorization service configuration available")
             return null
@@ -117,14 +116,16 @@ class AppAuthManagerImpl : AppAuthManager {
     }
 
     override fun processAuthorizationIntent(data: Intent) {
-        val authorizationResponse = AuthorizationResponse.Builder(authRequest!!).fromUri(data.data!!).build()
-        var authorizationException = AuthorizationException.fromIntent(data)
+        val authorizationResponse = AuthorizationResponse.fromIntent(data)
+        val authorizationException = AuthorizationException.fromIntent(data)
+
+        authState?.update(authorizationResponse,authorizationException)
 
         authorizationException?.let {
             val netIdError = createNetIdErrorForAuthorizationException(it)
             listener?.onAuthorizationFailed(netIdError)
         } ?: run {
-            authorizationResponse.let {
+            authorizationResponse?.let {
                 processTokenExchange(it)
             }
         }
