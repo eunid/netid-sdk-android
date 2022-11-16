@@ -32,7 +32,7 @@
             android:layout_height="48dp"
             android:contentDescription="@string/authorization_permission_close"
             android:scaleType="fitCenter"
-            app:icon="@android:drawable/ic_menu_close_clear_cancel"
+            app:icon="@drawable/ic_baseline_close_24"
             app:cornerRadius="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
