@@ -80,8 +80,8 @@
             android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/authorization_permission_agree_and_continue_with_net_id"
-            android:textColor="@android:color/white"
+            android:text="@string/authorization_login_title_text"
+            android:textColor="@color/authorization_agree_text_color"
             android:textAllCaps="true"
             android:textSize="@dimen/authorization_button_text_size"
             android:letterSpacing="@dimen/authorization_button_letter_spacing"
@@ -89,8 +89,10 @@
             app:iconSize="20dp"
             app:iconTint="@null"
             app:iconPadding="-20dp"
-            app:cornerRadius="@dimen/authorization_button_corner_radius"
-            app:backgroundTint="@color/authorization_net_id_button_color" />
+            app:backgroundTint="@color/authorization_net_id_button_color"                app:cornerRadius="@dimen/authorization_button_corner_radius"
+            app:strokeColor="@color/authorization_close_button_color"
+            app:strokeWidth="@dimen/authorization_close_button_stroke_width"
+            app:rippleColor="@color/authorization_close_button_color"  />
 
         <com.google.android.material.button.MaterialButton
                 style="@style/Widget.MaterialComponents.Button.UnelevatedButton"

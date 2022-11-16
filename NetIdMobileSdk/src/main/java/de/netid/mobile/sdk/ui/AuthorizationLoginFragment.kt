@@ -38,7 +38,6 @@ class AuthorizationLoginFragment(
     private val listener: AuthorizationFragmentListener,
     private val appIdentifiers: List<AppIdentifier>,
     private val authorizationIntent: Intent,
-    private val authFlow: NetIdAuthFlow,
     private val headlineText: String = "",
     private val loginText: String = "",
     private val continueText: String = ""
@@ -82,12 +81,6 @@ class AuthorizationLoginFragment(
     }
 
     private fun setupStandardButtons() {
-        var currentAppName = "App"
-        if (context?.applicationInfo?.name.toString().uppercase() != "NULL") {
-            currentAppName = context?.applicationInfo?.name.toString()
-        }
-//        val continueString = getString(R.string.authorization_login_continue, currentAppName)
-//        binding.fragmentAuthorizationButtonClose.text = continueString.uppercase()
         binding.fragmentAuthorizationButtonClose.setOnClickListener {
             listener.onCloseClicked()
         }
@@ -98,7 +91,7 @@ class AuthorizationLoginFragment(
 
     private fun setupAppButtons() {
         // If there are no apps installed, display a standard button to enable app2web flow
-        if (appIdentifiers.size == 0) {
+        if (appIdentifiers.isEmpty()) {
             binding.fragmentAuthorizationButtonAgreeAndContinue.visibility = View.VISIBLE
         }
 
