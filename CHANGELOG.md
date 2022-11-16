@@ -42,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cleaned up unused string resources
 - Small refactoring about claims handling
 - Changed icon for close button
+- Some cleanups
 
 ### Fixed
 - Fixed UserInfo json parser error

@@ -39,6 +39,8 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         private const val clientId = "082531ba-1b22-4381-81b1-64add4b85b8a"
         private const val redirectUri = "https://netid-sdk-web.letsdev.de/redirect"
         private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
+        private val permissionLayerConfig = null
+        private val loginLayerConfig = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,7 +85,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     private fun setupNetIdConfig() {
-        netIdConfig = NetIdConfig(clientId, redirectUri, claims)
+        netIdConfig = NetIdConfig(clientId, redirectUri, claims, permissionLayerConfig, loginLayerConfig)
         NetIdService.addListener(this)
     }
 

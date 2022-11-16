@@ -91,11 +91,11 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                 when (authFlow) {
                     NetIdAuthFlow.Login, NetIdAuthFlow.LoginPermission ->
                         AuthorizationLoginFragment(
-                            this, availableAppIdentifiers, it, authFlow, config.loginLayerConfig.headlineText, config.loginLayerConfig.loginText, config.loginLayerConfig.continueText
+                            this, availableAppIdentifiers, it, (config.loginLayerConfig?.headlineText) ?: "", (config.loginLayerConfig?.loginText) ?:"", (config.loginLayerConfig?.continueText)?: ""
                         )
                     NetIdAuthFlow.Permission ->
                         AuthorizationPermissionFragment(
-                            this, availableAppIdentifiers, it, config.permissionLayerConfig.logoId, config.permissionLayerConfig.headlineText, config.permissionLayerConfig.legalText, config.permissionLayerConfig.continueText
+                            this, availableAppIdentifiers, it, (config.permissionLayerConfig?.logoId)?: "", (config.permissionLayerConfig?.headlineText)?: "", (config.permissionLayerConfig?.legalText)?: "", (config.permissionLayerConfig?.continueText)?: ""
                         )
                 }
             }
