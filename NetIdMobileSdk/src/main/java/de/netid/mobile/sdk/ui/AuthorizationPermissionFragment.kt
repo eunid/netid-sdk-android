@@ -160,15 +160,15 @@ class AuthorizationPermissionFragment(
     }
 
     private fun openApp(verifiedAppLink: String) {
-        val authIntent = authorizationIntent.extras?.get("authIntent")as Intent
-        val authUri = authIntent.data as Uri
-        val uri = authUri.toString().replaceBefore("?", verifiedAppLink)
-
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
-//        intent?.putExtra(netIdScheme, context?.applicationInfo?.packageName)
-        intent.let {
-            context?.startActivity(intent)
+        authorizationIntent.extras?.apply {
+            val authIntent = getParcelable<Intent>("authIntent") ?: return@apply
+            val authUri = authIntent.data as Uri
+            val uri = authUri.toString().replaceBefore("?", verifiedAppLink)
+            authIntent.setPackage(null)
+            authIntent.data = Uri.parse(uri)
+            putParcelable("authIntent", authIntent)
         }
+        resultLauncher.launch(authorizationIntent)
     }
 
     private fun TextView.createAccountProviderSelectionLink(vararg links: Pair<String, View.OnClickListener>) {

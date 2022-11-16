@@ -27,7 +27,6 @@ object WebserviceConstants {
     const val GET_METHOD = "GET"
     const val POST_METHOD = "POST"
     const val HTTPS_PROTOCOL = "https://"
-    const val USER_INFO_PATH = "/userinfo"
     const val PERMISSION_READ_HOST = "einwilligungsspeicher.netid.de"
     const val PERMISSION_READ_PATH = "/netid-user-status"
     const val PERMISSION_WRITE_HOST = "einwilligen.netid.de"

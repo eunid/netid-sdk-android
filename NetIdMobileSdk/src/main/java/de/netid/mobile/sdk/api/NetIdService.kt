@@ -72,16 +72,6 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
-    fun transmitToken(token: String) {
-        if (TokenUtil.isValidJwtToken(token)) {
-            appAuthManager.setIdToken(token)
-        } else {
-            for (item in netIdServiceListeners) {
-                item.onTransmittedInvalidToken()
-            }
-        }
-    }
-
     fun getAuthorizationFragment(activity: Activity, authFlow: NetIdAuthFlow, forceApp2App: Boolean = false): Fragment? {
         checkAvailableNetIdApplications(activity)
         // If there are no ID apps installed, but forceApp2App is true, return with an error.
@@ -91,15 +81,10 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
 
         netIdConfig?.let { config ->
-            // If we have the permission flow, don't set extra claims.
-            var claims = config.claims
-            if (authFlow == NetIdAuthFlow.Permission) {
-                claims = ""
-            }
             return appAuthManager.getWebAuthorizationIntent(
                 config.clientId,
                 config.redirectUri,
-                claims,
+                config.claims,
                 authFlow,
                 activity
             )?.let {
@@ -134,8 +119,13 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             var error: NetIdError? = null
 
             appAuthManager.getAccessToken()?.let { token ->
-                userInfoManager.fetchUserInfo(broker, token)
-            } ?: run {
+                appAuthManager.getAuthState()?.authorizationServiceConfiguration?.discoveryDoc?.userinfoEndpoint?.let{ endpoint ->
+                    userInfoManager.fetchUserInfo(
+                        endpoint,
+                        token)
+                } ?:{
+                    error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.InvalidDiscoveryDocument)
+                }            } ?: run {
                 error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.UnauthorizedClient)
             }
 
