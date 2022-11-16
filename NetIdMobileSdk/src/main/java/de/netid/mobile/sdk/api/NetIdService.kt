@@ -81,15 +81,10 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
 
         netIdConfig?.let { config ->
-            // If we have the permission flow, don't set extra claims.
-            var claims = config.claims
-            if (authFlow == NetIdAuthFlow.Permission) {
-                claims = ""
-            }
             return appAuthManager.getWebAuthorizationIntent(
                 config.clientId,
                 config.redirectUri,
-                claims,
+                config.claims,
                 authFlow,
                 activity
             )?.let {

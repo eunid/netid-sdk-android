@@ -83,6 +83,7 @@ class AppAuthManagerImpl : AppAuthManager {
     ): Intent? {
         authorizationServiceConfiguration?.let { serviceConfiguration ->
             var scopes = mutableListOf<String>()
+            var claimsJSON: JSONObject? = if(claims.isEmpty()) null else JSONObject(claims)
             when (flow) {
                 NetIdAuthFlow.Login -> {
                     scopes.add(AuthorizationRequest.Scope.OPENID)
@@ -92,11 +93,11 @@ class AppAuthManagerImpl : AppAuthManager {
                     scopes.add(scopePermissionManagement)
                 }
                 NetIdAuthFlow.Permission -> {
+                    // remove claims, not relevant for this flow
+                    claimsJSON = null
                     scopes.add(scopePermissionManagement)
                 }
             }
-
-            val claimsJSON = if(claims.isEmpty() ) null else JSONObject(claims)
             val authRequestBuilder =
                 AuthorizationRequest.Builder(
                     serviceConfiguration,
