@@ -42,10 +42,6 @@ class AuthorizationLoginFragment(
     private val loginText: String = "",
     private val continueText: String = ""
 ) : Fragment() {
-    companion object {
-        private const val netIdScheme = "scheme"
-    }
-
     private var _binding: FragmentAuthorizationLoginBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
@@ -138,7 +134,6 @@ class AuthorizationLoginFragment(
         appButton.layoutParams = layoutParams
 
         appButton.setOnClickListener {
-            listener.onAppButtonClicked(appIdentifier)
             openApp(appIdentifier.android.verifiedAppLink)
         }
 
