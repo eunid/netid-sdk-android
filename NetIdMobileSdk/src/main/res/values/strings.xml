@@ -8,7 +8,8 @@
     <string name="authorization_permission_close">Schließen</string>
     <string name="authorization_permission_net_id">netID</string>
     <string name="authorization_permission_choose_account_provider">(anderen netID Account Anbieter hier auswählen)</string>
-    <string name="authorization_permission_netid_privacycenter">netID Privacy Center</string>
+    <string name="authorization_permission_privacycenter_match">netID Privacy Center</string>
+    <string name="authorization_permission_privacycenter_link">https://broker.netid.de/privacycenter</string>
 
     <!-- Login authorization-->
     <string name="authorization_login_title_text">Login mit netID</string>

@@ -137,7 +137,9 @@ class AuthorizationPermissionFragment(
                 } else {
                     String.format(legalText, appIdentifiers[0].name) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, chooseString)
                 }
-                legalInfoTextView.createAccountProviderSelectionLink(
+                // We only need to add the link to the text, if we have more than one id app installed.
+                // Otherwise, we leave the text as it is.
+                legalInfoTextView.createAccountProviderSelection(
                     Pair(chooseString, View.OnClickListener {
                         val listView: ListView = binding.fragmentAuthorizationAppCellContainer
                         val listAdapter =
@@ -151,7 +153,9 @@ class AuthorizationPermissionFragment(
         // Enable Links for clickable spans
         legalInfoTextView.movementMethod = LinkMovementMethod.getInstance()
         // Create Link to Privacy Center
-        legalInfoTextView.createPrivacyCenterLink()
+        legalInfoTextView.createLinks(Pair(
+            getString(R.string.authorization_permission_privacycenter_match),
+            getString(R.string.authorization_permission_privacycenter_link)))
     }
 
     override fun onDestroyView() {
@@ -171,57 +175,57 @@ class AuthorizationPermissionFragment(
         resultLauncher.launch(authorizationIntent)
     }
 
-    private fun TextView.createAccountProviderSelectionLink(vararg links: Pair<String, View.OnClickListener>) {
+    private fun TextView.createAccountProviderSelection(link: Pair<String, View.OnClickListener>) {
         val spannableString = this.text as Spannable
-        var startIndexOfLink = -1
-        for (link in links) {
-            val clickableSpan = object : ClickableSpan() {
-                override fun updateDrawState(textPaint: TextPaint) {
-                    textPaint.isUnderlineText = true
-                }
+        val startIndexOfLink: Int = spannableString.toString().indexOf(link.first)
 
-                override fun onClick(view: View) {
-                    Selection.setSelection((view as TextView).text as Spannable, 0)
-                    view.invalidate()
-                    link.second.onClick(view)
-                }
+        val clickableSpan = object : ClickableSpan() {
+            override fun updateDrawState(textPaint: TextPaint) {
+                textPaint.isUnderlineText = true
             }
-            startIndexOfLink = this.text.toString().indexOf(link.first, startIndexOfLink + 1)
-            // We only need to add the link to the text, if we have more than one id app installed.
-            // Otherwise, we leave the text as it is.
-            if (startIndexOfLink != -1) {
-                spannableString.setSpan(
-                    clickableSpan, startIndexOfLink, startIndexOfLink + link.first.length,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+
+            override fun onClick(view: View) {
+                Selection.setSelection((view as TextView).text as Spannable, 0)
+                view.invalidate()
+                link.second.onClick(view)
             }
+        }
+
+        if (startIndexOfLink != -1) {
+            spannableString.setSpan(
+                clickableSpan, startIndexOfLink, startIndexOfLink + link.first.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         }
     }
 
     /**
-     * Searches for occurrences of R.string.authorization_permission_netid_privacycenter within the TextView and
-     * creates URLSpans pointing to https://broker.netid.de/privacycenter. Expects android:bufferType="spannable"
+     * Searches for occurrences of a string within the TextView and
+     * creates URLSpans pointing to the provided URL. Expects android:bufferType="spannable"
      *
+     * @param links pairs of a string to be matched and URL to be linked to it using a URLSpan
      */
-    private fun TextView.createPrivacyCenterLink() {
-        val stringPrivacyCenter = getString(R.string.authorization_permission_netid_privacycenter)
+    private fun TextView.createLinks(vararg links: Pair<String,String>) {
         val spannable = this.text as Spannable
         var startIndexOfLink: Int
 
-        startIndexOfLink = spannable.toString().indexOf(stringPrivacyCenter)
-        //Loop over all occurrences of R.string.authorization_permission_netid_privacycenter
-        while (startIndexOfLink != -1) {
-            //Create URLSpan for each
-            spannable.setSpan(
-                URLSpan("https://broker.netid.de/privacycenter"),
-                startIndexOfLink,
-                startIndexOfLink + stringPrivacyCenter.length,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-            // Search for next occurrence
-            startIndexOfLink = spannable.toString().indexOf(
-                stringPrivacyCenter,
-                startIndexOfLink + stringPrivacyCenter.length)
+        for (link in links) {
+            startIndexOfLink = spannable.toString().indexOf(link.first)
+            //Loop over all occurrences
+            while (startIndexOfLink != -1) {
+                //Create URLSpan for each
+                spannable.setSpan(
+                    URLSpan(link.second),
+                    startIndexOfLink,
+                    startIndexOfLink + link.first.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                // Search for next occurrence
+                startIndexOfLink = spannable.toString().indexOf(
+                    link.first,
+                    startIndexOfLink + link.first.length
+                )
+            }
         }
     }
 
@@ -235,7 +239,9 @@ class AuthorizationPermissionFragment(
         } else {
             String.format(legalText, name) + getString(R.string.authorization_permission_legal_info_fixed, name, chooseString)
         }
-        // Re-Create link after change
-        binding.fragmentAuthorizationLegalInfoTextView.createPrivacyCenterLink()
+        // Re-Create link to privacy center after change
+        binding.fragmentAuthorizationLegalInfoTextView.createLinks(Pair(
+                getString(R.string.authorization_permission_privacycenter_match),
+                getString(R.string.authorization_permission_privacycenter_link)))
     }
 }
