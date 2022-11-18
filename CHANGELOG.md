@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed icon for close button
 - Some cleanups
 - Make permission erros more transparent
+- Force use of Chrome for app2web 
 
 ### Fixed
 - Fixed UserInfo json parser error
