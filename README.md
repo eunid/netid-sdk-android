@@ -41,30 +41,36 @@ Then, register your application as a listener to receive all callbacks made by t
 NetIdService.addListener(this)
 ```
 
-
-And then, initialize the NetIdService itself with the aforementioned configuration.
+Finally, initialize the NetIdService itself with the aforementioned configuration.
 ```kotlin
 NetIdService.initialize(netIdConfig, this.applicationContext)
 ```
 
 ## Authorization
 
-After the NetIDService has been initialized, subsequent calls to request authorization can be made. To initiate the authorization process, issue the following call to the NetIDService:
+After the NetIDService has been initialized, subsequent calls to request authorization can be made. 
+In the example app, you are presented with three choices as can be seen in this screenhsot.
+
+<img src="images/netID_choose_authFlow.png" alt="netID SDK example app - chosse authFlow" style="width:200px;"/>
+
+In your own app, you most likely will decide which flow to take without an user interaction.To initiate the authorization process, issue the following call to the NetIDService:
 ```kotlin
 NetIdService.getAuthorizationFragment(this, authFlow, forceApp2App)
 ```
 | Parameter | Description |
 | :---        |    :---   |
-| activity | The client id of your application. You can retrieve it from the netID Developer portal. This parameter is mandatory. |
-| authFlow | An URI that is used by your application to catch callbacks. You can retrieve it from the netID Developer portal. This parameter is mandatory. |
-| forceApp2App | A boolean value stating if you want to force app2app authorization. Can be omitted and defaults to `false`. |
+| activity | The activity to attach this fragment to. This parameter is mandatory. |
+| authFlow | Type of flow to use, can be either ``NetIdAuthFlow.Permission``, ``NetIdAuthFlow.Login`` or ``NetIdAuthFlow.LoginPermission``. This parameter is mandatory. |
+| forceApp2App | If set to true, will yield an ``NetIdError`` if the are no ID apps installed. Otherwise, will use app2web flow automatically. Defaults to ``false``. |
 
 You have to provide an instance of you app's activity so that the SDK can display a view for the authorization process itself.
 With the parameter `authFlow`you decide, if you want to use `Permission`, `Login` or `Login + Permission` as authorization flow.
 The optional parameter `forceApp2App` decides, if your app wants to use app2app only. If let alone, this parameter defaults to `false` meaning that if no ID provider apps are installed, the SDK will automatically fall back to app2web flow. If set to `true` and no ID provider apps are installed, this call will fail with an error.
 
-Depending on the chosen flow, different views are presented to the user to deviide on how to proceed with the authorization process.
+Depending on the chosen flow, different views are presented to the user to decide on how to proceed with the authorization process.
 
+<img src="images/netID_login_options.png" alt="netID SDK example app - chosse id app" style="width:200px;"/>
+<img src="images/netID_permission_app_options.png" alt="netID SDK example app - chosse id app" style="width:200px;"/>
 
 If the user did decide on how to proceed with the login process (e.g. which ID provider to use), a redirect to actually execute the authorization is called automatically.
 
@@ -142,4 +148,4 @@ The configuration resides in the file `netIdAppIdentifiers.json` inside the SDK.
     }
   ]
 }
-````
+```
