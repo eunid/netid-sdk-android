@@ -15,5 +15,11 @@
 package de.netid.mobile.sdk.api
 
 enum class NetIdErrorProcess {
-    Configuration, Authentication, UserInfo, Login, CodeExchange, Refresh, PermissionRead, PermissionWrite
+    Configuration,
+    Authentication,
+    UserInfo,
+    CodeExchange,
+    Refresh,
+    PermissionRead,
+    PermissionWrite
 }

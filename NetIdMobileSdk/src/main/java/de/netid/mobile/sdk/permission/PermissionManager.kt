@@ -16,7 +16,8 @@ package de.netid.mobile.sdk.permission
 
 import de.netid.mobile.sdk.api.NetIdError
 import de.netid.mobile.sdk.model.NetIdPermissionUpdate
-import de.netid.mobile.sdk.model.Permissions
+import de.netid.mobile.sdk.model.PermissionReponse
+import de.netid.mobile.sdk.model.PermissionStatusCode
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.webservice.PermissionReadCallback
 import de.netid.mobile.sdk.webservice.PermissionUpdateCallback
@@ -29,12 +30,12 @@ class PermissionManager(private val listener: PermissionManagerListener) {
                 accessToken,
                 collapseSyncId,
                 object : PermissionReadCallback {
-                    override fun onPermissionsFetched(permissions: Permissions) {
-                        listener.onPermissionsFetched(permissions)
+                    override fun onPermissionsFetched(permissionResponse: PermissionReponse) {
+                        listener.onPermissionsFetched(permissionResponse)
                     }
 
-                    override fun onPermissionsFetchFailed(error: NetIdError) {
-                        listener.onPermissionsFetchFailed(error)
+                    override fun onPermissionsFetchFailed(statusCode: PermissionStatusCode, error: NetIdError) {
+                        listener.onPermissionsFetchFailed(statusCode, error)
                     }
                 })
     }
@@ -50,8 +51,8 @@ class PermissionManager(private val listener: PermissionManagerListener) {
                         listener.onPermissionUpdated(subjectIdentifiers)
                     }
 
-                    override fun onPermissionUpdateFailed(error: NetIdError) {
-                        listener.onPermissionUpdateFailed(error)
+                    override fun onPermissionUpdateFailed(responseStatusCode: PermissionStatusCode, error: NetIdError) {
+                        listener.onPermissionUpdateFailed(responseStatusCode, error)
                     }
                 })
     }

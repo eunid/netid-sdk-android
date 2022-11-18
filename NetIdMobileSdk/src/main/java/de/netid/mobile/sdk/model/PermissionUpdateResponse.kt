@@ -21,8 +21,12 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class PermissionUpdateResponse(
+    // May be null in case of a successful response
+    @SerialName("status_code")
+    val statusCode: String? = null,
+    // May be null in case of an error
     @SerialName("subject_identifiers")
-    val subjectIdentifiers: SubjectIdentifiers
+    val subjectIdentifiers: SubjectIdentifiers? = null
 ) {
     override fun toString(): String {
         val format = Json { encodeDefaults = false }

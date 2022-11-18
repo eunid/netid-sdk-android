@@ -15,7 +15,6 @@
 package de.netid.mobile.sdk.example
 
 import android.content.res.ColorStateList
-import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -23,7 +22,8 @@ import androidx.core.content.ContextCompat
 import de.netid.mobile.sdk.api.*
 import de.netid.mobile.sdk.example.databinding.ActivityMainBinding
 import de.netid.mobile.sdk.model.NetIdPermissionUpdate
-import de.netid.mobile.sdk.model.Permissions
+import de.netid.mobile.sdk.model.PermissionReponse
+import de.netid.mobile.sdk.model.PermissionStatusCode
 import de.netid.mobile.sdk.model.UserInfo
 
 class MainActivity : AppCompatActivity(), NetIdServiceListener {
@@ -63,15 +63,6 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
             updateElementsForServiceState()
         }
-
-        // Did we get called from another app? E.g. as a callback.
-        val action: String? = intent?.action
-        val data: Uri? = intent?.data
-        if ((action.equals("android.intent.action.VIEW")) && (data != null)) {
-            NetIdService.onAuthenticationFinished(intent)
-            updateElementsForServiceState()
-        }
-
     }
 
     override fun onRestoreInstanceState(inState: Bundle) {
@@ -301,7 +292,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         }
     }
 
-    override fun onPermissionUpdateFinishedWithError(error: NetIdError) {
+    override fun onPermissionUpdateFinishedWithError(statusCode: PermissionStatusCode, error: NetIdError) {
         appendLog("netID service permission -update failed with error: ${error.code}")
         if (error.msg?.isNotEmpty() == true) {
             appendLog("original error message: ${error.msg}")
@@ -310,7 +301,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         updateElementsForServiceState()
     }
 
-    override fun onPermissionFetchFinishedWithError(error: NetIdError) {
+    override fun onPermissionFetchFinishedWithError(statusCode: PermissionStatusCode, error: NetIdError) {
         appendLog("netID service permission -fetch failed with error: ${error.code}")
         if (error.msg?.isNotEmpty() == true) {
             appendLog("original error message: ${error.msg}")
@@ -319,7 +310,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         updateElementsForServiceState()
     }
 
-    override fun onPermissionFetchFinished(permissions: Permissions) {
+    override fun onPermissionFetchFinished(permissions: PermissionReponse) {
         appendLog("netID service permission -fetch finished successfully: $permissions")
         serviceState = ServiceState.PermissionReadSuccessful
         updateElementsForServiceState()
@@ -330,9 +321,5 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         appendLog("netID service permission -update finished successfully.")
         serviceState = ServiceState.PermissionWriteSuccessful
         updateElementsForServiceState()
-    }
-
-    override fun onTransmittedInvalidToken() {
-        appendLog("netID service token transmit failed.")
     }
 }

@@ -15,10 +15,14 @@
 package de.netid.mobile.sdk.model
 
 enum class PermissionStatusCode(val code: String) {
-    PermissionsFound("PERMISSIONS_FOUND"),
-    PermissionsNotFound("PERMISSIONS_NOT_FOUND"),
-    NoToken("NO_TOKEN"),
-    TokenError("TOKEN_ERROR"),
-    TappNotAllowed("TAPP_NOT_ALLOWED"),
-    TpIdExistenceError("TPID_EXISTENCE_ERROR")
+    PERMISSIONS_FOUND("PERMISSIONS_FOUND"),
+    PERMISSIONS_NOT_FOUND("PERMISSIONS_NOT_FOUND"),
+    NO_TOKEN("NO_TOKEN"),
+    TOKEN_ERROR("TOKEN_ERROR"),
+    NO_PERMISSIONS("NO_PERMISSIONS"),
+    JSON_PARSE_ERROR("JSON_PARSE_ERROR"),
+    NO_REQUEST_BODY("NO_REQUEST_BODY"),
+    TAPP_NOT_ALLOWED("TAPP_NOT_ALLOWED"),
+    TPID_EXISTENCE_ERROR("TPID_EXISTENCE_ERROR"),
+    UNKNOWN("UNKNOWN")
 }
