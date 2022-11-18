@@ -42,10 +42,6 @@ class AuthorizationLoginFragment(
     private val loginText: String = "",
     private val continueText: String = ""
 ) : Fragment() {
-    companion object {
-        private const val netIdScheme = "scheme"
-    }
-
     private var _binding: FragmentAuthorizationLoginBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
@@ -85,6 +81,7 @@ class AuthorizationLoginFragment(
             listener.onCloseClicked()
         }
         binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
+            authorizationIntent.setPackage("com.android.chrome")
             resultLauncher.launch(authorizationIntent)
         }
     }
@@ -138,8 +135,7 @@ class AuthorizationLoginFragment(
         appButton.layoutParams = layoutParams
 
         appButton.setOnClickListener {
-            listener.onAppButtonClicked(appIdentifier)
-            openApp(appIdentifier.android.verifiedAppLink)
+            openApp(appIdentifier)
         }
 
         return appButton
@@ -150,12 +146,12 @@ class AuthorizationLoginFragment(
         super.onDestroyView()
     }
 
-    private fun openApp(verifiedAppLink: String) {
+    private fun openApp(app: AppIdentifier) {
         authorizationIntent.extras?.apply {
             val authIntent = getParcelable<Intent>("authIntent") ?: return@apply
             val authUri = authIntent.data as Uri
-            val uri = authUri.toString().replaceBefore("?", verifiedAppLink)
-            authIntent.setPackage(null)
+            val uri = authUri.toString().replaceBefore("?", app.android.verifiedAppLink)
+            authIntent.setPackage(app.android.applicationId)
             authIntent.data = Uri.parse(uri)
             putParcelable("authIntent", authIntent)
         }

@@ -236,8 +236,9 @@ object WebserviceApi {
 
             override fun onResponse(call: Call, response: Response) {
                 response.use {
+                    val body = response.body?.string() ?: ""
                     if (response.isSuccessful) {
-                        val permissonResponse = Json.decodeFromString<PermissionUpdateResponse>(response.body?.string() ?: "")
+                        val permissonResponse = Json.decodeFromString<PermissionUpdateResponse>(body)
                         Handler(Looper.getMainLooper()).post {
                             permissionUpdateCallback.onPermissionUpdated(permissonResponse.subjectIdentifiers)
                         }
@@ -246,7 +247,8 @@ object WebserviceApi {
                             permissionUpdateCallback.onPermissionUpdateFailed(
                                 NetIdError(
                                     NetIdErrorProcess.PermissionWrite,
-                                    NetIdErrorCode.InvalidRequest
+                                    NetIdErrorCode.InvalidRequest,
+                                    msg = body
                                 )
                             )
                         }

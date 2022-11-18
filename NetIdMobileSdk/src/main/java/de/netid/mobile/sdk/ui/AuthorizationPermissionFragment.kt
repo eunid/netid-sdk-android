@@ -100,10 +100,11 @@ class AuthorizationPermissionFragment(
             // If we only have one app or the user did not make changes to the default, use the standard one.
             if (adapter == null) adapter = context?.let { AuthorizationAppListAdapter(it, appIdentifiers) }
             if ((adapter != null) && (adapter.selectedPosition != -1) && (appIdentifiers.size != 0)) {
-                adapter.getItem(adapter.selectedPosition).android.verifiedAppLink.let { verifiedAppLink ->
-                    openApp(verifiedAppLink)
+                adapter.getItem(adapter.selectedPosition).let { app ->
+                    openApp(app)
                 }
             } else {
+                authorizationIntent.setPackage("com.android.chrome")
                 resultLauncher.launch(authorizationIntent)
             }
         }
@@ -163,12 +164,12 @@ class AuthorizationPermissionFragment(
         super.onDestroyView()
     }
 
-    private fun openApp(verifiedAppLink: String) {
+    private fun openApp(app: AppIdentifier) {
         authorizationIntent.extras?.apply {
             val authIntent = getParcelable<Intent>("authIntent") ?: return@apply
             val authUri = authIntent.data as Uri
-            val uri = authUri.toString().replaceBefore("?", verifiedAppLink)
-            authIntent.setPackage(null)
+            val uri = authUri.toString().replaceBefore("?", app.android.verifiedAppLink)
+            authIntent.setPackage(app.android.applicationId)
             authIntent.data = Uri.parse(uri)
             putParcelable("authIntent", authIntent)
         }
