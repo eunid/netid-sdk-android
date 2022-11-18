@@ -33,6 +33,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implement ui feedback
 - Refined JSON handling
 - Changed some wording
+- Renamed soft/hard to permission/login
+- Make subclaims optional, too
+- Broker/host is no longer configurable from the outside
+- Changes in calling verified app links
+- Use userinfo endpoint from discovery document
+- Get rid of copy of id token
+- Cleaned up unused string resources
+- Small refactoring about claims handling
+- Changed icon for close button
+- Some cleanups
+- Make permission erros more transparent
+- Force use of Chrome for app2web 
 
 ### Fixed
 - Fixed UserInfo json parser error
@@ -47,4 +59,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Only set claims in login and login+permission flows
 - Make get/update permission possible in permission flow
 - Fixed possible exception during permission fetch
+- Set correct value for app name
+- Fixed a crash in the context of the bottom fragment
  

@@ -22,13 +22,12 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class ShippingAddress(
     @SerialName("street_address")
-    val streetAddress: String,
-    val country: String,
-    val formatted: String,
-    val locality: String,
-    val recipient: String,
-    val postal_code: String,
-
+    val streetAddress: String? = null,
+    val country: String? = null,
+    val formatted: String? = null,
+    val locality: String? = null,
+    val recipient: String? = null,
+    val postal_code: String? = null,
     ) {
     override fun toString(): String {
         val format = Json { encodeDefaults = false }

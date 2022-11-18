@@ -6,7 +6,7 @@
     <color name="authorization_agree_text_color">#333333</color>
     <color name="authorization_agree_button_color">#FFFFFF</color>
 
-    <color name="authorization_net_id_button_color">#76B82A</color>
+    <color name="authorization_net_id_button_color">#FFFFFF</color>
     <color name="authorization_close_button_color">#70000000</color>
     <color name="authorization_app_button_color">#000000</color>
     <color name="authorization_close_button_background_color">#FFFFFF</color>

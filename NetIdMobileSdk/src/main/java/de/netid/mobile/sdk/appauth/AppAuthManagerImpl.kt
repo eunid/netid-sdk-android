@@ -39,25 +39,19 @@ class AppAuthManagerImpl : AppAuthManager {
     private var authorizationServiceConfiguration: AuthorizationServiceConfiguration? = null
     private var authState: AuthState? = null
     private var authService: AuthorizationService? = null
-    private var idToken: String? = null
-    private var authRequest: AuthorizationRequest? = null
 
     override fun getAccessToken(): String? {
         return authState?.accessToken
     }
 
-    override fun getIdToken(): String? {
-        return idToken
-    }
-
-    override fun setIdToken(token: String) {
-        idToken = token
-    }
-
     override fun getPermissionToken(): String? {
         // Fallback for getting a permission token as long as there is no refresh token flow (and only permission scope was requested).
-        val token = getIdToken() ?: return getAccessToken()
+        val token = authState?.idToken ?: return getAccessToken()
         return TokenUtil.getPermissionTokenFrom(token)
+    }
+
+    override fun getAuthState(): AuthState? {
+        return authState
     }
 
     override fun fetchAuthorizationServiceConfiguration(host: String) {
@@ -89,6 +83,7 @@ class AppAuthManagerImpl : AppAuthManager {
     ): Intent? {
         authorizationServiceConfiguration?.let { serviceConfiguration ->
             var scopes = mutableListOf<String>()
+            var claimsJSON: JSONObject? = if(claims.isEmpty()) null else JSONObject(claims)
             when (flow) {
                 NetIdAuthFlow.Login -> {
                     scopes.add(AuthorizationRequest.Scope.OPENID)
@@ -98,11 +93,11 @@ class AppAuthManagerImpl : AppAuthManager {
                     scopes.add(scopePermissionManagement)
                 }
                 NetIdAuthFlow.Permission -> {
+                    // remove claims, not relevant for this flow
+                    claimsJSON = null
                     scopes.add(scopePermissionManagement)
                 }
             }
-
-            val claimsJSON = if(claims.isEmpty() ) null else JSONObject(claims)
             val authRequestBuilder =
                 AuthorizationRequest.Builder(
                     serviceConfiguration,
@@ -111,10 +106,9 @@ class AppAuthManagerImpl : AppAuthManager {
                     Uri.parse(redirectUri)
                 ).setScopes(scopes
                 ).setClaims(claimsJSON)
-            authRequest = authRequestBuilder.build()
-
+            val authRequest = authRequestBuilder.build()
             authService = AuthorizationService(activity)
-            return authService?.getAuthorizationRequestIntent(authRequest!!)
+            return authService?.getAuthorizationRequestIntent(authRequest)
         } ?: run {
             Log.e(javaClass.simpleName, "No authorization service configuration available")
             return null
@@ -122,10 +116,10 @@ class AppAuthManagerImpl : AppAuthManager {
     }
 
     override fun processAuthorizationIntent(data: Intent) {
-        val authorizationResponse = AuthorizationResponse.Builder(authRequest!!).fromUri(data.data!!).build()
+        val authorizationResponse = AuthorizationResponse.fromIntent(data)
         val authorizationException = AuthorizationException.fromIntent(data)
 
-        authState?.update(authorizationResponse, authorizationException)
+        authState?.update(authorizationResponse,authorizationException)
 
         authorizationException?.let {
             val netIdError = createNetIdErrorForAuthorizationException(it)
@@ -133,34 +127,25 @@ class AppAuthManagerImpl : AppAuthManager {
         } ?: run {
             authorizationResponse?.let {
                 processTokenExchange(it)
-            } ?: run {
-                val netIdError =
-                    NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.Unknown)
-                listener?.onAuthorizationServiceConfigurationFetchFailed(netIdError)
             }
         }
     }
 
     private fun processTokenExchange(authorizationResponse: AuthorizationResponse) {
-        if (authorizationResponse.authorizationCode == null) {
-            if (authorizationResponse.additionalParameters.containsKey("error_code")) {
-                authorizationResponse.additionalParameters["error_code"]?.let {
-                    Log.i(javaClass.simpleName,
-                        it
-                    )
-                    val exception = AuthorizationException.AuthorizationRequestErrors.byString(it)
-                    listener?.onAuthorizationFailed(createNetIdErrorForAuthorizationException(exception))
-                }
-            }
-        }
         authService?.performTokenRequest(authorizationResponse.createTokenExchangeRequest()) { response, exception ->
             authState?.update(response, exception)
             exception?.let { authException ->
-                listener?.onAuthorizationFailed(createNetIdErrorForAuthorizationException(authException))
+                listener?.onAuthorizationFailed(
+                    createNetIdErrorForAuthorizationException(
+                        authException
+                    )
+                )
             } ?: run {
                 response?.let { tokenResponse ->
-                    Log.i(javaClass.simpleName, "Received token response: ${tokenResponse.accessToken}")
-                    idToken = tokenResponse.idToken
+                    Log.i(
+                        javaClass.simpleName,
+                        "Received token response: ${tokenResponse.accessToken}"
+                    )
                     listener?.onAuthorizationSuccessful()
                 }
             }
@@ -168,7 +153,10 @@ class AppAuthManagerImpl : AppAuthManager {
     }
 
     private fun createNetIdErrorForAuthorizationException(authorizationException: AuthorizationException): NetIdError {
-        val msg = authorizationException.error + " - " + authorizationException.errorDescription
+        var msg = ""
+        if (authorizationException.error != null) {
+            msg = authorizationException.error + " - " + authorizationException.errorDescription
+        }
         return when (authorizationException) {
             AuthorizationException.GeneralErrors.NETWORK_ERROR -> NetIdError(
                 NetIdErrorProcess.Configuration,

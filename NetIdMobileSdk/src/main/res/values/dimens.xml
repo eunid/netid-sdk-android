@@ -6,16 +6,16 @@
     <dimen name="authorization_button_corner_radius">5dp</dimen>
     <dimen name="authorization_close_button_stroke_width">1dp</dimen>
 
-    <!-- Soft Authorization -->
-    <dimen name="authorization_logo_soft_width">100dp</dimen>
-    <dimen name="authorization_logo_soft_height">40dp</dimen>
-    <dimen name="authorization_title_soft_text_size">16sp</dimen>
+    <!-- Permission Authorization -->
+    <dimen name="authorization_logo_permission_width">100dp</dimen>
+    <dimen name="authorization_logo_permission_height">40dp</dimen>
+    <dimen name="authorization_title_permission_text_size">16sp</dimen>
 
-    <!-- Hard Authorization -->
-    <dimen name="authorization_logo_hard_width">20dp</dimen>
-    <dimen name="authorization_logo_hard_height">20dp</dimen>
-    <dimen name="authorization_brand_logo_hard_width">80dp</dimen>
-    <dimen name="authorization_brand_logo_hard_height">20dp</dimen>
+    <!-- Login Authorization -->
+    <dimen name="authorization_logo_login_width">20dp</dimen>
+    <dimen name="authorization_logo_login_height">20dp</dimen>
+    <dimen name="authorization_brand_logo_login_width">80dp</dimen>
+    <dimen name="authorization_brand_logo_login_height">20dp</dimen>
 
     <dimen name="authorization_title_logo_size">14sp</dimen>
     <dimen name="authorization_title_text_size">18sp</dimen>

@@ -31,9 +31,8 @@ import de.netid.mobile.sdk.model.*
 import de.netid.mobile.sdk.permission.PermissionManager
 import de.netid.mobile.sdk.permission.PermissionManagerListener
 import de.netid.mobile.sdk.ui.AuthorizationFragmentListener
-import de.netid.mobile.sdk.ui.AuthorizationHardFragment
-import de.netid.mobile.sdk.ui.AuthorizationSoftFragment
-import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapter
+import de.netid.mobile.sdk.ui.AuthorizationLoginFragment
+import de.netid.mobile.sdk.ui.AuthorizationPermissionFragment
 import de.netid.mobile.sdk.userinfo.UserInfoManager
 import de.netid.mobile.sdk.userinfo.UserInfoManagerListener
 import de.netid.mobile.sdk.util.JsonUtil
@@ -45,6 +44,8 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     UserInfoManagerListener, PermissionManagerListener {
 
     private const val appIdentifierFilename = "netIdAppIdentifiers.json"
+    private const val broker = "broker.netid.de"
+
     private var netIdConfig: NetIdConfig? = null
 
     private lateinit var appAuthManager: AppAuthManager
@@ -70,19 +71,9 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             }
 
             this.netIdConfig = netIdConfig
-            setupAuthManagerAndFetchConfiguration(netIdConfig.host)
+            setupAuthManagerAndFetchConfiguration(broker)
             setupUserInfoManager()
             setupPermissionManager()
-        }
-    }
-
-    fun transmitToken(token: String) {
-        if (TokenUtil.isValidJwtToken(token)) {
-            appAuthManager.setIdToken(token)
-        } else {
-            for (item in netIdServiceListeners) {
-                item.onTransmittedInvalidToken()
-            }
         }
     }
 
@@ -95,26 +86,21 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
 
         netIdConfig?.let { config ->
-            // If we have the permission flow, don't set extra claims.
-            var claims = config.claims
-            if (authFlow == NetIdAuthFlow.Permission) {
-                claims = ""
-            }
             return appAuthManager.getWebAuthorizationIntent(
                 config.clientId,
                 config.redirectUri,
-                claims,
+                config.claims,
                 authFlow,
                 activity
             )?.let {
                 when (authFlow) {
                     NetIdAuthFlow.Login, NetIdAuthFlow.LoginPermission ->
-                        AuthorizationHardFragment(
-                            this, availableAppIdentifiers, it, authFlow, config.loginLayerConfig.headlineText, config.loginLayerConfig.loginText, config.loginLayerConfig.continueText
+                        AuthorizationLoginFragment(
+                            this, availableAppIdentifiers, it, (config.loginLayerConfig?.headlineText) ?: "", (config.loginLayerConfig?.loginText) ?:"", (config.loginLayerConfig?.continueText)?: ""
                         )
                     NetIdAuthFlow.Permission ->
-                        AuthorizationSoftFragment(
-                            this, availableAppIdentifiers, it, config.permissionLayerConfig.logoId, config.permissionLayerConfig.headlineText, config.permissionLayerConfig.legalText, config.permissionLayerConfig.continueText
+                        AuthorizationPermissionFragment(
+                            this, availableAppIdentifiers, it, (config.permissionLayerConfig?.logoId)?: "", (config.permissionLayerConfig?.headlineText)?: "", (config.permissionLayerConfig?.legalText)?: "", (config.permissionLayerConfig?.continueText)?: ""
                         )
                 }
             }
@@ -178,7 +164,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             )
 
             if (authIntent != null) {
-                val authFragment = AuthorizationSoftFragment(
+                val authFragment = AuthorizationPermissionFragment(
                     this,
                     availableAppIdentifiers,
                     authIntent,
@@ -218,7 +204,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             )
 
             if (authIntent != null) {
-                val authFragment = AuthorizationHardFragment(
+                val authFragment = AuthorizationLoginFragment(
                     this,
                     availableAppIdentifiers,
                     authIntent,
@@ -249,14 +235,15 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         if (handleConnection(context, NetIdErrorProcess.UserInfo)) {
             var error: NetIdError? = null
 
-            netIdConfig?.let { config ->
-                appAuthManager.getAccessToken()?.let { token ->
-                    userInfoManager.fetchUserInfo(config.host, token)
-                } ?: {
-                    error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.UnauthorizedClient)
-                }
-            } ?: run {
-                error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.Uninitialized)
+            appAuthManager.getAccessToken()?.let { token ->
+                appAuthManager.getAuthState()?.authorizationServiceConfiguration?.discoveryDoc?.userinfoEndpoint?.let{ endpoint ->
+                    userInfoManager.fetchUserInfo(
+                        endpoint,
+                        token)
+                } ?:{
+                    error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.InvalidDiscoveryDocument)
+                }            } ?: run {
+                error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.UnauthorizedClient)
             }
 
             error?.let {
