@@ -21,10 +21,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import de.netid.mobile.sdk.api.*
 import de.netid.mobile.sdk.example.databinding.ActivityMainBinding
-import de.netid.mobile.sdk.model.NetIdPermissionUpdate
-import de.netid.mobile.sdk.model.PermissionReponse
-import de.netid.mobile.sdk.model.PermissionStatusCode
-import de.netid.mobile.sdk.model.UserInfo
+import de.netid.mobile.sdk.model.*
 
 class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
@@ -293,7 +290,19 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     override fun onPermissionUpdateFinishedWithError(statusCode: PermissionStatusCode, error: NetIdError) {
-        appendLog("netID service permission -update failed with error: ${error.code}")
+        when (statusCode){
+            PermissionStatusCode.TOKEN_ERROR ->
+                // current token expired / is invalid
+                appendLog("Token error - token refresh / reauthorization necessary")
+            PermissionStatusCode.TPID_EXISTENCE_ERROR ->
+                // netID Account was deleted
+                appendLog("netID Account was deleted")
+            PermissionStatusCode.TAPP_NOT_ALLOWED ->
+                // Invalid configuration of client
+                appendLog("Client not authorized to use permission management")
+            else ->
+                appendLog("netID service permission -fetch failed with error: ${error.code}")
+        }
         if (error.msg?.isNotEmpty() == true) {
             appendLog("original error message: ${error.msg}")
         }
@@ -302,7 +311,19 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     override fun onPermissionFetchFinishedWithError(statusCode: PermissionStatusCode, error: NetIdError) {
-        appendLog("netID service permission -fetch failed with error: ${error.code}")
+        when (statusCode){
+            PermissionStatusCode.TOKEN_ERROR ->
+                // current token expired / is invalid
+                appendLog("Token error - token refresh / reauthorization necessary")
+            PermissionStatusCode.TPID_EXISTENCE_ERROR ->
+                // netID Account was deleted
+                appendLog("netID Account was deleted")
+            PermissionStatusCode.TAPP_NOT_ALLOWED ->
+                // Invalid configuration of client
+                appendLog("Client not authorized to use permission management")
+            else ->
+                appendLog("netID service permission -fetch failed with error: ${error.code}")
+        }
         if (error.msg?.isNotEmpty() == true) {
             appendLog("original error message: ${error.msg}")
         }
@@ -311,14 +332,26 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     override fun onPermissionFetchFinished(permissions: PermissionReponse) {
-        appendLog("netID service permission -fetch finished successfully: $permissions")
+        appendLog("netID service permission - fetch finished successfully")
+
+        when (PermissionStatusCode.valueOf(permissions.statusCode)) {
+            PermissionStatusCode.PERMISSIONS_FOUND ->
+                // Response contains existing permission
+                appendLog("Permissions: $permissions")
+            PermissionStatusCode.PERMISSIONS_NOT_FOUND ->
+                // No existing permission found
+                appendLog("No permissions found")
+            else ->
+                appendLog("This should not happen")
+        }
         serviceState = ServiceState.PermissionReadSuccessful
         updateElementsForServiceState()
 
     }
 
-    override fun onPermissionUpdateFinished() {
+    override fun onPermissionUpdateFinished(subjectIdentifiers: SubjectIdentifiers) {
         appendLog("netID service permission -update finished successfully.")
+        appendLog("Returned: $subjectIdentifiers")
         serviceState = ServiceState.PermissionWriteSuccessful
         updateElementsForServiceState()
     }

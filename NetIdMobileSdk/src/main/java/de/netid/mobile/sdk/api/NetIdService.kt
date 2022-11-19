@@ -301,7 +301,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     override fun onPermissionUpdated(subjectIdentifiers: SubjectIdentifiers) {
         Log.i(javaClass.simpleName, "netId service permissions updated successfully")
         for (item in netIdServiceListeners) {
-            item.onPermissionUpdateFinished()
+            item.onPermissionUpdateFinished(subjectIdentifiers)
         }
     }
 

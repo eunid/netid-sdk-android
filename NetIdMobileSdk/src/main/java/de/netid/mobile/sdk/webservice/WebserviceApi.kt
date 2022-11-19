@@ -156,17 +156,17 @@ object WebserviceApi {
             override fun onResponse(call: Call, response: Response) {
                 var permissionResponse: PermissionReponse
                 val format = Json { ignoreUnknownKeys = true }
-                val body: String = response.body?.string() ?: ""
+                val responseBody: String = response.body?.string() ?: ""
 
                 response.use {
                     if (response.isSuccessful) {
-                        permissionResponse = format.decodeFromString(body)
+                        permissionResponse = format.decodeFromString(responseBody)
                         Handler(Looper.getMainLooper()).post {
                             permissionReadCallback.onPermissionsFetched(permissionResponse)
                         }
                     } else {
                         // parse response for status_code for error details
-                        permissionResponse = format.decodeFromString(body)
+                        permissionResponse = format.decodeFromString(responseBody)
 
                         val responseStatus: PermissionStatusCode =
                             // Check if status_code is known and return in case it is
@@ -191,7 +191,8 @@ object WebserviceApi {
                                 responseStatus,
                                 NetIdError(
                                     NetIdErrorProcess.PermissionRead,
-                                    errorCode
+                                    errorCode,
+                                    msg = responseBody
                                 )
                             )
                         }
