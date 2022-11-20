@@ -21,6 +21,7 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class PermissionReponse(
+    // Default to unknown if status received is not mapped in PermissionResponseStatus
     @SerialName("status_code")
     val statusCode: PermissionResponseStatus = PermissionResponseStatus.UNKNOWN,
     @SerialName("subject_identifiers")

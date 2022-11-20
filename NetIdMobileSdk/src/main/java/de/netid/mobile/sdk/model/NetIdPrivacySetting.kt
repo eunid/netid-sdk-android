@@ -21,8 +21,11 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class NetIdPrivacySetting(
-    val type: String,
+    // type of entry - default to other if unexpected value is received
+    val type: NetIdPrivacySettingType = NetIdPrivacySettingType.OTHER,
+    // optional only present for netID Permissions
     val status: NetIdPermissionStatus? = null,
+    // optional only present for netID Permissions
     val value: String? = null,
     @SerialName("changed_at")
     val changedAt: String

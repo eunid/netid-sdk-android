@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 package de.netid.mobile.sdk.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
-@Serializable
-enum class NetIdPermissionStatus(val status: String) {
-    VALID("VALID"),
-    INVALID("INVALID")
+enum class NetIdPrivacySettingType(val code: String)  {
+    IDCONSENT("IDCONSENT"),
+    IAB_TC_STRING("IAB_TC_STRING"),
+    OTHER("OTHER")
 }
