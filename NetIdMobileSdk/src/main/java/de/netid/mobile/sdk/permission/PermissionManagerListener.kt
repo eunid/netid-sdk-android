@@ -15,13 +15,13 @@
 package de.netid.mobile.sdk.permission
 
 import de.netid.mobile.sdk.api.NetIdError
-import de.netid.mobile.sdk.model.PermissionReponse
+import de.netid.mobile.sdk.model.PermissionReadReponse
 import de.netid.mobile.sdk.model.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 
 interface PermissionManagerListener {
 
-    fun onPermissionsFetched(permissions: PermissionReponse)
+    fun onPermissionsFetched(permissions: PermissionReadReponse)
 
     fun onPermissionsFetchFailed(statusCode: PermissionResponseStatus, error: NetIdError)
 

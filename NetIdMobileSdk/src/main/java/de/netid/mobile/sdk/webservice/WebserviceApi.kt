@@ -109,7 +109,7 @@ object WebserviceApi {
 
     /**
      * Performs a request to read permissions related to an authorized user.
-     * The result of the request is provided via the given [PermissionReponse] instance.
+     * The result of the request is provided via the given [PermissionReadReponse] instance.
      *
      * @param accessToken a currently valid ID token to read permissions
      * @param collapseSyncId If `true`, the response will not contain the sync id
@@ -154,7 +154,7 @@ object WebserviceApi {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                var permissionResponse: PermissionReponse
+                var permissionResponse: PermissionReadReponse
                 // Unknown JSON claims are ignored, unknown ENUM values mapped to default
                 val format = Json { ignoreUnknownKeys = true; coerceInputValues = true }
                 val responseBody: String = response.body?.string() ?: ""
@@ -195,7 +195,7 @@ object WebserviceApi {
 
     /**
      * Performs a request to read permissions related to an authorized user.
-     * The result of the request is provided via the given [PermissionReponse] instance.
+     * The result of the request is provided via the given [PermissionReadReponse] instance.
      *
      * @param accessToken a currently valid ID token to read permissions
      * @param permissionUpdate a [NetIdPermissionUpdate] instance, defining the permission to update
@@ -252,7 +252,8 @@ object WebserviceApi {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                var permissionResponse: PermissionUpdateResponse
+                var permissionUpdateErrorResponse: PermissionUpdateErrorResponse
+                var permissionUpdateResponse: PermissionUpdateResponse
                 // Unknown JSON claims are ignored, unknown ENUM values mapped to default
                 val format = Json { ignoreUnknownKeys = true; coerceInputValues = true }
                 val responseBody = response.body?.string() ?: ""
@@ -260,17 +261,17 @@ object WebserviceApi {
                 response.use {
 
                     if (response.isSuccessful) {
-                        permissionResponse = format.decodeFromString(responseBody)
+                        // in case of success a SubjectIdentifier object is returned
+                        permissionUpdateResponse = format.decodeFromString(responseBody)
                         Handler(Looper.getMainLooper()).post {
-                            // In case of a successful call subjectIdentifier is never null
-                            permissionUpdateCallback.onPermissionUpdated(permissionResponse.subjectIdentifiers!!)
+                            permissionUpdateCallback.onPermissionUpdated(permissionUpdateResponse.subjectIdentifiers)
                         }
                     } else {
-                        permissionResponse = format.decodeFromString(responseBody)
+                        permissionUpdateErrorResponse = format.decodeFromString(responseBody)
 
                         // determine proper NetIDErrorCode
                         val errorCode: NetIdErrorCode =
-                            if (permissionResponse.statusCode == PermissionResponseStatus.TPID_EXISTENCE_ERROR){
+                            if (permissionUpdateErrorResponse.statusCode == PermissionResponseStatus.TPID_EXISTENCE_ERROR){
                                 NetIdErrorCode.Other
                             } else {
                                 NetIdErrorCode.InvalidRequest
@@ -278,8 +279,7 @@ object WebserviceApi {
 
                         Handler(Looper.getMainLooper()).post {
                             permissionUpdateCallback.onPermissionUpdateFailed(
-                                // never null in case of error, unknown values mapped to default via coerceInputValues
-                                permissionResponse.statusCode!!,
+                                permissionUpdateErrorResponse.statusCode,
                                 NetIdError(
                                     NetIdErrorProcess.PermissionWrite,
                                     errorCode,

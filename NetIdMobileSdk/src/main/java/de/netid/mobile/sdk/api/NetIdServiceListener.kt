@@ -14,7 +14,7 @@
 
 package de.netid.mobile.sdk.api
 
-import de.netid.mobile.sdk.model.PermissionReponse
+import de.netid.mobile.sdk.model.PermissionReadReponse
 import de.netid.mobile.sdk.model.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.UserInfo
@@ -40,7 +40,7 @@ interface NetIdServiceListener {
 
     fun onPermissionUpdateFinishedWithError(statusCode: PermissionResponseStatus, error: NetIdError)
 
-    fun onPermissionFetchFinished(permissions: PermissionReponse)
+    fun onPermissionFetchFinished(permissions: PermissionReadReponse)
 
     fun onPermissionFetchFinishedWithError(statusCode: PermissionResponseStatus, error: NetIdError)
 }

@@ -332,7 +332,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         updateElementsForServiceState()
     }
 
-    override fun onPermissionFetchFinished(permissions: PermissionReponse) {
+    override fun onPermissionFetchFinished(permissions: PermissionReadReponse) {
         appendLog("netID service permission - fetch finished successfully")
 
         when (permissions.statusCode) {

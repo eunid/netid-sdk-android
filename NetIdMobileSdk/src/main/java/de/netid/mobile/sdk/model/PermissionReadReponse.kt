@@ -20,12 +20,17 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-class PermissionUpdateResponse (
+data class PermissionReadReponse(
+    // Default to unknown if status received is not mapped in PermissionResponseStatus
+    @SerialName("status_code")
+    val statusCode: PermissionResponseStatus = PermissionResponseStatus.UNKNOWN,
     @SerialName("subject_identifiers")
-    val subjectIdentifiers: SubjectIdentifiers
-)  {
-   override fun toString(): String {
+    val subjectIdentifiers: SubjectIdentifiers? =null,
+    @SerialName("netid_privacy_settings")
+    val netIdPrivacySettings: List<NetIdPrivacySetting>? = null
+) {
+    override fun toString(): String {
         val format = Json { encodeDefaults = false }
         return format.encodeToString(this)
-   }
+    }
 }
