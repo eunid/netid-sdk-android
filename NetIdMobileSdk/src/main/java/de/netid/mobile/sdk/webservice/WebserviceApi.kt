@@ -145,7 +145,7 @@ object WebserviceApi {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
                 permissionReadCallback.onPermissionsFetchFailed(
-                    PermissionStatusCode.UNKNOWN,
+                    PermissionResponseStatus.UNKNOWN,
                     NetIdError(
                         NetIdErrorProcess.PermissionRead,
                         NetIdErrorCode.Unknown
@@ -155,7 +155,8 @@ object WebserviceApi {
 
             override fun onResponse(call: Call, response: Response) {
                 var permissionResponse: PermissionReponse
-                val format = Json { ignoreUnknownKeys = true }
+                // Unknown JSON claims are ignored, unknown ENUM values mapped to default
+                val format = Json { ignoreUnknownKeys = true; coerceInputValues = true }
                 val responseBody: String = response.body?.string() ?: ""
 
                 response.use {
@@ -168,19 +169,9 @@ object WebserviceApi {
                         // parse response for status_code for error details
                         permissionResponse = format.decodeFromString(responseBody)
 
-                        val responseStatus: PermissionStatusCode =
-                            // Check if status_code is known and return in case it is
-                            if (PermissionStatusCode.values().any {
-                                    it.name == permissionResponse.statusCode }) {
-                                PermissionStatusCode.valueOf(permissionResponse.statusCode)
-                            } else {
-                                //in case of unexpected status_code value -> set UNKNOWN
-                                PermissionStatusCode.UNKNOWN
-                            }
-
                         // determine proper NetIDErrorCode
                         val errorCode: NetIdErrorCode =
-                            if (responseStatus == PermissionStatusCode.TPID_EXISTENCE_ERROR){
+                            if (permissionResponse.statusCode == PermissionResponseStatus.TPID_EXISTENCE_ERROR){
                                 NetIdErrorCode.Other
                             } else {
                                 NetIdErrorCode.InvalidRequest
@@ -188,7 +179,7 @@ object WebserviceApi {
 
                         Handler(Looper.getMainLooper()).post {
                             permissionReadCallback.onPermissionsFetchFailed(
-                                responseStatus,
+                                permissionResponse.statusCode,
                                 NetIdError(
                                     NetIdErrorProcess.PermissionRead,
                                     errorCode,
@@ -252,7 +243,7 @@ object WebserviceApi {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
                 permissionUpdateCallback.onPermissionUpdateFailed(
-                    PermissionStatusCode.UNKNOWN,
+                    PermissionResponseStatus.UNKNOWN,
                     NetIdError(
                         NetIdErrorProcess.PermissionWrite,
                         NetIdErrorCode.Unknown
@@ -262,7 +253,8 @@ object WebserviceApi {
 
             override fun onResponse(call: Call, response: Response) {
                 var permissionResponse: PermissionUpdateResponse
-                val format = Json { ignoreUnknownKeys = true }
+                // Unknown JSON claims are ignored, unknown ENUM values mapped to default
+                val format = Json { ignoreUnknownKeys = true; coerceInputValues = true }
                 val responseBody = response.body?.string() ?: ""
 
                 response.use {
@@ -276,19 +268,9 @@ object WebserviceApi {
                     } else {
                         permissionResponse = format.decodeFromString(responseBody)
 
-                        val responseStatus: PermissionStatusCode =
-                            // Check if status_code is known and return in case it is
-                            if (PermissionStatusCode.values().any {
-                                    it.name == permissionResponse.statusCode }) {
-                                PermissionStatusCode.valueOf(permissionResponse.statusCode!!)
-                            } else {
-                                //in case of unexpected status_code value/null -> set UNKNOWN
-                                PermissionStatusCode.UNKNOWN
-                            }
-
                         // determine proper NetIDErrorCode
                         val errorCode: NetIdErrorCode =
-                            if (responseStatus == PermissionStatusCode.TPID_EXISTENCE_ERROR){
+                            if (permissionResponse.statusCode == PermissionResponseStatus.TPID_EXISTENCE_ERROR){
                                 NetIdErrorCode.Other
                             } else {
                                 NetIdErrorCode.InvalidRequest
@@ -296,7 +278,7 @@ object WebserviceApi {
 
                         Handler(Looper.getMainLooper()).post {
                             permissionUpdateCallback.onPermissionUpdateFailed(
-                                responseStatus,
+                                permissionResponse.statusCode ?:PermissionResponseStatus.UNKNOWN,
                                 NetIdError(
                                     NetIdErrorProcess.PermissionWrite,
                                     errorCode,

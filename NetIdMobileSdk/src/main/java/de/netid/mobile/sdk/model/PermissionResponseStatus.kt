@@ -14,7 +14,7 @@
 
 package de.netid.mobile.sdk.model
 
-enum class PermissionStatusCode(val code: String) {
+enum class PermissionResponseStatus(val code: String) {
     PERMISSIONS_FOUND("PERMISSIONS_FOUND"),
     PERMISSIONS_NOT_FOUND("PERMISSIONS_NOT_FOUND"),
     NO_TOKEN("NO_TOKEN"),

@@ -33,7 +33,6 @@ import de.netid.mobile.sdk.userinfo.UserInfoManagerListener
 import de.netid.mobile.sdk.util.JsonUtil
 import de.netid.mobile.sdk.util.PackageUtil
 import de.netid.mobile.sdk.util.ReachabilityUtil
-import de.netid.mobile.sdk.util.TokenUtil
 
 object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     UserInfoManagerListener, PermissionManagerListener {
@@ -147,7 +146,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             }
             error?.let {
                 for (item in netIdServiceListeners) {
-                    item.onPermissionFetchFinishedWithError(PermissionStatusCode.UNKNOWN, it)
+                    item.onPermissionFetchFinishedWithError(PermissionResponseStatus.UNKNOWN, it)
                 }
             }
         }
@@ -163,7 +162,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             }
             error?.let {
                 for (item in netIdServiceListeners) {
-                    item.onPermissionUpdateFinishedWithError(PermissionStatusCode.UNKNOWN, it)
+                    item.onPermissionUpdateFinishedWithError(PermissionResponseStatus.UNKNOWN, it)
                 }
             }
 
@@ -291,7 +290,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
-    override fun onPermissionsFetchFailed(statusCode: PermissionStatusCode, error: NetIdError) {
+    override fun onPermissionsFetchFailed(statusCode: PermissionResponseStatus, error: NetIdError) {
         Log.e(javaClass.simpleName, "netId service permissions fetch failed")
         for (item in netIdServiceListeners) {
             item.onPermissionFetchFinishedWithError(statusCode, error)
@@ -305,7 +304,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
-    override fun onPermissionUpdateFailed(statusCode: PermissionStatusCode, error: NetIdError) {
+    override fun onPermissionUpdateFailed(statusCode: PermissionResponseStatus, error: NetIdError) {
         Log.e(javaClass.simpleName, "netId service permission update failed")
         for (item in netIdServiceListeners) {
             item.onPermissionUpdateFinishedWithError(statusCode, error)

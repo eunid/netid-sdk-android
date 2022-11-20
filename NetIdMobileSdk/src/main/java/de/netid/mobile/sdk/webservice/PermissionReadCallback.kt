@@ -16,11 +16,11 @@ package de.netid.mobile.sdk.webservice
 
 import de.netid.mobile.sdk.api.NetIdError
 import de.netid.mobile.sdk.model.PermissionReponse
-import de.netid.mobile.sdk.model.PermissionStatusCode
+import de.netid.mobile.sdk.model.PermissionResponseStatus
 
 interface PermissionReadCallback {
 
     fun onPermissionsFetched(permissionResponse: PermissionReponse)
 
-    fun onPermissionsFetchFailed(statusCode: PermissionStatusCode, error: NetIdError)
+    fun onPermissionsFetchFailed(statusCode: PermissionResponseStatus, error: NetIdError)
 }

@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         private const val clientId = "082531ba-1b22-4381-81b1-64add4b85b8a"
         private const val redirectUri = "https://netid-sdk-web.letsdev.de/redirect"
         private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
+        // Using default text / icon
         private val permissionLayerConfig = null
         private val loginLayerConfig = null
     }
@@ -128,7 +129,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
             it.isEnabled = false
             // these values are only for demonstration purpose
             val permission = NetIdPermissionUpdate(
-                "VALID",
+                NetIdPermissionStatus.Valid,
                 "CPdfZIAPdfZIACnABCDECbCkAP_AAAAAAAYgIzJd9D7dbXFDefx_SPt0OYwW0NBXCuQCChSAA2AFVAOQcLQA02EaMATAhiACEQIAolIBAAEEHAFEAECQQIAEAAHsAgSEhAAKIAJEEBEQAAIQAAoKAAAAAAAIgAABoASAmBiQS5bmRUCAOIAQRgBIgggBCIADAgMBBEAIABgIAIIIgSgAAQAAAKIAAAAAARAAAASGgFABcAEMAPwAgoBaQEiAJ2AUiAxgBnwqASAEMAJgAXABHAEcALSAkEBeYDPh0EIABYAFQAMgAcgA-AEAALgAZAA0AB4AD6AIYAigBMACfAFwAXQAxABmADeAHMAPwAhgBLACYAE0AKMAUoAsQBbgDDAGiAPaAfgB-gEDAIoARaAjgCOgEpALEAWmAuYC6gF5AMUAbQA3ABxADnAHUAPQAi8BIICRAE7AKHAXmAwYBjADJAGVAMsAZmAz4BrADiwHjgPrAg0BDkhAbAAWABkAFwAQwAmABcADEAGYAN4AjgBSgCxAIoARwAlIBaQC5gGKANoAc4A6gB6AEggJEAScAz4B45KBAAAgABYAGQAOAAfAB4AEQAJgAXAAxABmADaAIYARwAowBSgC3AH4ARwAk4BaQC6gGKANwAdQBF4CRAF5gMsAZ8A1gCGoSBeAAgABYAFQAMgAcgA8AEAAMgAaAA8gCGAIoATAAngBvADmAH4AQgAhgBHACWAE0AKUAW4AwwB7QD8AP0AgYBFICNAI4ASkAuYBigDaAG4AOIAegBIgCdgFDgKRAXmAwYBkgDPoGsAayA4IB44EOREAYAQwA_AEiAJ2AUiAz4ZAHACGAEwARwBHAEnALzAZ8UgXAALAAqABkADkAHwAgABkADQAHkAQwBFACYAE8AKQAYgAzABzAD8AIYAUYApQBYgC3AGjAPwA_QCLQEcAR0AlIBcwC8gGKANoAbgA9ACLwEiAJOATsAocBeYDGAGSAMsAZ9A1gDWQHBAPHAhm.f_gAAAAAAsgA"
             )
             NetIdService.updatePermission(this.applicationContext, permission)
@@ -289,15 +290,15 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         }
     }
 
-    override fun onPermissionUpdateFinishedWithError(statusCode: PermissionStatusCode, error: NetIdError) {
+    override fun onPermissionUpdateFinishedWithError(statusCode: PermissionResponseStatus, error: NetIdError) {
         when (statusCode){
-            PermissionStatusCode.TOKEN_ERROR ->
+            PermissionResponseStatus.TOKEN_ERROR ->
                 // current token expired / is invalid
                 appendLog("Token error - token refresh / reauthorization necessary")
-            PermissionStatusCode.TPID_EXISTENCE_ERROR ->
+            PermissionResponseStatus.TPID_EXISTENCE_ERROR ->
                 // netID Account was deleted
                 appendLog("netID Account was deleted")
-            PermissionStatusCode.TAPP_NOT_ALLOWED ->
+            PermissionResponseStatus.TAPP_NOT_ALLOWED ->
                 // Invalid configuration of client
                 appendLog("Client not authorized to use permission management")
             else ->
@@ -310,15 +311,15 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         updateElementsForServiceState()
     }
 
-    override fun onPermissionFetchFinishedWithError(statusCode: PermissionStatusCode, error: NetIdError) {
+    override fun onPermissionFetchFinishedWithError(statusCode: PermissionResponseStatus, error: NetIdError) {
         when (statusCode){
-            PermissionStatusCode.TOKEN_ERROR ->
+            PermissionResponseStatus.TOKEN_ERROR ->
                 // current token expired / is invalid
                 appendLog("Token error - token refresh / reauthorization necessary")
-            PermissionStatusCode.TPID_EXISTENCE_ERROR ->
+            PermissionResponseStatus.TPID_EXISTENCE_ERROR ->
                 // netID Account was deleted
                 appendLog("netID Account was deleted")
-            PermissionStatusCode.TAPP_NOT_ALLOWED ->
+            PermissionResponseStatus.TAPP_NOT_ALLOWED ->
                 // Invalid configuration of client
                 appendLog("Client not authorized to use permission management")
             else ->
@@ -334,11 +335,11 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     override fun onPermissionFetchFinished(permissions: PermissionReponse) {
         appendLog("netID service permission - fetch finished successfully")
 
-        when (PermissionStatusCode.valueOf(permissions.statusCode)) {
-            PermissionStatusCode.PERMISSIONS_FOUND ->
+        when (permissions.statusCode) {
+            PermissionResponseStatus.PERMISSIONS_FOUND ->
                 // Response contains existing permission
                 appendLog("Permissions: $permissions")
-            PermissionStatusCode.PERMISSIONS_NOT_FOUND ->
+            PermissionResponseStatus.PERMISSIONS_NOT_FOUND ->
                 // No existing permission found
                 appendLog("No permissions found")
             else ->

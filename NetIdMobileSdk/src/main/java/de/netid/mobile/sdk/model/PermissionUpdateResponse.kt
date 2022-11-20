@@ -21,9 +21,9 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class PermissionUpdateResponse(
-    // May be null in case of a successful response
+    // May be missing in case of a successful response
     @SerialName("status_code")
-    val statusCode: String? = null,
+    val statusCode: PermissionResponseStatus? = PermissionResponseStatus.UNKNOWN,
     // May be null in case of an error
     @SerialName("subject_identifiers")
     val subjectIdentifiers: SubjectIdentifiers? = null

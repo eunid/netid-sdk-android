@@ -22,7 +22,7 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class SubjectIdentifiers(
     @SerialName("tpid")
-    val tpId: String? = null,
+    val tpId: String?,
     @SerialName("sync_id")
     val syncId: String? = null
 ) {

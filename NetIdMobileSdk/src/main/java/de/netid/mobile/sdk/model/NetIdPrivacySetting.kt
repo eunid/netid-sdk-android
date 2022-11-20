@@ -14,10 +14,21 @@
 
 package de.netid.mobile.sdk.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Serializable
-enum class NetIdPrivacySettingsStatus(val status: String) {
-    Valid("VALID"),
-    Invalid("INVALID")
+data class NetIdPrivacySetting(
+    val type: String,
+    val status: NetIdPermissionStatus? = null,
+    val value: String? = null,
+    @SerialName("changed_at")
+    val changedAt: String
+) {
+    override fun toString(): String {
+        val format = Json { encodeDefaults = false }
+        return format.encodeToString(this)
+    }
 }
