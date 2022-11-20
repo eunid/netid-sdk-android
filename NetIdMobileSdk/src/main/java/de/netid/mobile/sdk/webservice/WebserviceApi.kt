@@ -209,7 +209,7 @@ object WebserviceApi {
         permissionUpdateCallback: PermissionUpdateCallback
     ) {
         val jsonElement = Json.encodeToJsonElement(permissionUpdate)
-        val mediaType = "application/vnd.netid.permission-center.netid-permissions-v2+json".toMediaType()
+        val mediaType = WebserviceConstants.CONTENT_TYPE_PERMISSION_WRITE.toMediaType()
         val byteArray = jsonElement.toString().toByteArray()
         val body = byteArray.toRequestBody(mediaType)
 
