@@ -278,7 +278,8 @@ object WebserviceApi {
 
                         Handler(Looper.getMainLooper()).post {
                             permissionUpdateCallback.onPermissionUpdateFailed(
-                                permissionResponse.statusCode ?:PermissionResponseStatus.UNKNOWN,
+                                // never null in case of error, unknown values mapped to default via coerceInputValues
+                                permissionResponse.statusCode!!,
                                 NetIdError(
                                     NetIdErrorProcess.PermissionWrite,
                                     errorCode,
