@@ -156,7 +156,7 @@ class AuthorizationPermissionFragment(
 
     public fun createButton(appIdentifier: AppIdentifier): MaterialButton {
         val appButton = MaterialButton(requireContext(), null, com.google.android.material.R.attr.borderlessButtonStyle)
-        val continueString = getString(R.string.authorization_hard_continue, appIdentifier.name)
+        val continueString = getString(R.string.authorization_login_continue, appIdentifier.name)
         val resourceId =
             context?.resources?.getIdentifier(appIdentifiers[0].typeFaceIcon, "drawable", requireContext().opPackageName)
         appButton.icon = resourceId?.let {
@@ -183,9 +183,7 @@ class AuthorizationPermissionFragment(
         appButton.layoutParams = layoutParams
 
         appButton.setOnClickListener {
-            resultLauncher.launch(authorizationIntent)
-            listener.onAppButtonClicked(appIdentifier)
-            openApp(appIdentifier.android.verifiedAppLink)
+            openApp(appIdentifier)
         }
 
         return appButton

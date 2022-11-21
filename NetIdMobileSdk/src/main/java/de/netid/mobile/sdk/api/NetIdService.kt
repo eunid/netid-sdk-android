@@ -14,13 +14,10 @@
 
 package de.netid.mobile.sdk.api
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.util.Log
-import android.widget.Button
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
@@ -38,7 +35,6 @@ import de.netid.mobile.sdk.userinfo.UserInfoManagerListener
 import de.netid.mobile.sdk.util.JsonUtil
 import de.netid.mobile.sdk.util.PackageUtil
 import de.netid.mobile.sdk.util.ReachabilityUtil
-import de.netid.mobile.sdk.util.TokenUtil
 
 object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     UserInfoManagerListener, PermissionManagerListener {
@@ -77,8 +73,8 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
-    fun getAuthorizationFragment(activity: Activity, authFlow: NetIdAuthFlow, forceApp2App: Boolean = false): Fragment? {
-        checkAvailableNetIdApplications(activity)
+    fun getAuthorizationFragment(context: Context, authFlow: NetIdAuthFlow, forceApp2App: Boolean = false): Fragment? {
+        checkAvailableNetIdApplications(context)
         // If there are no ID apps installed, but forceApp2App is true, return with an error.
         if ((availableAppIdentifiers.isEmpty()) && forceApp2App) {
             this.onAuthorizationFailed(NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.NoIdAppInstalled))
@@ -91,7 +87,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                 config.redirectUri,
                 config.claims,
                 authFlow,
-                activity
+                context
             )?.let {
                 when (authFlow) {
                     NetIdAuthFlow.Login, NetIdAuthFlow.LoginPermission ->
@@ -108,12 +104,12 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         return null
     }
 
-    fun continueButtonPermissionFlow(activity: Activity, authFlow: NetIdAuthFlow): MaterialButton {
-        val button = MaterialButton(activity.applicationContext)
+    fun continueButtonPermissionFlow(context: Context): MaterialButton {
+        val button = MaterialButton(context)
 
         button.id = R.id.fragmentAuthorizationButtonAgreeAndContinue
         button.letterSpacing = Resources.getSystem().getDimension(R.dimen.authorization_button_letter_spacing)
-        button.text = Resources.getSystem().getText(R.string.authorization_soft_agree_and_continue_with_net_id)
+        button.text = Resources.getSystem().getText(R.string.authorization_permission_agree_and_continue_with_net_id)
         button.textSize = Resources.getSystem().getDimension(R.dimen.authorization_button_text_size)
         button.icon = Resources.getSystem().getDrawable(R.drawable.ic_netid_logo_small)
         button.iconSize = 20
@@ -127,12 +123,12 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         return button
     }
 
-    fun continueButtonLoginFlow(activity: Activity, authFlow: NetIdAuthFlow): MaterialButton {
-        val button = MaterialButton(activity.applicationContext)
+    fun continueButtonLoginFlow(context: Context): MaterialButton {
+        val button = MaterialButton(context)
 
         button.id = R.id.fragmentAuthorizationButtonAgreeAndContinue
         button.letterSpacing = Resources.getSystem().getDimension(R.dimen.authorization_button_letter_spacing)
-        button.text = Resources.getSystem().getText(R.string.authorization_soft_agree_and_continue_with_net_id)
+        button.text = Resources.getSystem().getText(R.string.authorization_permission_agree_and_continue_with_net_id)
         button.textSize = Resources.getSystem().getDimension(R.dimen.authorization_button_text_size)
         button.cornerRadius = Resources.getSystem().getDimension(R.dimen.authorization_button_corner_radius).toInt()
         button.backgroundTintList = Resources.getSystem().getColorStateList(R.color.authorization_net_id_button_color)
@@ -145,22 +141,21 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         return availableAppIdentifiers.count()
     }
 
-    fun permissionButtonForIdApp(activity: Activity, index: Int): MaterialButton? {
-        val button = MaterialButton(activity.applicationContext)
-        checkAvailableNetIdApplications(activity)
+    fun permissionButtonForIdApp(context: Context, index: Int): MaterialButton? {
+        val button = MaterialButton(context)
+        checkAvailableNetIdApplications(context)
         // If there are no ID apps installed, return with an error.
         if (availableAppIdentifiers.isEmpty() || (index >= availableAppIdentifiers.count())) {
             this.onAuthorizationFailed(NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.NoIdAppInstalled))
             return null
         }
-        val result = availableAppIdentifiers[index]
         netIdConfig?.let { config ->
             val authIntent = appAuthManager.getWebAuthorizationIntent(
                 config.clientId,
                 config.redirectUri,
                 config.claims,
                 NetIdAuthFlow.Permission,
-                activity
+                context
             )
 
             if (authIntent != null) {
@@ -168,10 +163,10 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                     this,
                     availableAppIdentifiers,
                     authIntent,
-                    config.permissionLayerConfig.logoId,
-                    config.permissionLayerConfig.headlineText,
-                    config.permissionLayerConfig.legalText,
-                    config.permissionLayerConfig.continueText
+                    (config.permissionLayerConfig?.logoId)?: "",
+                    (config.permissionLayerConfig?.headlineText)?: "",
+                    (config.permissionLayerConfig?.legalText)?: "",
+                    (config.permissionLayerConfig?.continueText)?: ""
                 )
 //                AuthorizationAppListAdapter(activity.applicationContext, availableAppIdentifiers).getView(index, )
                 return authFragment.createButton(availableAppIdentifiers[index])
@@ -182,8 +177,8 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         return button
     }
 
-    fun loginButtonForIdApp(activity: Activity, index: Int, authFlow: NetIdAuthFlow): MaterialButton? {
-        checkAvailableNetIdApplications(activity)
+    fun loginButtonForIdApp(context: Context, index: Int, authFlow: NetIdAuthFlow): MaterialButton? {
+        checkAvailableNetIdApplications(context)
         // If there are no ID apps installed, return with an error.
         if (availableAppIdentifiers.isEmpty() || (index >= availableAppIdentifiers.count())) {
             this.onAuthorizationFailed(NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.NoIdAppInstalled))
@@ -200,7 +195,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                 config.redirectUri,
                 config.claims,
                 authFlow,
-                activity
+                context
             )
 
             if (authIntent != null) {
@@ -208,10 +203,9 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                     this,
                     availableAppIdentifiers,
                     authIntent,
-                    authFlow,
-                    config.loginLayerConfig.headlineText,
-                    config.loginLayerConfig.loginText,
-                    config.loginLayerConfig.continueText
+                    (config.loginLayerConfig?.headlineText)?: "",
+                    (config.loginLayerConfig?.loginText)?: "",
+                    (config.loginLayerConfig?.continueText)?: ""
                 )
                 return authFragment.createButton(availableAppIdentifiers[index])
             }

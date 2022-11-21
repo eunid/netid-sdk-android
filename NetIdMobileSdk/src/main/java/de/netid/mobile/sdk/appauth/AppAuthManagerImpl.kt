@@ -14,7 +14,7 @@
 
 package de.netid.mobile.sdk.appauth
 
-import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
@@ -79,7 +79,7 @@ class AppAuthManagerImpl : AppAuthManager {
         redirectUri: String,
         claims: String,
         flow: NetIdAuthFlow,
-        activity: Activity
+        context: Context
     ): Intent? {
         authorizationServiceConfiguration?.let { serviceConfiguration ->
             var scopes = mutableListOf<String>()
@@ -107,7 +107,7 @@ class AppAuthManagerImpl : AppAuthManager {
                 ).setScopes(scopes
                 ).setClaims(claimsJSON)
             val authRequest = authRequestBuilder.build()
-            authService = AuthorizationService(activity)
+            authService = AuthorizationService(context)
             return authService?.getAuthorizationRequestIntent(authRequest)
         } ?: run {
             Log.e(javaClass.simpleName, "No authorization service configuration available")

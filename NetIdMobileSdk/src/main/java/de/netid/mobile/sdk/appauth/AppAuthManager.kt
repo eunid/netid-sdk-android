@@ -14,7 +14,7 @@
 
 package de.netid.mobile.sdk.appauth
 
-import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import de.netid.mobile.sdk.api.NetIdAuthFlow
 import net.openid.appauth.AuthState
@@ -30,7 +30,7 @@ interface AppAuthManager {
         redirectUri: String,
         claims: String,
         flow: NetIdAuthFlow,
-        activity: Activity
+        context: Context
     ): Intent?
 
     fun processAuthorizationIntent(data: Intent)

@@ -14,16 +14,30 @@
 
 package de.netid.mobile.sdk
 
-import android.content.Intent
-import android.net.Uri
+import android.R
+import android.app.Activity
+import android.os.Bundle
+import android.os.Handler
+import android.util.Log
+import android.view.ContextThemeWrapper
+import android.view.LayoutInflater
+import androidx.appcompat.app.AppCompatActivity
 import androidx.test.platform.app.InstrumentationRegistry
 import de.netid.mobile.sdk.api.*
+import de.netid.mobile.sdk.appauth.AppAuthManagerListener
 import de.netid.mobile.sdk.model.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
-class NetIdPermissionTest: NetIdServiceListener {
+class NetIdPermissionTest: NetIdServiceListener, AppAuthManagerListener
+ {
+//     AuthorizationFragmentListener,
+//    UserInfoManagerListener, PermissionManagerListener
+
+     var ready : Boolean = false
+
+     private var handler: Handler? = null
 
     companion object {
         private const val clientId = "082531ba-1b22-4381-81b1-64add4b85b8a"
@@ -35,6 +49,7 @@ class NetIdPermissionTest: NetIdServiceListener {
 
     @Before
     public fun setup() {
+        ready = false
         assertEquals("de.netid.mobile.sdk.test", appContext.packageName)
         val netIdConfig = NetIdConfig(clientId, redirectUri, claims)
         NetIdService.addListener(this)
@@ -50,12 +65,18 @@ class NetIdPermissionTest: NetIdServiceListener {
 
     @Test
     fun fetchPermissions() {
-/*        val continueButton = NetIdService.continueButtonPermissionFlow(this, NetIdAuthFlow.Permission)
-        continueButton.performClick()*/
+        while (!ready) {}
         val appDetailsIOS = AppDetailsIOS("", "", "")
         val appDetailsAndroid = AppDetailsAndroid("de.web.mobile.android.mail", "https://sso.web.de/authorize-app2app", "de.web.mobile.android.mail.NetIdActivityV1")
         val appIdentifier = AppIdentifier(0, "WEB.DE", "", "", "", "", appDetailsIOS, appDetailsAndroid)
+        ready = false
         NetIdService.onAppButtonClicked(appIdentifier)
+        val themedContext = ContextThemeWrapper(appContext, R.style.Theme_Material)
+        val view = LayoutInflater.from(themedContext).inflate(R.layout.activity_list_item, null, false)
+        appContext.setTheme(R.style.Theme_Material)
+        val continueButton = NetIdService.continueButtonPermissionFlow(appContext)
+        continueButton.performClick()
+        while (!ready) {}
 
         NetIdService.fetchPermissions(appContext)
     }
@@ -77,9 +98,39 @@ class NetIdPermissionTest: NetIdServiceListener {
         NetIdService.updatePermission(appContext, permission)
     }
 
+    // AppAuthManagerListener functions
+
+    override fun onAuthorizationServiceConfigurationFetchedSuccessfully() {
+        Log.i(javaClass.simpleName, "netId service Authorization Service Configuration fetched successfully")
+        onInitializationFinishedWithError(null)
+    }
+
+    override fun onAuthorizationServiceConfigurationFetchFailed(error: NetIdError) {
+        Log.e(javaClass.simpleName, "netId service Authorization Service Configuration fetch failed")
+        onInitializationFinishedWithError(error)
+    }
+
+    override fun onAuthorizationSuccessful() {
+        Log.i(javaClass.simpleName, "netId service Authorization successful")
+
+/*        NetIdService.appAuthManager.getAccessToken()?.let {
+            for (item in NetIdService.netIdServiceListeners) {
+                item.onAuthenticationFinished(it)
+            }
+        }*/
+    }
+
+    override fun onAuthorizationFailed(error: NetIdError) {
+        Log.e(javaClass.simpleName, "netId service Authorization failed")
+        onAuthenticationFinishedWithError(error)
+    }
+
+
+
     // Listener functions
     override fun onInitializationFinishedWithError(error: NetIdError?) {
         assertEquals(error, null)
+        ready = true
     }
 
     override fun onAuthenticationFinished(accessToken: String) {
