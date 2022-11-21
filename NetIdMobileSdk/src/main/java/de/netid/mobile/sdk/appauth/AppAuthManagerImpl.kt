@@ -24,6 +24,8 @@ import de.netid.mobile.sdk.api.NetIdErrorCode
 import de.netid.mobile.sdk.api.NetIdErrorProcess
 import de.netid.mobile.sdk.util.TokenUtil
 import net.openid.appauth.*
+import net.openid.appauth.browser.BrowserDenyList
+import net.openid.appauth.browser.VersionedBrowserMatcher
 import org.json.JSONObject
 
 
@@ -32,6 +34,10 @@ class AppAuthManagerImpl : AppAuthManager {
     companion object {
         private const val scheme = "https://"
         private const val scopePermissionManagement = "permission_management"
+        private val browserDenyList =  BrowserDenyList(
+            VersionedBrowserMatcher.FIREFOX_BROWSER,
+            VersionedBrowserMatcher.FIREFOX_CUSTOM_TAB
+        )
     }
 
     override var listener: AppAuthManagerListener? = null
@@ -110,7 +116,11 @@ class AppAuthManagerImpl : AppAuthManager {
                 ).setScopes(scopes
                 ).setClaims(claimsJSON)
             val authRequest = authRequestBuilder.build()
-            authService = AuthorizationService(activity)
+            val appAuthConfiguration = AppAuthConfiguration.Builder()
+            .setBrowserMatcher(browserDenyList)
+            .build()
+            authService = AuthorizationService(activity, appAuthConfiguration)
+
             return authService?.getAuthorizationRequestIntent(authRequest)
         } ?: run {
             Log.e(javaClass.simpleName, "No authorization service configuration available")
