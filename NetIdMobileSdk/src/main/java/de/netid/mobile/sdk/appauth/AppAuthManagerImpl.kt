@@ -58,7 +58,10 @@ class AppAuthManagerImpl : AppAuthManager {
         val uriString = scheme + host
         AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(uriString)) { serviceConfiguration, authorizationException ->
             authorizationException?.let {
-                val netIdError = createNetIdErrorForAuthorizationException(it)
+                val netIdError = createNetIdErrorForAuthorizationException(
+                    NetIdErrorProcess.Configuration,
+                    it
+                )
                 listener?.onAuthorizationServiceConfigurationFetchFailed(netIdError)
             } ?: run {
                 serviceConfiguration?.let {
@@ -122,7 +125,10 @@ class AppAuthManagerImpl : AppAuthManager {
         authState?.update(authorizationResponse,authorizationException)
 
         authorizationException?.let {
-            val netIdError = createNetIdErrorForAuthorizationException(it)
+            val netIdError = createNetIdErrorForAuthorizationException(
+                NetIdErrorProcess.Authentication,
+                it
+            )
             listener?.onAuthorizationFailed(netIdError)
         } ?: run {
             authorizationResponse?.let {
@@ -137,6 +143,7 @@ class AppAuthManagerImpl : AppAuthManager {
             exception?.let { authException ->
                 listener?.onAuthorizationFailed(
                     createNetIdErrorForAuthorizationException(
+                        NetIdErrorProcess.CodeExchange,
                         authException
                     )
                 )
@@ -152,81 +159,107 @@ class AppAuthManagerImpl : AppAuthManager {
         }
     }
 
-    private fun createNetIdErrorForAuthorizationException(authorizationException: AuthorizationException): NetIdError {
+    private fun createNetIdErrorForAuthorizationException(process: NetIdErrorProcess, authorizationException: AuthorizationException): NetIdError {
         var msg = ""
         if (authorizationException.error != null) {
             msg = authorizationException.error + " - " + authorizationException.errorDescription
         }
         return when (authorizationException) {
-            AuthorizationException.GeneralErrors.NETWORK_ERROR -> NetIdError(
-                NetIdErrorProcess.Configuration,
-                NetIdErrorCode.NetworkError
-            )
-            AuthorizationException.GeneralErrors.JSON_DESERIALIZATION_ERROR ->
-                NetIdError(
-                    NetIdErrorProcess.Configuration,
-                    NetIdErrorCode.JsonDeserializationError
-            )
-            AuthorizationException.GeneralErrors.INVALID_DISCOVERY_DOCUMENT ->
-                NetIdError(
-                    NetIdErrorProcess.Configuration,
-                    NetIdErrorCode.InvalidDiscoveryDocument
-            )
             AuthorizationException.AuthorizationRequestErrors.INVALID_REQUEST -> NetIdError(
-                NetIdErrorProcess.Authentication,
+                process,
                 NetIdErrorCode.InvalidRequest
             )
             AuthorizationException.AuthorizationRequestErrors.UNAUTHORIZED_CLIENT -> NetIdError(
-                NetIdErrorProcess.Authentication,
+                process,
                 NetIdErrorCode.UnauthorizedClient
             )
             AuthorizationException.AuthorizationRequestErrors.ACCESS_DENIED -> NetIdError(
-                NetIdErrorProcess.Authentication,
+                process,
                 NetIdErrorCode.AccessDenied
             )
             AuthorizationException.AuthorizationRequestErrors.UNSUPPORTED_RESPONSE_TYPE -> NetIdError(
-                    NetIdErrorProcess.Authentication,
-                    NetIdErrorCode.UnsupportedResponseType
+                process,
+                NetIdErrorCode.UnsupportedResponseType
             )
             AuthorizationException.AuthorizationRequestErrors.INVALID_SCOPE -> NetIdError(
-                NetIdErrorProcess.Authentication,
+                process,
                 NetIdErrorCode.InvalidScope
             )
             AuthorizationException.AuthorizationRequestErrors.SERVER_ERROR -> NetIdError(
-                NetIdErrorProcess.Authentication,
+                process,
                 NetIdErrorCode.ServerError
             )
             AuthorizationException.AuthorizationRequestErrors.TEMPORARILY_UNAVAILABLE -> NetIdError(
-                    NetIdErrorProcess.Authentication,
-                    NetIdErrorCode.TemporarilyUnavailable
+                process,
+                NetIdErrorCode.TemporarilyUnavailable
             )
             AuthorizationException.AuthorizationRequestErrors.CLIENT_ERROR -> NetIdError(
-                NetIdErrorProcess.Authentication,
+                process,
                 NetIdErrorCode.ClientError
             )
             AuthorizationException.AuthorizationRequestErrors.STATE_MISMATCH -> NetIdError(
-                NetIdErrorProcess.Authentication,
+                process,
                 NetIdErrorCode.StateMismatch
             )
             AuthorizationException.AuthorizationRequestErrors.OTHER -> NetIdError(
-                NetIdErrorProcess.Authentication,
+                process,
                 NetIdErrorCode.Other,
                 msg
             )
+            AuthorizationException.GeneralErrors.NETWORK_ERROR -> NetIdError(
+                process,
+                NetIdErrorCode.NetworkError
+            )
+            AuthorizationException.GeneralErrors.JSON_DESERIALIZATION_ERROR -> NetIdError(
+                process,
+                NetIdErrorCode.JsonDeserializationError
+            )
+            AuthorizationException.GeneralErrors.INVALID_DISCOVERY_DOCUMENT -> NetIdError(
+                process,
+                NetIdErrorCode.InvalidDiscoveryDocument
+            )
             AuthorizationException.GeneralErrors.PROGRAM_CANCELED_AUTH_FLOW -> NetIdError(
-                NetIdErrorProcess.Authentication,
+                process,
                 NetIdErrorCode.MissingBrowser
             )
             AuthorizationException.GeneralErrors.USER_CANCELED_AUTH_FLOW -> NetIdError(
-                NetIdErrorProcess.Authentication,
+                process,
                 NetIdErrorCode.AuthorizationCanceledByUser
             )
             AuthorizationException.GeneralErrors.PROGRAM_CANCELED_AUTH_FLOW -> NetIdError(
-                NetIdErrorProcess.Authentication,
+                process,
                 NetIdErrorCode.AuthorizationCanceledByProgram
             )
+            AuthorizationException.TokenRequestErrors.CLIENT_ERROR -> NetIdError(
+                process,
+                NetIdErrorCode.ClientError
+            )
+            AuthorizationException.TokenRequestErrors.INVALID_CLIENT -> NetIdError(
+                process,
+                NetIdErrorCode.InvalidClient
+            )
+            AuthorizationException.TokenRequestErrors.INVALID_GRANT -> NetIdError(
+                process,
+                NetIdErrorCode.InvalidGrant
+            )
+            AuthorizationException.TokenRequestErrors.INVALID_REQUEST -> NetIdError(
+                process,
+                NetIdErrorCode.InvalidRequest
+            )
+            AuthorizationException.TokenRequestErrors.INVALID_SCOPE -> NetIdError(
+                process,
+                NetIdErrorCode.InvalidScope
+            )
+            AuthorizationException.TokenRequestErrors.UNAUTHORIZED_CLIENT -> NetIdError(
+                process,
+                NetIdErrorCode.UnauthorizedClient
+            )
+            AuthorizationException.TokenRequestErrors.UNSUPPORTED_GRANT_TYPE -> NetIdError(
+                process,
+                NetIdErrorCode.UnsupportedGrantType
+            )
             AuthorizationException.TokenRequestErrors.OTHER -> NetIdError(
-                NetIdErrorProcess.CodeExchange,
+                process,
                 NetIdErrorCode.Other,
                 msg
             )

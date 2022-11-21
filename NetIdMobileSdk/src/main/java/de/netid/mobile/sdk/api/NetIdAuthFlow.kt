@@ -15,5 +15,7 @@
 package de.netid.mobile.sdk.api
 
 enum class NetIdAuthFlow {
-    Permission, Login, LoginPermission
+    Permission,
+    Login,
+    LoginPermission
 }

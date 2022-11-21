@@ -20,9 +20,12 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class NetIdPrivacySettings(
-    val type: String,
-    val status: String? = null,
+data class NetIdPrivacySetting(
+    // type of entry - default to other if unexpected value is received
+    val type: NetIdPrivacySettingType = NetIdPrivacySettingType.OTHER,
+    // optional only present for netID Permissions
+    val status: NetIdPermissionStatus? = null,
+    // optional
     val value: String? = null,
     @SerialName("changed_at")
     val changedAt: String

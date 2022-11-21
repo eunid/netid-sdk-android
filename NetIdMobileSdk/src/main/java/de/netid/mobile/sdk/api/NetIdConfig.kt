@@ -18,7 +18,8 @@ data class PermissionLayerConfig(
     val logoId: String? = "",
     val headlineText: String? = "",
     val legalText: String? = "",
-    val continueText: String? = "")
+    val continueText: String? = ""
+)
 
 data class LoginLayerConfig(
     val headlineText: String? = "",

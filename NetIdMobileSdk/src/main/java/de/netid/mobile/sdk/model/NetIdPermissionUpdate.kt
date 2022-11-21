@@ -22,7 +22,7 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class NetIdPermissionUpdate(
     @SerialName("idconsent")
-    val idConsent: String? = null,
+    val idConsent: NetIdPermissionStatus? = null,
     @SerialName("iab_tc_string")
     val iabTc: String? = null
 ) {

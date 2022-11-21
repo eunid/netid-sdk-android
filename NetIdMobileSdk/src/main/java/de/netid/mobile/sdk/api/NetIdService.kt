@@ -33,7 +33,6 @@ import de.netid.mobile.sdk.userinfo.UserInfoManagerListener
 import de.netid.mobile.sdk.util.JsonUtil
 import de.netid.mobile.sdk.util.PackageUtil
 import de.netid.mobile.sdk.util.ReachabilityUtil
-import de.netid.mobile.sdk.util.TokenUtil
 
 object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     UserInfoManagerListener, PermissionManagerListener {
@@ -147,7 +146,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             }
             error?.let {
                 for (item in netIdServiceListeners) {
-                    item.onPermissionFetchFinishedWithError(it)
+                    item.onPermissionFetchFinishedWithError(PermissionResponseStatus.UNKNOWN, it)
                 }
             }
         }
@@ -163,7 +162,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             }
             error?.let {
                 for (item in netIdServiceListeners) {
-                    item.onPermissionUpdateFinishedWithError(it)
+                    item.onPermissionUpdateFinishedWithError(PermissionResponseStatus.UNKNOWN, it)
                 }
             }
 
@@ -284,31 +283,31 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     }
 
     // PermissionManagerListener functions
-    override fun onPermissionsFetched(permissions: Permissions) {
+    override fun onPermissionsFetched(permissions: PermissionReadResponse) {
         Log.i(javaClass.simpleName, "netId service permissions fetched successfully")
         for (item in netIdServiceListeners) {
             item.onPermissionFetchFinished(permissions)
         }
     }
 
-    override fun onPermissionsFetchFailed(error: NetIdError) {
+    override fun onPermissionsFetchFailed(statusCode: PermissionResponseStatus, error: NetIdError) {
         Log.e(javaClass.simpleName, "netId service permissions fetch failed")
         for (item in netIdServiceListeners) {
-            item.onPermissionFetchFinishedWithError(error)
+            item.onPermissionFetchFinishedWithError(statusCode, error)
         }
     }
 
     override fun onPermissionUpdated(subjectIdentifiers: SubjectIdentifiers) {
         Log.i(javaClass.simpleName, "netId service permissions updated successfully")
         for (item in netIdServiceListeners) {
-            item.onPermissionUpdateFinished()
+            item.onPermissionUpdateFinished(subjectIdentifiers)
         }
     }
 
-    override fun onPermissionUpdateFailed(error: NetIdError) {
+    override fun onPermissionUpdateFailed(statusCode: PermissionResponseStatus, error: NetIdError) {
         Log.e(javaClass.simpleName, "netId service permission update failed")
         for (item in netIdServiceListeners) {
-            item.onPermissionUpdateFinishedWithError(error)
+            item.onPermissionUpdateFinishedWithError(statusCode, error)
         }
     }
 }
