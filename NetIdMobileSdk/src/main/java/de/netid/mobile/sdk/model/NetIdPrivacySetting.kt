@@ -25,7 +25,7 @@ data class NetIdPrivacySetting(
     val type: NetIdPrivacySettingType = NetIdPrivacySettingType.OTHER,
     // optional only present for netID Permissions
     val status: NetIdPermissionStatus? = null,
-    // optional only present for netID Permissions
+    // optional
     val value: String? = null,
     @SerialName("changed_at")
     val changedAt: String
