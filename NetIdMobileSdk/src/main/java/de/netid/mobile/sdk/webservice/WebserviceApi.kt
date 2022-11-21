@@ -34,7 +34,6 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
 
-
 /**
  * Provides functions to perform web requests.
  */
@@ -109,7 +108,7 @@ object WebserviceApi {
 
     /**
      * Performs a request to read permissions related to an authorized user.
-     * The result of the request is provided via the given [PermissionReadReponse] instance.
+     * The result of the request is provided via the given [PermissionReadResponse] instance.
      *
      * @param accessToken a currently valid ID token to read permissions
      * @param collapseSyncId If `true`, the response will not contain the sync id
@@ -143,7 +142,6 @@ object WebserviceApi {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
                 permissionReadCallback.onPermissionsFetchFailed(
                     PermissionResponseStatus.UNKNOWN,
                     NetIdError(
@@ -154,7 +152,7 @@ object WebserviceApi {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                var permissionResponse: PermissionReadReponse
+                var permissionResponse: PermissionReadResponse
                 // Unknown JSON claims are ignored, unknown ENUM values mapped to default
                 val format = Json { ignoreUnknownKeys = true; coerceInputValues = true }
                 val responseBody: String = response.body?.string() ?: ""
@@ -171,7 +169,7 @@ object WebserviceApi {
 
                         // determine proper NetIDErrorCode
                         val errorCode: NetIdErrorCode =
-                            if (permissionResponse.statusCode == PermissionResponseStatus.TPID_EXISTENCE_ERROR){
+                            if (permissionResponse.statusCode == PermissionResponseStatus.TPID_EXISTENCE_ERROR) {
                                 NetIdErrorCode.Other
                             } else {
                                 NetIdErrorCode.InvalidRequest
@@ -195,7 +193,7 @@ object WebserviceApi {
 
     /**
      * Performs a request to read permissions related to an authorized user.
-     * The result of the request is provided via the given [PermissionReadReponse] instance.
+     * The result of the request is provided via the given [PermissionReadResponse] instance.
      *
      * @param accessToken a currently valid ID token to read permissions
      * @param permissionUpdate a [NetIdPermissionUpdate] instance, defining the permission to update
@@ -213,7 +211,6 @@ object WebserviceApi {
         val byteArray = jsonElement.toString().toByteArray()
         val body = byteArray.toRequestBody(mediaType)
 
-
         val requestBuilder = Request.Builder()
             .url(WebserviceConstants.HTTPS_PROTOCOL + WebserviceConstants.PERMISSION_WRITE_HOST + WebserviceConstants.PERMISSION_WRITE_PATH)
             .method(WebserviceConstants.POST_METHOD, body)
@@ -225,7 +222,7 @@ object WebserviceApi {
         if (collapseSyncId) {
             requestBuilder.header(
                 WebserviceConstants.ACCEPT_HEADER_KEY,
-             WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE
+                WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE
             )
         } else {
             requestBuilder.header(
@@ -238,7 +235,7 @@ object WebserviceApi {
             WebserviceConstants.CONTENT_TYPE_HEADER_KEY,
             WebserviceConstants.CONTENT_TYPE_PERMISSION_WRITE
         )
-            .build()
+        .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
@@ -259,7 +256,6 @@ object WebserviceApi {
                 val responseBody = response.body?.string() ?: ""
 
                 response.use {
-
                     if (response.isSuccessful) {
                         // in case of success a SubjectIdentifier object is returned
                         permissionUpdateResponse = format.decodeFromString(responseBody)

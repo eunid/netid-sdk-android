@@ -283,7 +283,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     }
 
     // PermissionManagerListener functions
-    override fun onPermissionsFetched(permissions: PermissionReadReponse) {
+    override fun onPermissionsFetched(permissions: PermissionReadResponse) {
         Log.i(javaClass.simpleName, "netId service permissions fetched successfully")
         for (item in netIdServiceListeners) {
             item.onPermissionFetchFinished(permissions)

@@ -32,6 +32,10 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     private var serviceState = ServiceState.Uninitialized
     private lateinit var bottomDialogFragment: SdkContentBottomDialogFragment
 
+    /** Companion object for basic configuration of the [NetIdService] via [NetIdConfig] object.
+     *  clientId and redirectUri are mandatory, all other parameters are optional.
+     *  Nevertheless, we set a standard set of claims here.
+     */
     companion object {
         private const val clientId = "082531ba-1b22-4381-81b1-64add4b85b8a"
         private const val redirectUri = "https://netid-sdk-web.letsdev.de/redirect"
@@ -127,7 +131,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
         binding.activityMainButtonPermissionWrite.setOnClickListener {
             it.isEnabled = false
-            // these values are only for demonstration purpose
+            // these values are only for demonstration purposes
             val permission = NetIdPermissionUpdate(
                 NetIdPermissionStatus.VALID,
                 "CPdfZIAPdfZIACnABCDECbCkAP_AAAAAAAYgIzJd9D7dbXFDefx_SPt0OYwW0NBXCuQCChSAA2AFVAOQcLQA02EaMATAhiACEQIAolIBAAEEHAFEAECQQIAEAAHsAgSEhAAKIAJEEBEQAAIQAAoKAAAAAAAIgAABoASAmBiQS5bmRUCAOIAQRgBIgggBCIADAgMBBEAIABgIAIIIgSgAAQAAAKIAAAAAARAAAASGgFABcAEMAPwAgoBaQEiAJ2AUiAxgBnwqASAEMAJgAXABHAEcALSAkEBeYDPh0EIABYAFQAMgAcgA-AEAALgAZAA0AB4AD6AIYAigBMACfAFwAXQAxABmADeAHMAPwAhgBLACYAE0AKMAUoAsQBbgDDAGiAPaAfgB-gEDAIoARaAjgCOgEpALEAWmAuYC6gF5AMUAbQA3ABxADnAHUAPQAi8BIICRAE7AKHAXmAwYBjADJAGVAMsAZmAz4BrADiwHjgPrAg0BDkhAbAAWABkAFwAQwAmABcADEAGYAN4AjgBSgCxAIoARwAlIBaQC5gGKANoAc4A6gB6AEggJEAScAz4B45KBAAAgABYAGQAOAAfAB4AEQAJgAXAAxABmADaAIYARwAowBSgC3AH4ARwAk4BaQC6gGKANwAdQBF4CRAF5gMsAZ8A1gCGoSBeAAgABYAFQAMgAcgA8AEAAMgAaAA8gCGAIoATAAngBvADmAH4AQgAhgBHACWAE0AKUAW4AwwB7QD8AP0AgYBFICNAI4ASkAuYBigDaAG4AOIAegBIgCdgFDgKRAXmAwYBkgDPoGsAayA4IB44EOREAYAQwA_AEiAJ2AUiAz4ZAHACGAEwARwBHAEnALzAZ8UgXAALAAqABkADkAHwAgABkADQAHkAQwBFACYAE8AKQAYgAzABzAD8AIYAUYApQBYgC3AGjAPwA_QCLQEcAR0AlIBcwC8gGKANoAbgA9ACLwEiAJOATsAocBeYDGAGSAMsAZ9A1gDWQHBAPHAhm.f_gAAAAAAsgA"
@@ -332,7 +336,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         updateElementsForServiceState()
     }
 
-    override fun onPermissionFetchFinished(permissions: PermissionReadReponse) {
+    override fun onPermissionFetchFinished(permissions: PermissionReadResponse) {
         appendLog("netID service permission - fetch finished successfully")
 
         when (permissions.statusCode) {

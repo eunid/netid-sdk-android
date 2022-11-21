@@ -16,7 +16,7 @@ package de.netid.mobile.sdk.permission
 
 import de.netid.mobile.sdk.api.NetIdError
 import de.netid.mobile.sdk.model.NetIdPermissionUpdate
-import de.netid.mobile.sdk.model.PermissionReadReponse
+import de.netid.mobile.sdk.model.PermissionReadResponse
 import de.netid.mobile.sdk.model.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.webservice.PermissionReadCallback
@@ -30,7 +30,7 @@ class PermissionManager(private val listener: PermissionManagerListener) {
                 accessToken,
                 collapseSyncId,
                 object : PermissionReadCallback {
-                    override fun onPermissionsFetched(permissionResponse: PermissionReadReponse) {
+                    override fun onPermissionsFetched(permissionResponse: PermissionReadResponse) {
                         listener.onPermissionsFetched(permissionResponse)
                     }
 
