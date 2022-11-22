@@ -244,9 +244,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
     override fun onUserInfoFetchedWithError(error: NetIdError) {
         if (error.msg?.isNotEmpty() == true) {
-            appendLog("netID service user info failed: ${error.code}, ${error.process}, ${error.msg}")
+            appendLog("netID service user info - fetch failed: ${error.code}, ${error.process}, ${error.msg}")
         } else {
-            appendLog("netID service user info failed: ${error.code}, ${error.process}")
+            appendLog("netID service user info - fetch failed: ${error.code}, ${error.process}")
         }
         serviceState = ServiceState.UserInfoFailed
         updateElementsForServiceState()
@@ -327,7 +327,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
                 // Error parsing JSON body
                 appendLog("Invalid JSON body, parse error")
             else ->
-                appendLog("netID service permission - fetch failed with error: ${error.code}")
+                appendLog("netID service permission - update failed with error: ${error.code}")
         }
         if (error.msg?.isNotEmpty() == true) {
             appendLog("original error message: ${error.msg}")
@@ -391,7 +391,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     override fun onPermissionUpdateFinished(subjectIdentifiers: SubjectIdentifiers) {
-        appendLog("netID service permission -update finished successfully.")
+        appendLog("netID service permission - update finished successfully.")
         appendLog("Returned: $subjectIdentifiers")
         serviceState = ServiceState.PermissionWriteSuccessful
         updateElementsForServiceState()
