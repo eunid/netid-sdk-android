@@ -78,7 +78,8 @@ object WebserviceApi {
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (response.isSuccessful) {
-                        val userInfo = Json.decodeFromString<UserInfo>(response.body?.string() ?: "")
+                        // Unknown JSON claims are ignored
+                        val userInfo = Json{ ignoreUnknownKeys = true }.decodeFromString<UserInfo>(response.body?.string() ?: "")
                         Handler(Looper.getMainLooper()).post {
                             userInfoCallback.onUserInfoFetched(userInfo)
                         }
