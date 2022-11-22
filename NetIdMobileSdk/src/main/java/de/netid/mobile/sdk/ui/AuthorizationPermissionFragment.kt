@@ -104,7 +104,6 @@ class AuthorizationPermissionFragment(
                     openApp(app)
                 }
             } else {
-                authorizationIntent.setPackage("com.android.chrome")
                 resultLauncher.launch(authorizationIntent)
             }
         }

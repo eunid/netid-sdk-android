@@ -20,13 +20,9 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class Permissions(
+data class PermissionUpdateErrorResponse(
     @SerialName("status_code")
-    val statusCode: String,
-    @SerialName("subject_identifiers")
-    val subjectIdentifiers: SubjectIdentifiers,
-    @SerialName("netid_privacy_settings")
-    val netIdPrivacySettings: List<NetIdPrivacySettings>
+    val statusCode: PermissionResponseStatus = PermissionResponseStatus.UNKNOWN,
 ) {
     override fun toString(): String {
         val format = Json { encodeDefaults = false }

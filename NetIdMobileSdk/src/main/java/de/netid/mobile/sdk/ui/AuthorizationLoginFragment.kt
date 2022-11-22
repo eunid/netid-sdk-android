@@ -81,7 +81,6 @@ class AuthorizationLoginFragment(
             listener.onCloseClicked()
         }
         binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
-            authorizationIntent.setPackage("com.android.chrome")
             resultLauncher.launch(authorizationIntent)
         }
     }

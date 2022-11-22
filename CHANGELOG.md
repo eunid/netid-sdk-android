@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Some cleanups
 - Make permission erros more transparent
 - Force use of Chrome for app2web 
+- Be less strict when parsing JSON, ignore unknown claims
 
 ### Fixed
 - Fixed UserInfo json parser error

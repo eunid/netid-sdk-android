@@ -12,22 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 package de.netid.mobile.sdk.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-
-@Serializable
-data class SubjectIdentifiers(
-    @SerialName("tpid")
-    val tpId: String?,
-    @SerialName("sync_id")
-    val syncId: String? = null
-) {
-    override fun toString(): String {
-        val format = Json { encodeDefaults = false }
-        return format.encodeToString(this)
-    }
+enum class NetIdPrivacySettingType(val code: String)  {
+    IDCONSENT("IDCONSENT"),
+    IAB_TC_STRING("IAB_TC_STRING"),
+    OTHER("OTHER")
 }
