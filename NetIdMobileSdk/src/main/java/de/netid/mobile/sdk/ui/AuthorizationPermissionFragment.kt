@@ -20,11 +20,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Selection
 import android.text.Spannable
-import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.text.style.URLSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,6 +48,7 @@ class AuthorizationPermissionFragment(
     private val legalText: String = "",
     private val continueText: String = ""
 ) : Fragment(), AuthorizationAppListAdapterListener {
+
     private var _binding: FragmentAuthorizationPermissionBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
@@ -114,19 +115,21 @@ class AuthorizationPermissionFragment(
     private fun setupAppButtons() {
         val netIdString = getString(R.string.authorization_permission_net_id)
         val chooseString = getString(R.string.authorization_permission_choose_account_provider)
+        val legalInfoTextView = binding.fragmentAuthorizationLegalInfoTextView
+
         when (appIdentifiers.size) {
-            0 -> binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
+            0 -> legalInfoTextView.text = if (legalText.isEmpty()) {
                 getString(R.string.authorization_permission_legal_info, netIdString) + getString(R.string.authorization_permission_legal_info_fixed, netIdString, "")
             } else {
                 String.format(legalText, netIdString) + getString(R.string.authorization_permission_legal_info_fixed, netIdString, "")
             }
-            1 -> binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
+            1 -> legalInfoTextView.text = if (legalText.isEmpty()) {
                 getString(R.string.authorization_permission_legal_info, appIdentifiers[0].name) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, "")
             } else {
                 String.format(legalText, appIdentifiers[0].name) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, "")
             }
             else -> {
-                binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
+                legalInfoTextView.text = if (legalText.isEmpty()) {
                     getString(
                         R.string.authorization_permission_legal_info,
                         appIdentifiers[0].name
@@ -134,7 +137,9 @@ class AuthorizationPermissionFragment(
                 } else {
                     String.format(legalText, appIdentifiers[0].name) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, chooseString)
                 }
-                binding.fragmentAuthorizationLegalInfoTextView.makeLinks(
+                // We only need to add the link to the text, if we have more than one id app installed.
+                // Otherwise, we leave the text as it is.
+                legalInfoTextView.createAccountProviderSelection(
                     Pair(chooseString, View.OnClickListener {
                         val listView: ListView = binding.fragmentAuthorizationAppCellContainer
                         val listAdapter =
@@ -145,6 +150,12 @@ class AuthorizationPermissionFragment(
                 )
             }
         }
+        // Enable Links for clickable spans
+        legalInfoTextView.movementMethod = LinkMovementMethod.getInstance()
+        // Create Link to Privacy Center
+        legalInfoTextView.createLinks(Pair(
+            getString(R.string.authorization_permission_privacycenter_match),
+            getString(R.string.authorization_permission_privacycenter_link)))
     }
 
     override fun onDestroyView() {
@@ -164,34 +175,58 @@ class AuthorizationPermissionFragment(
         resultLauncher.launch(authorizationIntent)
     }
 
-    private fun TextView.makeLinks(vararg links: Pair<String, View.OnClickListener>) {
-        val spannableString = SpannableString(this.text)
-        var startIndexOfLink = -1
-        for (link in links) {
-            val clickableSpan = object : ClickableSpan() {
-                override fun updateDrawState(textPaint: TextPaint) {
-                    textPaint.isUnderlineText = true
-                }
+    private fun TextView.createAccountProviderSelection(link: Pair<String, View.OnClickListener>) {
+        val spannableString = this.text as Spannable
+        val startIndexOfLink: Int = spannableString.toString().indexOf(link.first)
 
-                override fun onClick(view: View) {
-                    Selection.setSelection((view as TextView).text as Spannable, 0)
-                    view.invalidate()
-                    link.second.onClick(view)
-                }
+        val clickableSpan = object : ClickableSpan() {
+            override fun updateDrawState(textPaint: TextPaint) {
+                textPaint.isUnderlineText = true
             }
-            startIndexOfLink = this.text.toString().indexOf(link.first, startIndexOfLink + 1)
-            // We only need to add the link to the text, if we have more than one id app installed.
-            // Otherwise, we leave the text as it is.
-            if (startIndexOfLink != -1) {
-                spannableString.setSpan(
-                    clickableSpan, startIndexOfLink, startIndexOfLink + link.first.length,
+
+            override fun onClick(view: View) {
+                Selection.setSelection((view as TextView).text as Spannable, 0)
+                view.invalidate()
+                link.second.onClick(view)
+            }
+        }
+
+        if (startIndexOfLink != -1) {
+            spannableString.setSpan(
+                clickableSpan, startIndexOfLink, startIndexOfLink + link.first.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+    }
+
+    /**
+     * Searches for occurrences of a string within the TextView and
+     * creates URLSpans pointing to the provided URL. Expects android:bufferType="spannable"
+     *
+     * @param links pairs of a string to be matched and URL to be linked to it using a URLSpan
+     */
+    private fun TextView.createLinks(vararg links: Pair<String,String>) {
+        val spannable = this.text as Spannable
+        var startIndexOfLink: Int
+
+        for (link in links) {
+            startIndexOfLink = spannable.toString().indexOf(link.first)
+            //Loop over all occurrences
+            while (startIndexOfLink != -1) {
+                //Create URLSpan for each
+                spannable.setSpan(
+                    URLSpan(link.second),
+                    startIndexOfLink,
+                    startIndexOfLink + link.first.length,
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                // Search for next occurrence
+                startIndexOfLink = spannable.toString().indexOf(
+                    link.first,
+                    startIndexOfLink + link.first.length
                 )
             }
         }
-        this.movementMethod =
-            LinkMovementMethod.getInstance()
-        this.setText(spannableString, TextView.BufferType.SPANNABLE)
     }
 
     override fun onAppSelected(name: String) {
@@ -204,5 +239,9 @@ class AuthorizationPermissionFragment(
         } else {
             String.format(legalText, name) + getString(R.string.authorization_permission_legal_info_fixed, name, chooseString)
         }
+        // Re-Create link to privacy center after change
+        binding.fragmentAuthorizationLegalInfoTextView.createLinks(Pair(
+                getString(R.string.authorization_permission_privacycenter_match),
+                getString(R.string.authorization_permission_privacycenter_link)))
     }
 }

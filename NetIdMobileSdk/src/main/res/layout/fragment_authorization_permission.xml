@@ -76,6 +76,7 @@
         android:text="@string/authorization_permission_legal_info"
         android:textColor="@color/authorization_legal_info_text_color"
         android:textSize="@dimen/authorization_legal_text_size"
+        android:bufferType="spannable"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fragmentAuthorizationTitleTextView" />
