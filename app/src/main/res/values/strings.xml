@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">netID MobileSdk-App</string>
+    <string name="app_name">netID SDK Demo</string>
 
     <string name="net_id_service">netID Service</string>
     <string name="net_id_service_permission_title">Permission Management</string>
