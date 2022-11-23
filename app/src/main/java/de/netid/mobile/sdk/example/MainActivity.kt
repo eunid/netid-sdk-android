@@ -144,6 +144,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         binding.activityMainButtonEndSession.setOnClickListener {
             it.isEnabled = false
             appendLog("netID service session finished successfully")
+            NetIdService.endSession()
             serviceState = ServiceState.InitializationSuccessful
             updateElementsForServiceState()
         }
