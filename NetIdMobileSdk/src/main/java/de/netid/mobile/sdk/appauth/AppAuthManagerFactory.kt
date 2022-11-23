@@ -14,12 +14,14 @@
 
 package de.netid.mobile.sdk.appauth
 
+import android.content.Context
+
 class AppAuthManagerFactory {
 
     companion object {
 
-        fun createAppAuthManager(): AppAuthManager {
-            return AppAuthManagerImpl()
+        fun createAppAuthManager(context: Context): AppAuthManager {
+            return AppAuthManagerImpl(context)
         }
     }
 }

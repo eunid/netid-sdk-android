@@ -65,7 +65,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             }
 
             this.netIdConfig = netIdConfig
-            setupAuthManagerAndFetchConfiguration(broker)
+            setupAuthManagerAndFetchConfiguration(context, broker)
             setupUserInfoManager()
             setupPermissionManager()
         }
@@ -169,8 +169,8 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
-    private fun setupAuthManagerAndFetchConfiguration(host: String) {
-        appAuthManager = AppAuthManagerFactory.createAppAuthManager()
+    private fun setupAuthManagerAndFetchConfiguration(context: Context, host: String) {
+        appAuthManager = AppAuthManagerFactory.createAppAuthManager(context)
         appAuthManager.listener = this
         appAuthManager.fetchAuthorizationServiceConfiguration(host)
     }
@@ -190,12 +190,21 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         availableAppIdentifiers.addAll(installedAppIdentifiers)
     }
 
+    fun endSession() {
+        Log.i(javaClass.simpleName, "netId service did end session successfully")
+        appAuthManager.endSession()
+    }
+
 // AppAuthManagerListener functions
 
     override fun onAuthorizationServiceConfigurationFetchedSuccessfully() {
         Log.i(javaClass.simpleName, "netId service Authorization Service Configuration fetched successfully")
         for (item in netIdServiceListeners) {
             item.onInitializationFinishedWithError(null)
+        }
+        // Do we have (already) a session (maybe from last time)? Then try to make use of it.
+        if (appAuthManager.getAuthState() != null) {
+            onAuthorizationSuccessful()
         }
     }
 

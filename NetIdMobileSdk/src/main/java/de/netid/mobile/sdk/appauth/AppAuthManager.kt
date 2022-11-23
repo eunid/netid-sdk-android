@@ -15,9 +15,11 @@
 package de.netid.mobile.sdk.appauth
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import de.netid.mobile.sdk.api.NetIdAuthFlow
 import net.openid.appauth.AuthState
+import java.util.concurrent.locks.ReentrantLock
 
 interface AppAuthManager {
 
@@ -40,4 +42,6 @@ interface AppAuthManager {
     fun getPermissionToken(): String?
 
     fun getAuthState(): AuthState?
+
+    fun endSession()
 }

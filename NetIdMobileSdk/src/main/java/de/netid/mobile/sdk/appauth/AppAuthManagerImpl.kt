@@ -15,7 +15,9 @@
 package de.netid.mobile.sdk.appauth
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.util.Log
 import de.netid.mobile.sdk.api.NetIdAuthFlow
@@ -26,10 +28,12 @@ import de.netid.mobile.sdk.util.TokenUtil
 import net.openid.appauth.*
 import net.openid.appauth.browser.BrowserDenyList
 import net.openid.appauth.browser.VersionedBrowserMatcher
+import org.json.JSONException
 import org.json.JSONObject
+import java.util.concurrent.locks.ReentrantLock
 
 
-class AppAuthManagerImpl : AppAuthManager {
+class AppAuthManagerImpl(context: Context) : AppAuthManager {
 
     companion object {
         private const val scheme = "https://"
@@ -38,26 +42,84 @@ class AppAuthManagerImpl : AppAuthManager {
             VersionedBrowserMatcher.FIREFOX_BROWSER,
             VersionedBrowserMatcher.FIREFOX_CUSTOM_TAB
         )
+        private const val STORE_NAME = "netIdSdk"
+        private const val KEY_STATE = "authState"
+        private val reentrantLock = ReentrantLock()
+        private var authState: AuthState? = null
     }
 
     override var listener: AppAuthManagerListener? = null
 
     private var authorizationServiceConfiguration: AuthorizationServiceConfiguration? = null
-    private var authState: AuthState? = null
     private var authService: AuthorizationService? = null
+    private var sharedPreferences: SharedPreferences
+
+    init {
+        sharedPreferences = context.getSharedPreferences(STORE_NAME, Context.MODE_PRIVATE)
+    }
 
     override fun getAccessToken(): String? {
-        return authState?.accessToken
+        return getAuthState()?.accessToken
     }
 
     override fun getPermissionToken(): String? {
         // Fallback for getting a permission token as long as there is no refresh token flow (and only permission scope was requested).
-        val token = authState?.idToken ?: return getAccessToken()
+        val token = getAuthState()?.idToken ?: return getAccessToken()
         return TokenUtil.getPermissionTokenFrom(token)
     }
 
     override fun getAuthState(): AuthState? {
+        if (authState != null)
+            return authState
+
+        authState = readState()
         return authState
+    }
+
+    /**
+     * Read auth state from shared preferences if available.
+     * If there is no state or if the state can not be reconstructed, null is returned.
+     * @return the read auth state or null if there is none
+     */
+    private fun readState(): AuthState? {
+        reentrantLock.lock()
+        return try {
+            sharedPreferences.getString(KEY_STATE, null)?.let { savedAuthState ->
+                try {
+                    AuthState.jsonDeserialize(savedAuthState)
+                } catch (ex: JSONException) {
+                    null
+                }
+            }?: run {
+                null
+            }
+        } finally {
+            reentrantLock.unlock()
+        }
+    }
+
+    /**
+     * Write current auth state to shared preferences.
+     * If the given state is null, remove the currently stored state.
+     * @parameter authState the state to persist or null to remove from store
+     */
+    private fun writeState(authState: AuthState?) {
+        reentrantLock.lock()
+        try {
+            val editor: SharedPreferences.Editor = sharedPreferences.edit()
+            if (authState == null) {
+                // Remove state from shared preferences
+                editor.remove(KEY_STATE)
+            } else {
+                // Persist state in shared preferences
+                editor.putString(KEY_STATE, authState.jsonSerializeString())
+            }
+            check(editor.commit()) {
+                Log.e(javaClass.simpleName, "Failed to write auth state to shared preferences")
+            }
+        } finally {
+            reentrantLock.unlock()
+        }
     }
 
     override fun fetchAuthorizationServiceConfiguration(host: String) {
@@ -72,7 +134,11 @@ class AppAuthManagerImpl : AppAuthManager {
             } ?: run {
                 serviceConfiguration?.let {
                     authorizationServiceConfiguration = serviceConfiguration
-                    authState = AuthState(serviceConfiguration)
+                    authState = readState()
+                    if (authState == null) {
+                        authState = AuthState(serviceConfiguration)
+                        writeState(authState)
+                    }
 
                     listener?.onAuthorizationServiceConfigurationFetchedSuccessfully()
                 } ?: run {
@@ -91,7 +157,7 @@ class AppAuthManagerImpl : AppAuthManager {
         activity: Activity
     ): Intent? {
         authorizationServiceConfiguration?.let { serviceConfiguration ->
-            var scopes = mutableListOf<String>()
+            val scopes = mutableListOf<String>()
             var claimsJSON: JSONObject? = if(claims.isEmpty()) null else JSONObject(claims)
             when (flow) {
                 NetIdAuthFlow.Login -> {
@@ -133,6 +199,7 @@ class AppAuthManagerImpl : AppAuthManager {
         val authorizationException = AuthorizationException.fromIntent(data)
 
         authState?.update(authorizationResponse,authorizationException)
+        writeState(authState)
 
         authorizationException?.let {
             val netIdError = createNetIdErrorForAuthorizationException(
@@ -150,6 +217,7 @@ class AppAuthManagerImpl : AppAuthManager {
     private fun processTokenExchange(authorizationResponse: AuthorizationResponse) {
         authService?.performTokenRequest(authorizationResponse.createTokenExchangeRequest()) { response, exception ->
             authState?.update(response, exception)
+            writeState(authState)
             exception?.let { authException ->
                 listener?.onAuthorizationFailed(
                     createNetIdErrorForAuthorizationException(
@@ -275,5 +343,10 @@ class AppAuthManagerImpl : AppAuthManager {
             )
             else -> NetIdError(NetIdErrorProcess.Configuration, NetIdErrorCode.Unknown, msg)
         }
+    }
+
+    override fun endSession() {
+        authState = null
+        writeState(authState)
     }
 }
