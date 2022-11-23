@@ -296,6 +296,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
     override fun onPermissionUpdateFinishedWithError(statusCode: PermissionResponseStatus, error: NetIdError) {
         when (statusCode) {
+            PermissionResponseStatus.NO_TOKEN ->
+                // no token was passed (handled by SDK should not happen)
+                appendLog("No bearer token in request available.")
             PermissionResponseStatus.TOKEN_ERROR ->
                 // current token expired / is invalid
                 appendLog("Token error - token refresh / reauthorization necessary")
@@ -305,21 +308,12 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
             PermissionResponseStatus.TAPP_NOT_ALLOWED ->
                 // Invalid configuration of client
                 appendLog("Client not authorized to use permission management")
-            PermissionResponseStatus.NO_TPID ->
-                // Missing TPID
-                appendLog("No tpid_sec cookie in request available")
-            PermissionResponseStatus.NO_TAPP_ID ->
-                // Missing TAPP_ID
-                appendLog("Mandatory parameter tapp_id is missing")
             PermissionResponseStatus.PERMISSION_PARAMETERS_ERROR ->
                 // Invalid parameter payload
                 appendLog("Syntactic or semantic error in a permission")
             PermissionResponseStatus.NO_PERMISSIONS ->
                 // No permission parameter given
                 appendLog("Parameters are missing. At least one permission must be set.")
-            PermissionResponseStatus.ID_CONSENT_REQUIRED ->
-                // No id consent given or revoked
-                appendLog("Consent for passing the tpid (\"identification\") was revoked or declined by the user")
             PermissionResponseStatus.NO_REQUEST_BODY ->
                 // Request body missing
                 appendLog("Required request body is missing")
@@ -338,6 +332,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
     override fun onPermissionFetchFinishedWithError(statusCode: PermissionResponseStatus, error: NetIdError) {
         when (statusCode){
+            PermissionResponseStatus.NO_TOKEN ->
+                // no token was passed (handled by SDK should not happen)
+                appendLog("No bearer token in request available.")
             PermissionResponseStatus.TOKEN_ERROR ->
                 // current token expired / is invalid
                 appendLog("Token error - token refresh / reauthorization necessary")
@@ -347,21 +344,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
             PermissionResponseStatus.TAPP_NOT_ALLOWED ->
                 // Invalid configuration of client
                 appendLog("Client not authorized to use permission management")
-            PermissionResponseStatus.NO_TPID ->
-                // Missing TPID
-                appendLog("No tpid_sec cookie in request available")
-            PermissionResponseStatus.NO_TAPP_ID ->
-                // Missing TAPP_ID
-                appendLog("Mandatory parameter tapp_id is missing")
-            PermissionResponseStatus.TAPP_ERROR ->
-                // TAPP_ID is present but incorrect
-                appendLog("tapp_id is invalid")
             PermissionResponseStatus.PERMISSIONS_NOT_FOUND ->
                 // Missing permissions
                 appendLog("Permissions for tpid not found")
-            PermissionResponseStatus.ID_CONSENT_REQUIRED ->
-                // No id consent given or revoked
-                appendLog("Consent for passing the tpid (\"identification\") was revoked or declined by the user")
             else ->
                 appendLog("netID service permission - fetch failed with error: ${error.code}")
         }
