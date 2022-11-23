@@ -45,13 +45,13 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
         private const val STORE_NAME = "netIdSdk"
         private const val KEY_STATE = "authState"
         private val reentrantLock = ReentrantLock()
-        private var authState: AuthState? = null
     }
 
     override var listener: AppAuthManagerListener? = null
 
     private var authorizationServiceConfiguration: AuthorizationServiceConfiguration? = null
     private var authService: AuthorizationService? = null
+    private var authState: AuthState? = null
     private var sharedPreferences: SharedPreferences
 
     init {
