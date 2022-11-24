@@ -16,9 +16,7 @@ package de.netid.mobile.sdk
 
 import androidx.test.platform.app.InstrumentationRegistry
 import de.netid.mobile.sdk.api.*
-import de.netid.mobile.sdk.model.NetIdPermissionUpdate
-import de.netid.mobile.sdk.model.Permissions
-import de.netid.mobile.sdk.model.UserInfo
+import de.netid.mobile.sdk.model.*
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -54,11 +52,11 @@ class NetIdPermissionTest: NetIdServiceListener {
         setup()
 
         val permission = NetIdPermissionUpdate(
-            "VALID",
+            NetIdPermissionStatus.VALID,
             "CPdfZIAPdfZIACnABCDECbCkAP_AAAAAAAYgIzJd9D7dbXFDefx_SPt0OYwW0NBXCuQCChSAA2AFVAOQcLQA02EaMATAhiACEQIAolIBAAEEHAFEAECQQIAEAAHsAgSEhAAKIAJEEBEQAAIQAAoKAAAAAAAIgAABoASAmBiQS5bmRUCAOIAQRgBIgggBCIADAgMBBEAIABgIAIIIgSgAAQAAAKIAAAAAARAAAASGgFABcAEMAPwAgoBaQEiAJ2AUiAxgBnwqASAEMAJgAXABHAEcALSAkEBeYDPh0EIABYAFQAMgAcgA-AEAALgAZAA0AB4AD6AIYAigBMACfAFwAXQAxABmADeAHMAPwAhgBLACYAE0AKMAUoAsQBbgDDAGiAPaAfgB-gEDAIoARaAjgCOgEpALEAWmAuYC6gF5AMUAbQA3ABxADnAHUAPQAi8BIICRAE7AKHAXmAwYBjADJAGVAMsAZmAz4BrADiwHjgPrAg0BDkhAbAAWABkAFwAQwAmABcADEAGYAN4AjgBSgCxAIoARwAlIBaQC5gGKANoAc4A6gB6AEggJEAScAz4B45KBAAAgABYAGQAOAAfAB4AEQAJgAXAAxABmADaAIYARwAowBSgC3AH4ARwAk4BaQC6gGKANwAdQBF4CRAF5gMsAZ8A1gCGoSBeAAgABYAFQAMgAcgA8AEAAMgAaAA8gCGAIoATAAngBvADmAH4AQgAhgBHACWAE0AKUAW4AwwB7QD8AP0AgYBFICNAI4ASkAuYBigDaAG4AOIAegBIgCdgFDgKRAXmAwYBkgDPoGsAayA4IB44EOREAYAQwA_AEiAJ2AUiAz4ZAHACGAEwARwBHAEnALzAZ8UgXAALAAqABkADkAHwAgABkADQAHkAQwBFACYAE8AKQAYgAzABzAD8AIYAUYApQBYgC3AGjAPwA_QCLQEcAR0AlIBcwC8gGKANoAbgA9ACLwEiAJOATsAocBeYDGAGSAMsAZ9A1gDWQHBAPHAhm.f_gAAAAAAsgA"
         )
         val permissionOnlyConsent = NetIdPermissionUpdate(
-            "INVALID"
+            NetIdPermissionStatus.INVALID,
         )
         val permissionOnlyIabTc = NetIdPermissionUpdate(null, "CPdfZIAPdfZIACnABCDECbCkAP_AAAAAAAYgIzJd9D7dbXFDefx_SPt0OYwW0NBXCuQCChSAA2AFVAOQcLQA02EaMATAhiACEQIAolIBAAEEHAFEAECQQIAEAAHsAgSEhAAKIAJEEBEQAAIQAAoKAAAAAAAIgAABoASAmBiQS5bmRUCAOIAQRgBIgggBCIADAgMBBEAIABgIAIIIgSgAAQAAAKIAAAAAARAAAASGgFABcAEMAPwAgoBaQEiAJ2AUiAxgBnwqASAEMAJgAXABHAEcALSAkEBeYDPh0EIABYAFQAMgAcgA-AEAALgAZAA0AB4AD6AIYAigBMACfAFwAXQAxABmADeAHMAPwAhgBLACYAE0AKMAUoAsQBbgDDAGiAPaAfgB-gEDAIoARaAjgCOgEpALEAWmAuYC6gF5AMUAbQA3ABxADnAHUAPQAi8BIICRAE7AKHAXmAwYBjADJAGVAMsAZmAz4BrADiwHjgPrAg0BDkhAbAAWABkAFwAQwAmABcADEAGYAN4AjgBSgCxAIoARwAlIBaQC5gGKANoAc4A6gB6AEggJEAScAz4B45KBAAAgABYAGQAOAAfAB4AEQAJgAXAAxABmADaAIYARwAowBSgC3AH4ARwAk4BaQC6gGKANwAdQBF4CRAF5gMsAZ8A1gCGoSBeAAgABYAFQAMgAcgA8AEAAMgAaAA8gCGAIoATAAngBvADmAH4AQgAhgBHACWAE0AKUAW4AwwB7QD8AP0AgYBFICNAI4ASkAuYBigDaAG4AOIAegBIgCdgFDgKRAXmAwYBkgDPoGsAayA4IB44EOREAYAQwA_AEiAJ2AUiAz4ZAHACGAEwARwBHAEnALzAZ8UgXAALAAqABkADkAHwAgABkADQAHkAQwBFACYAE8AKQAYgAzABzAD8AIYAUYApQBYgC3AGjAPwA_QCLQEcAR0AlIBcwC8gGKANoAbgA9ACLwEiAJOATsAocBeYDGAGSAMsAZ9A1gDWQHBAPHAhm.f_gAAAAAAsgA"
         )
@@ -99,25 +97,27 @@ class NetIdPermissionTest: NetIdServiceListener {
         TODO("Not yet implemented")
     }
 
-    override fun onPermissionUpdateFinishedWithError(error: NetIdError) {
+    override fun onPermissionUpdateFinishedWithError(
+        statusCode: PermissionResponseStatus,
+        error: NetIdError
+    ) {
         assertEquals(error.process, NetIdErrorProcess.PermissionWrite)
         assertEquals(error.code, NetIdErrorCode.UnauthorizedClient)
     }
 
-    override fun onPermissionFetchFinishedWithError(error: NetIdError) {
+    override fun onPermissionFetchFinished(permissions: PermissionReadResponse) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onPermissionFetchFinishedWithError(
+        statusCode: PermissionResponseStatus,
+        error: NetIdError
+    ) {
         assertEquals(error.process, NetIdErrorProcess.PermissionRead)
         assertEquals(error.code, NetIdErrorCode.UnauthorizedClient)
     }
 
-    override fun onPermissionFetchFinished(permissions: Permissions) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onPermissionUpdateFinished() {
-        TODO("Not yet implemented")
-    }
-
-    override fun onTransmittedInvalidToken() {
+    override fun onPermissionUpdateFinished(subjectIdentifiers: SubjectIdentifiers) {
         TODO("Not yet implemented")
     }
 

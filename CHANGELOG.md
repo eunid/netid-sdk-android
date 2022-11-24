@@ -17,8 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enabled app2app workflow
 - Enabled handling of redirect uri
 - Added third flow option login + permission
-- Added parameter to forece app2app flow
+- Added parameter to force app2app flow
 - Added session persistence
+- Added possibility to add optional claims to login flow
 
 ### Changed
 - Renamed NetID to netID
