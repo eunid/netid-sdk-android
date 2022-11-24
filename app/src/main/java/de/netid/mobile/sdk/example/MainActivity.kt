@@ -22,7 +22,6 @@ import androidx.core.content.ContextCompat
 import de.netid.mobile.sdk.api.*
 import de.netid.mobile.sdk.example.databinding.ActivityMainBinding
 import de.netid.mobile.sdk.model.*
-import org.json.JSONObject
 
 class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
@@ -51,7 +50,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        setupNetIdConfig()
+        setupNetIdConfig()
 
         setupInitializeButton()
         setupAuthorizeButton()
@@ -79,27 +78,13 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     private fun setupNetIdConfig() {
-        var effectiveClaims = claims
-        if (binding.activityMainCheckBoxShippingAddress.isChecked) {
-            val jsonClaims = JSONObject(effectiveClaims)
-            val userinfo = jsonClaims.get("userinfo") as JSONObject
-            userinfo.put("shipping_address", JSONObject.NULL)
-            effectiveClaims = jsonClaims.toString()
-        }
-        if (binding.activityMainCheckBoxBirthdate.isChecked) {
-            val jsonClaims = JSONObject(effectiveClaims)
-            val userinfo = jsonClaims.getJSONObject("userinfo")
-            userinfo.put("birthdate", JSONObject.NULL)
-            effectiveClaims = jsonClaims.toString()
-        }
-        netIdConfig = NetIdConfig(clientId, redirectUri, effectiveClaims, permissionLayerConfig, loginLayerConfig)
+        netIdConfig = NetIdConfig(clientId, redirectUri, claims, permissionLayerConfig, loginLayerConfig)
         NetIdService.addListener(this)
     }
 
     private fun setupInitializeButton() {
         binding.activityMainButtonInitialize.setOnClickListener {
             it.isEnabled = false
-            setupNetIdConfig()
             NetIdService.initialize(netIdConfig, this.applicationContext)
         }
     }
@@ -187,8 +172,6 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         binding.activityMainButtonEndSession.isEnabled = isAuthorized
         binding.activityMainButtonPermissionWrite.isEnabled = isAuthorized
         binding.activityMainButtonPermissionRead.isEnabled = isAuthorized
-        binding.activityMainCheckBoxShippingAddress.isEnabled = isUninitialized
-        binding.activityMainCheckBoxBirthdate.isEnabled = isUninitialized
 
         updateStateColorElements()
     }
