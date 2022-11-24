@@ -51,8 +51,6 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        setupNetIdConfig()
-
         setupInitializeButton()
         setupAuthorizeButton()
         setupUserInfoButton()
