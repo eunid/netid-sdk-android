@@ -72,10 +72,8 @@ The optional parameter `forceApp2App` decides, if your app wants to use app2app 
 
 Depending on the chosen flow, different views are presented to the user to decide on how to proceed with the authorization process.
 
-![](images/netIdSdk_android_login_with_idApps.png){:height="100px" width="200px"}
-
-<img src="images/netIdSdk_android_login_with_idApps.png" alt="netID SDK example app - chosse id app" style="width:150px;"><p><em>Login flow with installed id apps</em></p></img>
-<img src="images/netIdSdk_android_permission_with_idApps.png" alt="netID SDK example app - chosse id app" style="width:150px;"><p><em>Permission flow with installed id apps</em></p></img>
+|<img src="images/netIdSdk_android_login_with_idApps.png" alt="netID SDK example app - chosse id app" style="width:150px;"><p><em>Login flow with installed id apps</em></p></img>|
+<img src="images/netIdSdk_android_permission_with_idApps.png" alt="netID SDK example app - chosse id app" style="width:150px;"><p><em>Permission flow with installed id apps</em></p></img>|
 
 If the user did decide on how to proceed with the login process (e.g. which ID provider to use), a redirect to actually execute the authorization is called automatically.
 
