@@ -38,8 +38,8 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
      *  Nevertheless, we set a standard set of claims here.
      */
     companion object {
-        private const val clientId = "082531ba-1b22-4381-81b1-64add4b85b8a"
-        private const val redirectUri = "https://netid-sdk-web.letsdev.de/redirect"
+        private const val clientId = "73729a4c-9523-4da3-9a40-b99f1c046952"
+        private const val redirectUri = "https://eunid.github.io/redirectApp"
         private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
         // Using default text / icon
         private val permissionLayerConfig = null

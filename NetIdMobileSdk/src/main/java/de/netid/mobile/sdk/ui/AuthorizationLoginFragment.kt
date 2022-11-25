@@ -152,7 +152,7 @@ class AuthorizationLoginFragment(
             val uri = authUri.toString().replaceBefore("?", app.android.verifiedAppLink)
             authIntent.setPackage(app.android.applicationId)
             authIntent.data = Uri.parse(uri)
-            putParcelable("authIntent", authIntent)
+ //           putParcelable("authIntent", authIntent)
         }
         resultLauncher.launch(authorizationIntent)
     }
