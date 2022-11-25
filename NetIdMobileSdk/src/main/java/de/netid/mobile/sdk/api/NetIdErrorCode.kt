@@ -35,5 +35,6 @@ enum class NetIdErrorCode {
     InvalidClient,
     InvalidGrant,
     UnsupportedGrantType,
+    InvalidAuthState,
     Other
 }

@@ -124,6 +124,10 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
                 if (bottomDialogFragment.sdkContentFragment != null)
                     bottomDialogFragment.show(supportFragmentManager, null)
             }
+            builder.setOnDismissListener {
+                binding.activityMainButtonAuthorize.isEnabled = true
+                updateElementsForServiceState()
+            }
             builder.show()
         }
     }

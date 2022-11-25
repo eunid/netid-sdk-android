@@ -64,4 +64,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed possible exception during permission fetch
 - Set correct value for app name
 - Fixed a crash in the context of the bottom fragment
+- Fixed a bug when authorizing/deauthorizing and authorizing again
  
