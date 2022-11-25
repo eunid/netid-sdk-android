@@ -2,7 +2,8 @@
 
 ## About
 
-Alongside the netID SDK, this repository has a sample app, demonstarting the implemented features.
+The `netID MobileSDK` facilitates the use of the [netID](https://netid.de) authorization and privacy management services.
+Alongside the SDK, this repository hosts a sample app, demonstarting the implemented features.
 
 ## Initialize NetIDService
 
@@ -70,6 +71,8 @@ With the parameter `authFlow`you decide, if you want to use `Permission`, `Login
 The optional parameter `forceApp2App` decides, if your app wants to use app2app only. If let alone, this parameter defaults to `false` meaning that if no ID provider apps are installed, the SDK will automatically fall back to app2web flow. If set to `true` and no ID provider apps are installed, this call will fail with an error.
 
 Depending on the chosen flow, different views are presented to the user to decide on how to proceed with the authorization process.
+
+![](images/netIdSdk_android_login_with_idApps.png){:height="100px" width="200px"}
 
 <img src="images/netIdSdk_android_login_with_idApps.png" alt="netID SDK example app - chosse id app" style="width:150px;"><p><em>Login flow with installed id apps</em></p></img>
 <img src="images/netIdSdk_android_permission_with_idApps.png" alt="netID SDK example app - chosse id app" style="width:150px;"><p><em>Permission flow with installed id apps</em></p></img>
