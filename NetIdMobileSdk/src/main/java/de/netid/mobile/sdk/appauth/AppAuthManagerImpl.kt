@@ -122,6 +122,10 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
         }
     }
 
+    /**
+     * Fetches the discovery document which includes the configuration for the authentication endpoints.
+     * @parameter host: server address
+     */
     override fun fetchAuthorizationServiceConfiguration(host: String) {
         val uriString = scheme + host
         AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(uriString)) { serviceConfiguration, authorizationException ->
@@ -149,6 +153,15 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
         }
     }
 
+    /**
+     * Starts the web authorization process.
+     * @parameter clientID the client id
+     * @parameter redirectUri the uri to use as a callback
+     * @parameter claims claims that should be set (for login flows)
+     * @parameter flow kind of to use, can be any of [NetIdAuthFlow.Permission], [NetIdAuthFlow.Login], or [NetIdAuthFlow.LoginPermission]
+     * @parameter activity
+     * @return intent
+     */
     override fun getWebAuthorizationIntent(
         clientId: String,
         redirectUri: String,

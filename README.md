@@ -2,6 +2,8 @@
 
 ## About
 
+Alongside the netID SDK, this repository has a sample app, demonstarting the implemented features.
+
 ## Initialize NetIDService
 
 The `NetIdService` is the main interface to communicate with the netID SDK. It handles all the communication with the backend services and provides ui elements for the autherization flow.
@@ -27,7 +29,7 @@ The parameters have the following meaning:
 | :---        |    :---   |
 | clientId | The client id of your application. You can retrieve it from the netID Developer portal. This parameter is mandatory. |
 | redirectUri | An URI that is used by your application to catch callbacks. You can retrieve it from the netID Developer portal. This parameter is mandatory. |
-| claims | An array of strings, denoting additional claims that should be set during authorization. Can be null. |
+| claims | An OIDC-compliant, URL-encoded JSON string, denoting additional claims that should be set during authorization. Can be null. |
 | permissionLayerConfig | A set of strings, that can be used to customize the appearance of the layer for the permission flow. Can be null. |
 | loginLayerConfig | A set of strings, that can be used to customize the appearance of the layer for the login flow. Can be null. |
 
@@ -51,9 +53,9 @@ NetIdService.initialize(netIdConfig, this.applicationContext)
 After the NetIDService has been initialized, subsequent calls to request authorization can be made. 
 In the example app, you are presented with three choices as can be seen in this screenhsot.
 
-<img src="images/netID_choose_authFlow.png" alt="netID SDK example app - chosse authFlow" style="width:200px;"/>
+<img src="images/netIdSdk_android_choose_authFlow.png" alt="netID SDK example app - chosse authFlow" style="width:200px;"/>
 
-In your own app, you most likely will decide which flow to take without an user interaction.To initiate the authorization process, issue the following call to the NetIDService:
+In your own app, you most likely will decide which flow to take without an user interaction. To initiate the authorization process, issue the following call to the NetIDService:
 ```kotlin
 NetIdService.getAuthorizationFragment(this, authFlow, forceApp2App)
 ```
@@ -69,10 +71,17 @@ The optional parameter `forceApp2App` decides, if your app wants to use app2app 
 
 Depending on the chosen flow, different views are presented to the user to decide on how to proceed with the authorization process.
 
-<img src="images/netID_login_options.png" alt="netID SDK example app - chosse id app" style="width:200px;"/>
-<img src="images/netID_permission_app_options.png" alt="netID SDK example app - chosse id app" style="width:200px;"/>
+<img src="images/netIdSdk_android_login_with_idApps.png" alt="netID SDK example app - chosse id app" style="width:150px;"><p><em>Login flow with installed id apps</em></p></img>
+<img src="images/netIdSdk_android_permission_with_idApps.png" alt="netID SDK example app - chosse id app" style="width:150px;"><p><em>Permission flow with installed id apps</em></p></img>
 
 If the user did decide on how to proceed with the login process (e.g. which ID provider to use), a redirect to actually execute the authorization is called automatically.
+
+## Session persistence
+The SDK implements session persistence. So if a user has been authorized successfully, this state stays persistent even when closing and reopening the app again.
+
+To test this with the demo app, close the app once you are successfully authorized. Then, open the app again. After pressing the ```SDK initialisieren```-button, your session will be restored and you are again authorized. So there will be no need to press ```Authorisieren``` again.
+
+To get rid of the current session, the ```NetIdService.endsession()``` has to be called explicitly. In the demo app, this is done by pressing ```Session beenden```. Note however, that this will destroy the current session only. There will be no logout on the server itself.
 
 ## Using the authorized service
 
@@ -104,48 +113,3 @@ NetIdService.transmitToken(this.applicationContext, token)
 ```
 Sets the id token to be used by the SDK. When using app2web flow, it is not necessary to set the token because the SDK itself gets a callback and can extract the id token. But in the app2app flow, the application is getting the authorization information directly. And thus, the application has to set the token for further use in the SDK.
 
-## SDK configuration for ID provider apps
-
-It is possible to configure the SDK to make use of the apps of different ID providers. Right now, two of them are supported.
-The configuration resides in the file `netIdAppIdentifiers.json` inside the SDK. As this is an internal part of the SDK, it is not meant to be set via an interface nor API.
-
-```json
-{
-  "netIdAppIdentifiers": [
-    {
-      "id": 1,
-      "name": "GMX",
-      "icon": "logo_gmx",
-      "typeFaceIcon": "typeface_gmx",
-      "backgroundColor": "#FF1E50A0",
-      "foregroundColor": "#FFFFFFFF",
-      "iOS": {
-        "bundleIdentifier": "de.gmx.mobile.ios.mail",
-        "scheme": "gmxmail",
-        "universalLink": "https://sso.gmx.net/authorize-app2app"
-      },
-      "android": {
-        "applicationId": "de.gmx.mobile.android.mail",
-        "verifiedAppLink": "https://sso.gmx.net/authorize-app2app"
-      }
-    },
-    {
-      "id": 2,
-      "name": "WEB.DE",
-      "icon": "logo_web_de",
-      "typeFaceIcon": "typeface_webde",
-      "backgroundColor": "#FFFFD800",
-      "foregroundColor": "#FF333333",
-      "iOS": {
-        "bundleIdentifier": "de.web.mobile.ios.mail",
-        "scheme": "webdemail",
-        "universalLink": "https://sso.web.de/authorize-app2app"
-      },
-      "android": {
-        "applicationId": "de.web.mobile.android.mail",
-        "verifiedAppLink": "https://sso.web.de/authorize-app2app"
-      }
-    }
-  ]
-}
-```

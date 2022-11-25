@@ -116,21 +116,18 @@ class AuthorizationPermissionFragment(
         val chooseString = getString(R.string.authorization_permission_choose_account_provider)
         when (appIdentifiers.size) {
             0 -> binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
-                getString(R.string.authorization_permission_legal_info, netIdString) + getString(R.string.authorization_permission_legal_info_fixed, netIdString, "")
+                getString(R.string.authorization_permission_legal_info) + getString(R.string.authorization_permission_legal_info_fixed, netIdString, "")
             } else {
                 String.format(legalText, netIdString) + getString(R.string.authorization_permission_legal_info_fixed, netIdString, "")
             }
             1 -> binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
-                getString(R.string.authorization_permission_legal_info, appIdentifiers[0].name) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, "")
+                getString(R.string.authorization_permission_legal_info) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, "")
             } else {
                 String.format(legalText, appIdentifiers[0].name) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, "")
             }
             else -> {
                 binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
-                    getString(
-                        R.string.authorization_permission_legal_info,
-                        appIdentifiers[0].name
-                    ) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, chooseString)
+                    getString(R.string.authorization_permission_legal_info,) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, chooseString)
                 } else {
                     String.format(legalText, appIdentifiers[0].name) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, chooseString)
                 }
@@ -197,10 +194,7 @@ class AuthorizationPermissionFragment(
     override fun onAppSelected(name: String) {
         val chooseString = getString(R.string.authorization_permission_choose_account_provider)
         binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
-            getString(
-                R.string.authorization_permission_legal_info,
-                appIdentifiers[0].name
-            ) + getString(R.string.authorization_permission_legal_info_fixed, name, chooseString)
+            getString(R.string.authorization_permission_legal_info) + getString(R.string.authorization_permission_legal_info_fixed, name, chooseString)
         } else {
             String.format(legalText, name) + getString(R.string.authorization_permission_legal_info_fixed, name, chooseString)
         }
