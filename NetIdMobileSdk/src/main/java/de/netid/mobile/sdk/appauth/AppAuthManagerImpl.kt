@@ -229,6 +229,12 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
 
     private fun processTokenExchange(authorizationResponse: AuthorizationResponse) {
         authService?.performTokenRequest(authorizationResponse.createTokenExchangeRequest()) { response, exception ->
+            if (authState == null) {
+                listener?.onAuthorizationFailed(
+                    NetIdError(NetIdErrorProcess.CodeExchange, NetIdErrorCode.InvalidAuthState)
+                )
+                return@performTokenRequest
+            }
             authState?.update(response, exception)
             writeState(authState)
             exception?.let { authException ->
@@ -359,7 +365,13 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
     }
 
     override fun endSession() {
-        authState = null
+        //Initialize authState with existing AuthorizationServerConfiguration
+        authorizationServiceConfiguration?.let {
+            authState = AuthState(it)
+        } ?: run {
+            // Set to null in case AuthorizationService is not initialized
+            authState = null
+        }
         writeState(authState)
     }
 }
