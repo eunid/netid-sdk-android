@@ -30,7 +30,8 @@ data class LoginLayerConfig(
 data class NetIdConfig(
     val clientId: String,
     val redirectUri: String,
-    val claims: String,
+    val claims: String? = null,
+    val promptWeb: String? = null,
     val permissionLayerConfig: PermissionLayerConfig? = null,
     val loginLayerConfig: LoginLayerConfig? = null
 )

@@ -165,13 +165,15 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
     override fun getWebAuthorizationIntent(
         clientId: String,
         redirectUri: String,
-        claims: String,
+        claims: String?,
+        prompt: String?,
         flow: NetIdAuthFlow,
         activity: Activity
     ): Intent? {
         authorizationServiceConfiguration?.let { serviceConfiguration ->
             val scopes = mutableListOf<String>()
-            var claimsJSON: JSONObject? = if(claims.isEmpty()) null else JSONObject(claims)
+            var claimsJSON: JSONObject? = claims?.let { JSONObject(claims) }
+            
             when (flow) {
                 NetIdAuthFlow.Login -> {
                     scopes.add(AuthorizationRequest.Scope.OPENID)
@@ -193,7 +195,9 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
                     ResponseTypeValues.CODE,
                     Uri.parse(redirectUri)
                 ).setScopes(scopes
-                ).setClaims(claimsJSON)
+                ).setClaims(claimsJSON
+                ).setPrompt(prompt)
+
             val authRequest = authRequestBuilder.build()
             val appAuthConfiguration = AppAuthConfiguration.Builder()
             .setBrowserMatcher(browserDenyList)
