@@ -34,12 +34,32 @@ The parameters have the following meaning:
 | permissionLayerConfig | A set of strings, that can be used to customize the appearance of the layer for the permission flow. Can be null. |
 | loginLayerConfig | A set of strings, that can be used to customize the appearance of the layer for the login flow. Can be null. |
 
-As stated above, it is possible to customize certain aspects of the dialog presented for authorization. For example:
-```kotlin
-    private val loginLayerConfig = LoginLayerConfig("Headline text", "Login with app %s", "Continue text")
-``` 
+ 
+Besides the `clientId`, the `redirectUri` is the most important parameter in the configuration. The `redirectUri` is a link that is called by the authorization service to get back to your app once the authorization process has finished. As this is a rather crucial process, the netID SDK makes use of Verified App Links to ensure proper and secure communication between the authorization service and your app. 
+In order to make app links work, you have to provide a link in the form of an uri (e.g. https://netid-sdk-web.letsdev.de/redirect) and host a special file named `assetlinks.json` on that very same domain (in this example https://netid-sdk-web.letsdev.de/.well-known/assetlinks.json).
+When using `Android Studio` for development, there is an extra section inside the menu `Tools` called `App Links Assistant` to help create and test app links for you application as well as the corresponding asset file.
 
-Then, register your application as a listener to receive all callbacks made by the `NetIdService`.
+To make your application trigger on the aforementioned redirect, you must include the following snippet in your app's `AndroidManifest.xml`:
+```xml
+<activity
+    android:name="net.openid.appauth.RedirectUriReceiverActivity"
+    tools:node="replace"
+    android:exported="true">
+    <intent-filter android:autoVerify="true">
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="https"
+            android:host="netid-sdk-web.letsdev.de"
+            android:path="/redirect"/>
+    </intent-filter>
+</activity>
+```
+However, for your own application you have to make sure that `scheme`, `host`, and `path` match your very own settings.
+
+To learn more about Verified App Links, see the corresponding documentation [here](https://developer.android.com/training/app-links/verify-android-applinks).
+
+After setting up your application in the correct way and constructing the configuration object, register your application as a listener to receive all callbacks made by the `NetIdService`.
 ```kotlin
 NetIdService.addListener(this)
 ```
@@ -72,16 +92,30 @@ The optional parameter `forceApp2App` decides, if your app wants to use app2app 
 
 Depending on the chosen flow, different views are presented to the user to decide on how to proceed with the authorization process.
 
-| <img src="images/netIdSdk_android_login_with_idApps.png" alt="netID SDK example app - chosse id app" style="width:150px;"><p><em>Login flow with installed id apps</em></p></img> | <img src="images/netIdSdk_android_permission_with_idApps.png" alt="netID SDK example app - chosse id app" style="width:150px;"><p><em>Permission flow with installed id apps</em></p></img> |
+<table>
+<td><img src="images/netIdSdk_android_login_without_idApps.png" alt="netID SDK example app - chosse id app" style="width:200px;"><p><em>Login flow without installed id apps</em></p></img></td>
+<td><img src="images/netIdSdk_android_permission_without_idApps.png" alt="netID SDK example app - chosse id app" style="width:200px;"><p><em>Permission flow without installed id apps</em></p></img></td>
+</table>
+
+As stated above, it is possible to customize certain aspects of the dialog presented for authorization. For example, the strings displayed during the login process could be changed with this configuration:
+```kotlin
+private val loginLayerConfig = LoginLayerConfig("Headline text", "Login with app %s", "Continue text")
+``` 
+
+The SDK will figure out by itself, if account provider apps like [GMX](https://play.google.com/store/apps/details?id=de.gmx.mobile.android.mail) or [web.de](https://play.google.com/store/apps/details?id=de.web.mobile.android.mail) are installed. If so, the SDK will always prefer the app2app-flow instead of app2web when communicating with the netID authorization service. When at least one of those apps is found, the call to `getAuthorizationFragment` will return a slightly different layout, exposing the found apps:
+<table>
+<td><img src="images/netIdSdk_android_login_with_idApps.png" alt="netID SDK example app - chosse id app" style="width:200px;"><p><em>Login flow with installed id apps</em></p></img></td>
+<td><img src="images/netIdSdk_android_permission_with_idApps.png" alt="netID SDK example app - chosse id app" style="width:200px;"><p><em>Permission flow with installed id apps</em></p></img></td>
+</table>
 
 If the user did decide on how to proceed with the login process (e.g. which ID provider to use), a redirect to actually execute the authorization is called automatically.
 
 ## Session persistence
 The SDK implements session persistence. So if a user has been authorized successfully, this state stays persistent even when closing and reopening the app again.
 
-To test this with the demo app, close the app once you are successfully authorized. Then, open the app again. After pressing the ```SDK initialisieren```-button, your session will be restored and you are again authorized. So there will be no need to press ```Authorisieren``` again.
+To test this with the demo app, close the app once you are successfully authorized. Then, open the app again. After pressing the `SDK initialisieren`-button, your session will be restored and you are again authorized. So there will be no need to press `Authorisieren` again.
 
-To get rid of the current session, the ```NetIdService.endsession()``` has to be called explicitly. In the demo app, this is done by pressing ```Session beenden```. Note however, that this will destroy the current session only. There will be no logout on the server itself.
+To get rid of the current session, `NetIdService.endsession()` has to be called explicitly. In the demo app, this is done by pressing `Session beenden`. Note however, that this will only destroy the current session. There will be no logout on the server itself.
 
 ## Using the authorized service
 
