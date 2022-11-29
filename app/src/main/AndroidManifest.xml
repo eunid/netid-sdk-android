@@ -32,7 +32,13 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https"
                     android:host="eunid.github.io"
-                    android:pathPrefix="/redirectApp"/>
+                    android:path="/redirectApp"/>
+                <data android:scheme="https"
+                    android:host="fallback.eunid.github.io"
+                    android:path="/redirectApp"/>
+                <data android:scheme="de.netid.sdk"
+                    android:host="redirect"
+                    android:path="/redirectApp"/>
             </intent-filter>
         </activity>
     </application>
