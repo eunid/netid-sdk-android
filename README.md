@@ -93,8 +93,8 @@ The optional parameter `forceApp2App` decides, if your app wants to use app2app 
 Depending on the chosen flow, different views are presented to the user to decide on how to proceed with the authorization process.
 
 <table>
-<td><img src="images/netIdSdk_android_login_without_idApps.png" alt="netID SDK example app - chosse id app" style="width:200px;"><p><em>Login flow without installed id apps</em></p></img></td>
-<td><img src="images/netIdSdk_android_permission_without_idApps.png" alt="netID SDK example app - chosse id app" style="width:200px;"><p><em>Permission flow without installed id apps</em></p></img></td>
+<td><img src="images/netIdSdk_android_login_without_idApps.png" alt="netID SDK example app - login flow with app2web" style="width:200px;"><p><em>Login flow without installed id apps</em></p></img></td>
+<td><img src="images/netIdSdk_android_permission_without_idApps.png" alt="netID SDK example app - permission flow with app2web" style="width:200px;"><p><em>Permission flow without installed id apps</em></p></img></td>
 </table>
 
 As stated above, it is possible to customize certain aspects of the dialog presented for authorization. For example, the strings displayed during the login process could be changed with this configuration:
@@ -104,8 +104,8 @@ private val loginLayerConfig = LoginLayerConfig("Headline text", "Login with app
 
 The SDK will figure out by itself, if account provider apps like [GMX](https://play.google.com/store/apps/details?id=de.gmx.mobile.android.mail) or [web.de](https://play.google.com/store/apps/details?id=de.web.mobile.android.mail) are installed. If so, the SDK will always prefer the app2app-flow instead of app2web when communicating with the netID authorization service. When at least one of those apps is found, the call to `getAuthorizationFragment` will return a slightly different layout, exposing the found apps:
 <table>
-<td><img src="images/netIdSdk_android_login_with_idApps.png" alt="netID SDK example app - chosse id app" style="width:200px;"><p><em>Login flow with installed id apps</em></p></img></td>
-<td><img src="images/netIdSdk_android_permission_with_idApps.png" alt="netID SDK example app - chosse id app" style="width:200px;"><p><em>Permission flow with installed id apps</em></p></img></td>
+<td><img src="images/netIdSdk_android_login_with_idApps.png" alt="netID SDK example app - login flow with app2app" style="width:200px;"><p><em>Login flow with installed id apps</em></p></img></td>
+<td><img src="images/netIdSdk_android_permission_with_idApps.png" alt="netID SDK example app - permission flow with app2app" style="width:200px;"><p><em>Permission flow with installed id apps</em></p></img></td>
 </table>
 
 If the user did decide on how to proceed with the login process (e.g. which ID provider to use), a redirect to actually execute the authorization is called automatically.
