@@ -88,6 +88,7 @@ class AuthorizationLoginFragment(
     private fun setupAppButtons() {
         // If there are no apps installed, display a standard button to enable app2web flow
         if (appIdentifiers.isEmpty()) {
+            binding.fragmentAuthorizationTitleTextView.visibility = View.GONE
             binding.fragmentAuthorizationButtonAgreeAndContinue.visibility = View.VISIBLE
         }
 
