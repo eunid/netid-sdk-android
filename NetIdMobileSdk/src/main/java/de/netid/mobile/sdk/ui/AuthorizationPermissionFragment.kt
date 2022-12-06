@@ -78,7 +78,7 @@ class AuthorizationPermissionFragment(
         setupStandardButtons()
         setupAppButtons()
         if (logoId.isNotEmpty()) {
-            var logo = context?.resources?.getIdentifier(logoId, "drawable", context?.opPackageName)
+            var logo = context?.resources?.getIdentifier(logoId, "drawable", context?.packageName)
                 ?.let { context?.getDrawable(it) }
             if (logo != null) {
                 binding.fragmentAuthorizationLogoImageView.setImageDrawable(logo)

@@ -141,9 +141,3 @@ Fetches the permissions object. On success `onFetchPermissions` is called on the
 NetIdService.updatePermissions(this.applicationContext)
 ```
 Updates the permissions object. On success `onUpdatePermissions` is called on the delegate, returning the requested information. Otherwise `onUpdatePermissionsWithError` gets called, returning a description of the error.
-
-```kotlin   
-NetIdService.transmitToken(this.applicationContext, token)
-```
-Sets the id token to be used by the SDK. When using app2web flow, it is not necessary to set the token because the SDK itself gets a callback and can extract the id token. But in the app2app flow, the application is getting the authorization information directly. And thus, the application has to set the token for further use in the SDK.
-
