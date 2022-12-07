@@ -110,7 +110,7 @@ class AuthorizationLoginFragment(
             String.format(loginText, appIdentifier.name)
         }
         val resourceId =
-            context?.resources?.getIdentifier(appIdentifiers[0].typeFaceIcon, "drawable", requireContext().opPackageName)
+            context?.resources?.getIdentifier(appIdentifier.typeFaceIcon, "drawable", requireContext().packageName)
         appButton.icon = resourceId?.let {
             ResourcesCompat.getDrawable(
                 requireContext().resources,

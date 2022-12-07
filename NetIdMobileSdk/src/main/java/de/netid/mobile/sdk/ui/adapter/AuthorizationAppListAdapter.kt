@@ -55,7 +55,7 @@ class AuthorizationAppListAdapter(
 
         viewHolder.itemName.text = context.resources.getString(R.string.authorization_cell_use_app_text, items[position].name)
         val resourceId: Int =
-            context.resources.getIdentifier(items[position].icon, "drawable", context.opPackageName)
+            context.resources.getIdentifier(items[position].icon, "drawable", context.packageName)
         viewHolder.itemImage.setImageDrawable(
             ResourcesCompat.getDrawable(
                 context.resources,

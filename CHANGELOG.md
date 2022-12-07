@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Force use of Chrome for app2web 
 - Be less strict when parsing JSON, ignore unknown claims
 - Hide text about apps when using app2web
+- Removed unused function from documentation
 
 ### Fixed
 - Fixed UserInfo json parser error
@@ -66,4 +67,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set correct value for app name
 - Fixed a crash in the context of the bottom fragment
 - Fixed a bug when authorizing/deauthorizing and authorizing again
+- Fixed a bug where for every id app the same logo was displayed
  
