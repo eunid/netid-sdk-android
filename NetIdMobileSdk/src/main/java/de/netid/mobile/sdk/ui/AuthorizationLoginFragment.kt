@@ -88,6 +88,7 @@ class AuthorizationLoginFragment(
     private fun setupAppButtons() {
         // If there are no apps installed, display a standard button to enable app2web flow
         if (appIdentifiers.isEmpty()) {
+            binding.fragmentAuthorizationTitleTextView.visibility = View.GONE
             binding.fragmentAuthorizationButtonAgreeAndContinue.visibility = View.VISIBLE
         }
 
@@ -109,7 +110,7 @@ class AuthorizationLoginFragment(
             String.format(loginText, appIdentifier.name)
         }
         val resourceId =
-            context?.resources?.getIdentifier(appIdentifiers[0].typeFaceIcon, "drawable", requireContext().opPackageName)
+            context?.resources?.getIdentifier(appIdentifier.typeFaceIcon, "drawable", requireContext().packageName)
         appButton.icon = resourceId?.let {
             ResourcesCompat.getDrawable(
                 requireContext().resources,
