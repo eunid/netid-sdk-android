@@ -29,7 +29,7 @@ data class PermissionLayerConfig(
 
 /**
  * @property headlineText Sets the text of the headline (beneath the logo). Only visible, if at least one id app is installed.
- * @property loginText Sets the text of the buttons displayed, if id apps are installed. The name of the app will be displayed as well, if the string is a format sting containing  "%s".
+ * @property loginText Sets the text of the buttons displayed, if id apps are installed. The name of the app will be displayed as well, if the string is a format string containing  "%1$s".
  * @property continueText Sets the text of the continue button at the bottom of the dialog. Only visible, if there is no id app installed.
  */
 data class LoginLayerConfig(
