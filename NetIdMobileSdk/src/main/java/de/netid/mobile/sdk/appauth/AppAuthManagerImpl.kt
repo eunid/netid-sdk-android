@@ -159,7 +159,7 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
      * @param clientId the client id
      * @param redirectUri the uri to use as a callback
      * @param claims claims that should be set (for login flows), ignored for [NetIdAuthFlow.Permission]
-     * @param prompt prompt value to be set for Web based flows
+     * @param prompt prompt value to be set for Web based flows, ignores otherwise
      * @param flow kind of flow, can be any of [NetIdAuthFlow.Permission], [NetIdAuthFlow.Login], or [NetIdAuthFlow.LoginPermission]
      * @param activity
      * @return intent

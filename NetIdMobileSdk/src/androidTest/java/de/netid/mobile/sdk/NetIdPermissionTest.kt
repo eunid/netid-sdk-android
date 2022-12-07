@@ -66,7 +66,7 @@ class NetIdPermissionTest: NetIdServiceListener {
 
     // Listener functions
     override fun onInitializationFinishedWithError(error: NetIdError?) {
-        TODO("Not yet implemented")
+        assertNull(error)
     }
 
     override fun onAuthenticationFinished(accessToken: String) {
