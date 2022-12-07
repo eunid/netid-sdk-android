@@ -101,7 +101,7 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
     /**
      * Write current auth state to shared preferences.
      * If the given state is null, remove the currently stored state.
-     * @parameter authState the state to persist or null to remove from store
+     * @param authState the state to persist or null to remove from store
      */
     private fun writeState(authState: AuthState?) {
         reentrantLock.lock()
@@ -124,7 +124,8 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
 
     /**
      * Fetches the discovery document which includes the configuration for the authentication endpoints.
-     * @parameter host: server address
+     * TODO Add details on state handling for persistence
+     * @param host: server address
      */
     override fun fetchAuthorizationServiceConfiguration(host: String) {
         val uriString = scheme + host
@@ -155,23 +156,26 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
 
     /**
      * Starts the web authorization process.
-     * @parameter clientID the client id
-     * @parameter redirectUri the uri to use as a callback
-     * @parameter claims claims that should be set (for login flows)
-     * @parameter flow kind of to use, can be any of [NetIdAuthFlow.Permission], [NetIdAuthFlow.Login], or [NetIdAuthFlow.LoginPermission]
-     * @parameter activity
+     * @param clientId the client id
+     * @param redirectUri the uri to use as a callback
+     * @param claims claims that should be set (for login flows), ignored for [NetIdAuthFlow.Permission]
+     * @param prompt prompt value to be set for Web based flows, null otherwise
+     * @param flow kind of flow, can be any of [NetIdAuthFlow.Permission], [NetIdAuthFlow.Login], or [NetIdAuthFlow.LoginPermission]
+     * @param activity
      * @return intent
      */
     override fun getWebAuthorizationIntent(
         clientId: String,
         redirectUri: String,
-        claims: String,
+        claims: String?,
+        prompt: String?,
         flow: NetIdAuthFlow,
         activity: Activity
     ): Intent? {
         authorizationServiceConfiguration?.let { serviceConfiguration ->
             val scopes = mutableListOf<String>()
-            var claimsJSON: JSONObject? = if(claims.isEmpty()) null else JSONObject(claims)
+            var claimsJSON: JSONObject? = claims?.let { JSONObject(claims) }
+
             when (flow) {
                 NetIdAuthFlow.Login -> {
                     scopes.add(AuthorizationRequest.Scope.OPENID)
@@ -193,7 +197,9 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
                     ResponseTypeValues.CODE,
                     Uri.parse(redirectUri)
                 ).setScopes(scopes
-                ).setClaims(claimsJSON)
+                ).setClaims(claimsJSON
+                ).setPrompt(prompt)
+
             val authRequest = authRequestBuilder.build()
             val appAuthConfiguration = AppAuthConfiguration.Builder()
             .setBrowserMatcher(browserDenyList)

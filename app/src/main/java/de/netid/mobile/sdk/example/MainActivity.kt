@@ -90,7 +90,15 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
             userinfo.put("birthdate", JSONObject.NULL)
             effectiveClaims = jsonClaims.toString()
         }
-        netIdConfig = NetIdConfig(clientId, redirectUri, effectiveClaims, permissionLayerConfig, loginLayerConfig)
+
+        netIdConfig = NetIdConfig(
+            clientId = clientId,
+            redirectUri = redirectUri,
+            claims = effectiveClaims,
+            promptWeb = "consent",
+            permissionLayerConfig = permissionLayerConfig,
+            loginLayerConfig = loginLayerConfig)
+
         NetIdService.addListener(this)
     }
 

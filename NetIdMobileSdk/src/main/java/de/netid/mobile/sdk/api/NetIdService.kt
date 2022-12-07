@@ -80,10 +80,15 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
 
         netIdConfig?.let { config ->
+            //prompt is applied only in App2Web Flows
+            val effectivePrompt: String? =
+                if(availableAppIdentifiers.isEmpty()) config.promptWeb else null
+
             return appAuthManager.getWebAuthorizationIntent(
                 config.clientId,
                 config.redirectUri,
                 config.claims,
+                effectivePrompt,
                 authFlow,
                 activity
             )?.let {

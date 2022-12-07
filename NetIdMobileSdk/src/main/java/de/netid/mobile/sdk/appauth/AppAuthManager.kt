@@ -30,7 +30,8 @@ interface AppAuthManager {
     fun getWebAuthorizationIntent(
         clientId: String,
         redirectUri: String,
-        claims: String,
+        claims: String?,
+        prompt: String?,
         flow: NetIdAuthFlow,
         activity: Activity
     ): Intent?
