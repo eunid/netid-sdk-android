@@ -38,7 +38,6 @@ import de.netid.mobile.sdk.model.AppIdentifier
 import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapter
 import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapterListener
 
-
 class AuthorizationPermissionFragment(
     private val listener: AuthorizationFragmentListener,
     private val appIdentifiers: MutableList<AppIdentifier> = mutableListOf(),
@@ -75,8 +74,8 @@ class AuthorizationPermissionFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupStandardButtons()
-        setupAppButtons()
+        configureStandardButtons()
+        configurePermissionFlowDialog()
         if (logoId.isNotEmpty()) {
             var logo = context?.resources?.getIdentifier(logoId, "drawable", context?.packageName)
                 ?.let { context?.getDrawable(it) }
@@ -92,7 +91,17 @@ class AuthorizationPermissionFragment(
         }
     }
 
-    private fun setupStandardButtons() {
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
+
+    /**
+     * Internal helper function that configures two standard buttons.
+     * One button is for closing the dialog, the other one is used to continue the authorization process.
+     * The button to continue is configured so that it can either use app2web- or (if id apps are installed) app2app-flow.
+     */
+    private fun configureStandardButtons() {
         binding.fragmentAuthorizationButtonAgreeAndContinue.text = getString(R.string.authorization_permission_agree_and_continue_with_net_id).uppercase()
         binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
             var adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter
@@ -111,7 +120,13 @@ class AuthorizationPermissionFragment(
         }
     }
 
-    private fun setupAppButtons() {
+    /**
+     * Internal helper function that configures the permission dialog.
+     * This does consist of setting the correct text and, if id apps are installed,
+     * configure radio buttons to switch between different id apps.
+     * However, if only one id add is installed, there will be no choice whatsoever.
+     */
+    private fun configurePermissionFlowDialog() {
         val netIdString = getString(R.string.authorization_permission_net_id)
         val chooseString = getString(R.string.authorization_permission_choose_account_provider)
         when (appIdentifiers.size) {
@@ -144,23 +159,9 @@ class AuthorizationPermissionFragment(
         }
     }
 
-    override fun onDestroyView() {
-        _binding = null
-        super.onDestroyView()
-    }
-
-    private fun openApp(app: AppIdentifier) {
-        authorizationIntent.extras?.apply {
-            val authIntent = getParcelable<Intent>("authIntent") ?: return@apply
-            val authUri = authIntent.data as Uri
-            val uri = authUri.toString().replaceBefore("?", app.android.verifiedAppLink)
-            authIntent.setPackage(app.android.applicationId)
-            authIntent.data = Uri.parse(uri)
-            putParcelable("authIntent", authIntent)
-        }
-        resultLauncher.launch(authorizationIntent)
-    }
-
+    /**
+     * Internal helper function that creates a link in a text view if more than one id app is installed.
+     */
     private fun TextView.makeLinks(vararg links: Pair<String, View.OnClickListener>) {
         val spannableString = SpannableString(this.text)
         var startIndexOfLink = -1
@@ -189,6 +190,22 @@ class AuthorizationPermissionFragment(
         this.movementMethod =
             LinkMovementMethod.getInstance()
         this.setText(spannableString, TextView.BufferType.SPANNABLE)
+    }
+
+    /**
+     * Open an id app via a VerifiedAppLink.
+     * @param appIdentifier AppIdentifier of the app to be opened.
+     */
+    private fun openApp(appIdentifier: AppIdentifier) {
+        authorizationIntent.extras?.apply {
+            val authIntent = getParcelable<Intent>("authIntent") ?: return@apply
+            val authUri = authIntent.data as Uri
+            val uri = authUri.toString().replaceBefore("?", appIdentifier.android.verifiedAppLink)
+            authIntent.setPackage(appIdentifier.android.applicationId)
+            authIntent.data = Uri.parse(uri)
+            putParcelable("authIntent", authIntent)
+        }
+        resultLauncher.launch(authorizationIntent)
     }
 
     override fun onAppSelected(name: String) {

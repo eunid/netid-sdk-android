@@ -25,9 +25,25 @@ interface AppAuthManager {
 
     var listener: AppAuthManagerListener?
 
+    /**
+     * Fetches the discovery document which includes the configuration for the authentication endpoints.
+     * During this call, it is checked if there is an AuthState present from a former session.
+     * If so, this AuthState is used, otherwise a new one is created based on the service configuration.
+     * @param host: server address
+     */
     fun fetchAuthorizationServiceConfiguration(host: String)
 
-    fun getWebAuthorizationIntent(
+    /**
+     * Starts the authorization process.
+     * @param clientId the client id
+     * @param redirectUri the uri to use as a callback
+     * @param claims claims that should be set (for login flows), ignored for [NetIdAuthFlow.Permission]
+     * @param prompt prompt value to be set for Web based flows, null otherwise
+     * @param flow kind of flow, can be any of [NetIdAuthFlow.Permission], [NetIdAuthFlow.Login], or [NetIdAuthFlow.LoginPermission]
+     * @param activity
+     * @return intent
+     */
+    fun getAuthorizationIntent(
         clientId: String,
         redirectUri: String,
         claims: String?,
@@ -36,13 +52,32 @@ interface AppAuthManager {
         activity: Activity
     ): Intent?
 
+    /**
+     * Processes the authorization intent.
+     * @param intent the intent
+     */
     fun processAuthorizationIntent(data: Intent)
 
+    /**
+     * Returns the currently available access token if there is one, null otherwise.
+     * @return accessToken
+     */
     fun getAccessToken(): String?
 
+    /**
+     * Returns the currently available permission token if there is one, null otherwise.
+     * @return permissionToken
+     */
     fun getPermissionToken(): String?
 
+    /**
+     * Returns the currently available auth state if there is one, null otherwise.
+     * @return authState
+     */
     fun getAuthState(): AuthState?
 
+    /**
+     * Ends the current session.
+     */
     fun endSession()
 }

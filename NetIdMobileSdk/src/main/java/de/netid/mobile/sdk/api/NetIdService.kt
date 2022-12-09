@@ -84,7 +84,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             val effectivePrompt: String? =
                 if(availableAppIdentifiers.isEmpty()) config.promptWeb else null
 
-            return appAuthManager.getWebAuthorizationIntent(
+            return appAuthManager.getAuthorizationIntent(
                 config.clientId,
                 config.redirectUri,
                 config.claims,
