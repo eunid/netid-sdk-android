@@ -15,7 +15,7 @@ private lateinit var netIdConfig: NetIdConfig
 
 companion object {
     private const val clientId = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-    private const val redirectUri = "https://netid-sdk-web.letsdev.de/redirect"
+    private const val redirectUri = "https://eunid.github.io/redirectApp"
     private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
     private val permissionLayerConfig = null
     private val loginLayerConfig = null
@@ -36,7 +36,7 @@ The parameters have the following meaning:
 
  
 Besides the `clientId`, the `redirectUri` is the most important parameter in the configuration. The `redirectUri` is a link that is called by the authorization service to get back to your app once the authorization process has finished. As this is a rather crucial process, the netID SDK makes use of Verified App Links to ensure proper and secure communication between the authorization service and your app. 
-In order to make app links work, you have to provide a link in the form of an uri (e.g. https://netid-sdk-web.letsdev.de/redirect) and host a special file named `assetlinks.json` on that very same domain (in this example https://netid-sdk-web.letsdev.de/.well-known/assetlinks.json).
+In order to make app links work, you have to provide a link in the form of an uri (e.g. https://eunid.github.io/redirectApp) and host a special file named `assetlinks.json` on that very same domain (in this example https://eunid.github.io/.well-known/assetlinks.json).
 When using `Android Studio` for development, there is an extra section inside the menu `Tools` called `App Links Assistant` to help create and test app links for you application as well as the corresponding asset file.
 
 To make your application trigger on the aforementioned redirect, you must include the following snippet in your app's `AndroidManifest.xml`:
@@ -50,8 +50,8 @@ To make your application trigger on the aforementioned redirect, you must includ
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
         <data android:scheme="https"
-            android:host="netid-sdk-web.letsdev.de"
-            android:path="/redirect"/>
+            android:host="eunid.github.io"
+            android:path="/redirectApp"/>
     </intent-filter>
 </activity>
 ```
