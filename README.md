@@ -3,7 +3,7 @@
 ## About
 
 The `netID MobileSDK` facilitates the use of the [netID](https://netid.de) authorization and privacy management services.
-Alongside the SDK, this repository hosts a sample app, demonstarting the implemented features.
+Alongside the SDK, this repository hosts a sample app, demonstarting the usage.
 
 ## Initialize NetIDService
 
@@ -27,14 +27,13 @@ netIdConfig = NetIdConfig(clientID, redirectUri, claims, permissionLayerConfig, 
 
 The parameters have the following meaning:
 | Parameter | Description |
-| :---        |    :---   |
+| :- | :- |
 | clientId | The client id of your application. You can retrieve it from the netID Developer portal. This parameter is mandatory. |
 | redirectUri | An URI that is used by your application to catch callbacks. You can retrieve it from the netID Developer portal. This parameter is mandatory. |
 | claims | An OIDC-compliant, URL-encoded JSON string, denoting additional claims that should be set during authorization. Can be null. |
 | permissionLayerConfig | A set of strings, that can be used to customize the appearance of the layer for the permission flow. Can be null. |
 | loginLayerConfig | A set of strings, that can be used to customize the appearance of the layer for the login flow. Can be null. |
 
- 
 Besides the `clientId`, the `redirectUri` is the most important parameter in the configuration. The `redirectUri` is a link that is called by the authorization service to get back to your app once the authorization process has finished. As this is a rather crucial process, the netID SDK makes use of Verified App Links to ensure proper and secure communication between the authorization service and your app. 
 In order to make app links work, you have to provide a link in the form of an uri (e.g. https://eunid.github.io/redirectApp) and host a special file named `assetlinks.json` on that very same domain (in this example https://eunid.github.io/.well-known/assetlinks.json).
 When using `Android Studio` for development, there is an extra section inside the menu `Tools` called `App Links Assistant` to help create and test app links for you application as well as the corresponding asset file.
@@ -72,7 +71,7 @@ NetIdService.initialize(netIdConfig, this.applicationContext)
 ## Authorization
 
 After the NetIDService has been initialized, subsequent calls to request authorization can be made. 
-In the example app, you are presented with three choices as can be seen in this screenhsot.
+In the example app, you are presented with three choices as can be seen in this screenshot.
 
 <img src="images/netIdSdk_android_choose_authFlow.png" alt="netID SDK example app - chosse authFlow" style="width:200px;"/>
 
@@ -81,20 +80,30 @@ In your own app, you most likely will decide which flow to take without an user 
 NetIdService.getAuthorizationFragment(this, authFlow, forceApp2App)
 ```
 | Parameter | Description |
-| :---        |    :---   |
+| :-        |    :-   |
 | activity | The activity to attach this fragment to. This parameter is mandatory. |
 | authFlow | Type of flow to use, can be either ``NetIdAuthFlow.Permission``, ``NetIdAuthFlow.Login`` or ``NetIdAuthFlow.LoginPermission``. This parameter is mandatory. |
-| forceApp2App | If set to true, will yield an ``NetIdError`` if the are no ID apps installed. Otherwise, will use app2web flow automatically. Defaults to ``false``. |
+| forceApp2App | If set to true, will yield an ``NetIdError`` if the are no Account Provider apps installed. Otherwise, will use app2web flow automatically. Defaults to ``false``. |
 
 You have to provide an instance of you app's activity so that the SDK can display a view for the authorization process itself.
 With the parameter `authFlow`you decide, if you want to use `Permission`, `Login` or `Login + Permission` as authorization flow.
-The optional parameter `forceApp2App` decides, if your app wants to use app2app only. If let alone, this parameter defaults to `false` meaning that if no ID provider apps are installed, the SDK will automatically fall back to app2web flow. If set to `true` and no ID provider apps are installed, this call will fail with an error.
+The optional parameter `forceApp2App` decides, if your app wants to use app2app only. If let alone, this parameter defaults to `false` meaning that if no Account Provider apps are installed, the SDK will automatically fall back to app2web flow. If set to `true` and no Account Provider apps are installed, this call will fail with an error.
 
 Depending on the chosen flow, different views are presented to the user to decide on how to proceed with the authorization process.
 
 <table>
-<td><img src="images/netIdSdk_android_login_without_idApps.png" alt="netID SDK example app - login flow with app2web" style="width:200px;"><p><em>Login flow without installed id apps</em></p></img></td>
-<td><img src="images/netIdSdk_android_permission_without_idApps.png" alt="netID SDK example app - permission flow with app2web" style="width:200px;"><p><em>Permission flow without installed id apps</em></p></img></td>
+    <tr>
+        <th>Login Flow with no Account Provider Apps</th>
+        <th>Permission Flow with no Account Provider Apps</th>
+    </tr>
+    <tr>
+        <td width=50%>
+            <img src="images/netIdSdk_android_login_without_idApps.png" alt="netID SDK example app - login flow with app2web" style="width:200px;"><p><em>Login flow without installed id apps</em></p></img>
+        </td>
+        <td width=50%>
+            <img src="images/netIdSdk_android_permission_without_idApps.png" alt="netID SDK example app - permission flow with app2web" style="width:200px;"><p><em>Permission flow without installed id apps</em></p></img>
+        </td>
+    </tr>
 </table>
 
 As stated above, it is possible to customize certain aspects of the dialog presented for authorization. For example, the strings displayed during the login process could be changed with this configuration:
@@ -102,20 +111,34 @@ As stated above, it is possible to customize certain aspects of the dialog prese
 private val loginLayerConfig = LoginLayerConfig("Headline text", "Login with app %s", "Continue text")
 ``` 
 
-The SDK will figure out by itself, if account provider apps like [GMX](https://play.google.com/store/apps/details?id=de.gmx.mobile.android.mail) or [web.de](https://play.google.com/store/apps/details?id=de.web.mobile.android.mail) are installed. If so, the SDK will always prefer the app2app-flow instead of app2web when communicating with the netID authorization service. When at least one of those apps is found, the call to `getAuthorizationFragment` will return a slightly different layout, exposing the found apps:
+The SDK will figure out by itself, if Account Provider apps like [GMX](https://play.google.com/store/apps/details?id=de.gmx.mobile.android.mail) or [web.de](https://play.google.com/store/apps/details?id=de.web.mobile.android.mail) are installed. If so, the SDK will always prefer the app2app-flow instead of app2web when communicating with the netID authorization service. When at least one of those apps is found, the call to `getAuthorizationFragment` will return a slightly different layout, exposing the found apps:
 <table>
-<td><img src="images/netIdSdk_android_login_with_idApps.png" alt="netID SDK example app - login flow with app2app" style="width:200px;"><p><em>Login flow with installed id apps</em></p></img></td>
-<td><img src="images/netIdSdk_android_permission_with_idApps.png" alt="netID SDK example app - permission flow with app2app" style="width:200px;"><p><em>Permission flow with installed id apps</em></p></img></td>
+    <tr>
+        <td>
+            <p><em>Login flow with multiple Account Provider Apps</em></p>
+        </td>
+        <td>
+            <p><em>Permission flow with multiple Account Provider Apps / expanded choice menu - Default is to pre-select one App and collapse choice menu</em></p>  
+        </td>
+    </tr>
+    <tr>
+        <td width=50%>
+            <img src="images/netIdSdk_android_login_with_idApps.png" alt="netID SDK example app - login flow with app2app" style="width:200px;"><p><em>Login flow with installed id apps</em></p></img>
+        </td>
+        <td width=50%>
+            <img src="images/netIdSdk_android_permission_with_idApps.png" alt="netID SDK example app - permission flow with app2app" style="width:200px;"><p><em>Permission flow with installed id apps</em></p></img>
+        </td>
+    </tr>
 </table>
 
-If the user did decide on how to proceed with the login process (e.g. which ID provider to use), a redirect to actually execute the authorization is called automatically.
+If the user did decide on how to proceed with the login process (e.g. which Account Provider provider to use), a redirect to actually execute the authorization is called automatically.
 
 ## Session persistence
 The SDK implements session persistence. So if a user has been authorized successfully, this state stays persistent even when closing and reopening the app again.
 
 To test this with the demo app, close the app once you are successfully authorized. Then, open the app again. After pressing the `SDK initialisieren`-button, your session will be restored and you are again authorized. So there will be no need to press `Authorisieren` again.
 
-To get rid of the current session, `NetIdService.endsession()` has to be called explicitly. In the demo app, this is done by pressing `Session beenden`. Note however, that this will only destroy the current session. There will be no logout on the server itself.
+To get rid of the current session, `NetIdService.endsession()` has to be called explicitly. In the demo app, this is done by pressing `Session beenden`. Note, that this will delete the current session within the App only
 
 ## Using the authorized service
 
@@ -125,7 +148,7 @@ Subsequent calls now can be made to use different aspects of the service.
 ```kotlin
 NetIdService.endSession()
 ```
-Use this call to end a session. On the listener `onEndSession` is called signalling success of the operation. All objects regarding authorization (e.g. tokens) will get discarded. However, the service itself will still be available. A new call to `getAuthorizationFragment` will trigger a new authorization process.
+Use this call to end a session. On the listener `onEndSession` is called signaling success of the operation. All objects regarding authorization (e.g. tokens) will get discarded. However, the service itself will still be available. A new call to `getAuthorizationFragment` will trigger a new authorization process.
 
 ```kotlin
 NetIdService.fetchUserInfo(this.applicationContext)

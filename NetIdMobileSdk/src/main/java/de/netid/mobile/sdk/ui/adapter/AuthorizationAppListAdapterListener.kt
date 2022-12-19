@@ -15,5 +15,9 @@
 package de.netid.mobile.sdk.ui.adapter
 
 interface AuthorizationAppListAdapterListener {
+    /**
+     * Internal helper function that sets the correct name of an id add in text.
+     * @param name name of the app
+     */
     fun onAppSelected(name: String)
 }

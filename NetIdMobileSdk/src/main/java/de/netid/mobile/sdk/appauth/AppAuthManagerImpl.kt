@@ -122,11 +122,6 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
         }
     }
 
-    /**
-     * Fetches the discovery document which includes the configuration for the authentication endpoints.
-     * TODO Add details on state handling for persistence
-     * @param host: server address
-     */
     override fun fetchAuthorizationServiceConfiguration(host: String) {
         val uriString = scheme + host
         AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(uriString)) { serviceConfiguration, authorizationException ->
@@ -154,17 +149,7 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
         }
     }
 
-    /**
-     * Starts the web authorization process.
-     * @param clientId the client id
-     * @param redirectUri the uri to use as a callback
-     * @param claims claims that should be set (for login flows), ignored for [NetIdAuthFlow.Permission]
-     * @param prompt prompt value to be set for Web based flows, null otherwise
-     * @param flow kind of flow, can be any of [NetIdAuthFlow.Permission], [NetIdAuthFlow.Login], or [NetIdAuthFlow.LoginPermission]
-     * @param activity
-     * @return intent
-     */
-    override fun getWebAuthorizationIntent(
+    override fun getAuthorizationIntent(
         clientId: String,
         redirectUri: String,
         claims: String?,
@@ -233,6 +218,10 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
         }
     }
 
+    /**
+     * Triggers the token exchange process after an authorization response has been received.
+     * @param authorizationResponse the authorization response
+     */
     private fun processTokenExchange(authorizationResponse: AuthorizationResponse) {
         authService?.performTokenRequest(authorizationResponse.createTokenExchangeRequest()) { response, exception ->
             if (authState == null) {
@@ -262,6 +251,12 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
         }
     }
 
+    /**
+     * Internal function to convert an authorization exception to a NetIdError
+     * @param process an id identifying the type of process that caused the error
+     * @param authorizationException the actual authorization exception
+     * @return NetIdError
+     */
     private fun createNetIdErrorForAuthorizationException(process: NetIdErrorProcess, authorizationException: AuthorizationException): NetIdError {
         var msg = ""
         if (authorizationException.error != null) {
