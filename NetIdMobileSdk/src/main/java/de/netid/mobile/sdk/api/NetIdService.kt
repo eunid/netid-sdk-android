@@ -155,10 +155,11 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             return null
         }
         netIdConfig?.let { config ->
-            val authIntent = appAuthManager.getWebAuthorizationIntent(
+            val authIntent = appAuthManager.getAuthorizationIntent(
                 config.clientId,
                 config.redirectUri,
                 config.claims,
+                config.promptWeb,
                 NetIdAuthFlow.Permission,
                 context
             )
@@ -195,10 +196,11 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             return null
 
         netIdConfig?.let { config ->
-            val authIntent = appAuthManager.getWebAuthorizationIntent(
+            val authIntent = appAuthManager.getAuthorizationIntent(
                 config.clientId,
                 config.redirectUri,
                 config.claims,
+                config.promptWeb,
                 authFlow,
                 context
             )
