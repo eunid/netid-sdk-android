@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.sdk.ui.adapter
 
-interface AuthorizationAppListAdapterListener {
-    /**
-     * Internal helper function that sets the correct name of an id add in text.
-     * @param name name of the app
-     */
-    fun onAppSelected(name: String)
+package de.netid.mobile.sdk.model
+
+enum class NetIdPrivacySettingType(val code: String)  {
+    IDCONSENT("IDCONSENT"),
+    IAB_TC_STRING("IAB_TC_STRING"),
+    OTHER("OTHER")
 }

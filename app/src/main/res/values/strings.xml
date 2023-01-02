@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">netID MobileSdk-App</string>
+    <string name="app_name">netID SDK Demo</string>
 
     <string name="net_id_service">netID Service</string>
     <string name="net_id_service_permission_title">Permission Management</string>
@@ -14,6 +14,7 @@
     <string name="net_id_service_auth_login">Login</string>
     <string name="net_id_service_auth_login_permission">Login + Permission</string>
     <string name="net_id_service_choose_auth_way">Bitte wähle Deinen Authorisierungsprozess.</string>
+    <string name="net_id_service_extra_claims">Zusätzliche <i>optional claims</i> für Login-Flow</string>
     <string name="network_error_alert_title">Netzwerkfehler</string>
     <string name="network_error_alert_description">Bitte stelle sicher, dass eine Netzwerkverbindung besteht.</string>
     <string name="network_error_alert_action">Verstanden</string>

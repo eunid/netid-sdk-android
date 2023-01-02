@@ -21,18 +21,15 @@ import org.junit.Assert.*
 
 class NetIdConfigTest {
     companion object {
-        private const val clientId = "082531ba-1b22-4381-81b1-64add4b85b8a"
-        private const val host = "broker.netid.de"
-        private const val redirectUri = "https://netid-sdk-web.letsdev.de/redirect"
+        private const val clientId = "ec54097f-83f6-4bb1-86f3-f7c584c649cd"
+        private const val redirectUri = "https://eunid.github.io/redirectApp"
         private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
     }
 
-
     @Test
     fun initializeNetIdConfig() {
-        val netIdConfig = NetIdConfig(host, clientId, redirectUri, claims)
+        val netIdConfig = NetIdConfig(clientId, redirectUri, claims)
         assertEquals(netIdConfig.clientId, clientId)
-        assertEquals(netIdConfig.host, host)
         assertEquals(netIdConfig.redirectUri, redirectUri)
         assertEquals(netIdConfig.claims, claims)
     }

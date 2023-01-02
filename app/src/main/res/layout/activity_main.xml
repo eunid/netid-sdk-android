@@ -8,28 +8,6 @@
     android:padding="@dimen/main_activity_outer_padding"
     tools:context="de.netid.mobile.sdk.example.MainActivity">
 
-    <TextView
-        android:id="@+id/activityMainTitleTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/net_id_service"
-        android:textColor="@color/authorization_title_text_color"
-        android:textSize="@dimen/net_id_service_title_text_size"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/activityMainTitleIconImageView"
-        android:layout_width="@dimen/service_logo_width"
-        android:layout_height="@dimen/service_logo_height"
-        android:src="@drawable/ic_logo_net_id"
-        android:layout_marginEnd="@dimen/service_logo_margin_end"
-        app:layout_constraintEnd_toStartOf="@id/activityMainTitleTextView"
-        app:layout_constraintTop_toTopOf="@id/activityMainTitleTextView"
-        app:layout_constraintBottom_toBottomOf="@id/activityMainTitleTextView"
-        android:contentDescription="@string/service_logo_content_description" />
-
     <LinearLayout
         android:id="@+id/activityMainButtonContainerLayout"
         android:layout_width="match_parent"
@@ -37,8 +15,7 @@
         android:orientation="vertical"
         android:layout_marginTop="@dimen/main_activity_vertical_margin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/activityMainTitleTextView">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -118,18 +95,51 @@
 
         </LinearLayout>
 
-
-    <TextView
-            android:id="@+id/activityMainTitlePermissionTextView"
+        <TextView
+            android:id="@+id/activityMainTitleExtraClaimsTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/main_activity_permission_section_margin_horizontal"
-            android:text="@string/net_id_service_permission_title"
+            android:text="@string/net_id_service_extra_claims"
             android:textSize="@dimen/net_id_service_title_permission_text_size"
             android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <CheckBox
+                android:id="@+id/activityMainCheckBoxShippingAddress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="shipping_address" />
+
+            <CheckBox
+                android:id="@+id/activityMainCheckBoxBirthdate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="birthdate" />
+
+        </LinearLayout>
+
+        <TextView
+                android:id="@+id/activityMainTitlePermissionTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/main_activity_permission_section_margin_horizontal"
+                android:text="@string/net_id_service_permission_title"
+                android:textSize="@dimen/net_id_service_title_permission_text_size"
+                android:textColor="@color/black"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
                   android:layout_width="match_parent"
@@ -158,7 +168,6 @@
                       android:textColor="@drawable/netid_button"
                       android:textAllCaps="false" />
         </LinearLayout>
-
 
     </LinearLayout>
 

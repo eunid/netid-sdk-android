@@ -30,7 +30,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
-import de.netid.mobile.sdk.api.NetIdAuthFlow
 import de.netid.mobile.sdk.databinding.FragmentAuthorizationLoginBinding
 import de.netid.mobile.sdk.model.AppIdentifier
 
@@ -69,27 +68,36 @@ class AuthorizationLoginFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupStandardButtons()
-        setupAppButtons()
+        configureStandardButton()
+        configureIdAppButtons()
         if (headlineText.isNotEmpty()) {
             binding.fragmentAuthorizationTitleTextView.text = headlineText
         }
     }
 
-    private fun setupStandardButtons() {
+    /**
+     * Internal helper function that configures a standard button.
+     * Actually, this button just closes the login dialog.
+     */
+    private fun configureStandardButton() {
         binding.fragmentAuthorizationButtonClose.setOnClickListener {
             listener.onCloseClicked()
         }
-        binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
-            authorizationIntent.setPackage("com.android.chrome")
-            resultLauncher.launch(authorizationIntent)
-        }
     }
 
-    private fun setupAppButtons() {
+    /**
+     * Internal helper function that configures buttons for id apps.
+     * If there are no id apps installed, a standard button for initializing the app2web-flow
+     * is configured instead.
+     */
+    private fun configureIdAppButtons() {
         // If there are no apps installed, display a standard button to enable app2web flow
         if (appIdentifiers.isEmpty()) {
+            binding.fragmentAuthorizationTitleTextView.visibility = View.GONE
             binding.fragmentAuthorizationButtonAgreeAndContinue.visibility = View.VISIBLE
+            binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
+                resultLauncher.launch(authorizationIntent)
+            }
         }
 
         appIdentifiers.forEachIndexed { index, appIdentifier ->
@@ -102,6 +110,11 @@ class AuthorizationLoginFragment(
         }
     }
 
+    /**
+     * Internal helper function that creates and styles a button for an id app.
+     * @param appIdentifier AppIdentifier holds all information to configure the button
+     * @return button
+     */
     public fun createButton(appIdentifier: AppIdentifier): MaterialButton {
         val appButton = MaterialButton(requireContext(), null, com.google.android.material.R.attr.borderlessButtonStyle)
         val continueString = if (loginText.isEmpty()) {
@@ -110,7 +123,7 @@ class AuthorizationLoginFragment(
             String.format(loginText, appIdentifier.name)
         }
         val resourceId =
-            context?.resources?.getIdentifier(appIdentifiers[0].typeFaceIcon, "drawable", requireContext().opPackageName)
+            context?.resources?.getIdentifier(appIdentifier.typeFaceIcon, "drawable", requireContext().packageName)
         appButton.icon = resourceId?.let {
             ResourcesCompat.getDrawable(
                 requireContext().resources,
@@ -146,12 +159,16 @@ class AuthorizationLoginFragment(
         super.onDestroyView()
     }
 
-    private fun openApp(app: AppIdentifier) {
+    /**
+     * Open an id app via a VerifiedAppLink.
+     * @param appIdentifier AppIdentifier of the app to be opened.
+     */
+    private fun openApp(appIdentifier: AppIdentifier) {
         authorizationIntent.extras?.apply {
             val authIntent = getParcelable<Intent>("authIntent") ?: return@apply
             val authUri = authIntent.data as Uri
-            val uri = authUri.toString().replaceBefore("?", app.android.verifiedAppLink)
-            authIntent.setPackage(app.android.applicationId)
+            val uri = authUri.toString().replaceBefore("?", appIdentifier.android.verifiedAppLink)
+            authIntent.setPackage(appIdentifier.android.applicationId)
             authIntent.data = Uri.parse(uri)
             putParcelable("authIntent", authIntent)
         }

@@ -30,10 +30,9 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:host="netid-sdk-web.letsdev.de" />
-                <data android:path="/redirect" />
+                <data android:scheme="https"
+                    android:host="eunid.github.io"
+                    android:path="/redirectApp"/>
             </intent-filter>
         </activity>
     </application>

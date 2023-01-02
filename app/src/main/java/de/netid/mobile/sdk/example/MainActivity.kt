@@ -15,16 +15,14 @@
 package de.netid.mobile.sdk.example
 
 import android.content.res.ColorStateList
-import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import de.netid.mobile.sdk.api.*
 import de.netid.mobile.sdk.example.databinding.ActivityMainBinding
-import de.netid.mobile.sdk.model.NetIdPermissionUpdate
-import de.netid.mobile.sdk.model.Permissions
-import de.netid.mobile.sdk.model.UserInfo
+import de.netid.mobile.sdk.model.*
+import org.json.JSONObject
 
 class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
@@ -35,10 +33,15 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     private var serviceState = ServiceState.Uninitialized
     private lateinit var bottomDialogFragment: SdkContentBottomDialogFragment
 
+    /** Companion object for basic configuration of the [NetIdService] via [NetIdConfig] object.
+     *  clientId and redirectUri are mandatory, all other parameters are optional.
+     *  Nevertheless, we set a standard set of claims here.
+     */
     companion object {
-        private const val clientId = "082531ba-1b22-4381-81b1-64add4b85b8a"
-        private const val redirectUri = "https://netid-sdk-web.letsdev.de/redirect"
+        private const val clientId = "ec54097f-83f6-4bb1-86f3-f7c584c649cd"
+        private const val redirectUri = "https://eunid.github.io/redirectApp"
         private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
+        // Using default text / icon
         private val permissionLayerConfig = null
         private val loginLayerConfig = null
     }
@@ -47,8 +50,6 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        setupNetIdConfig()
 
         setupInitializeButton()
         setupAuthorizeButton()
@@ -63,15 +64,6 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
             updateElementsForServiceState()
         }
-
-        // Did we get called from another app? E.g. as a callback.
-        val action: String? = intent?.action
-        val data: Uri? = intent?.data
-        if ((action.equals("android.intent.action.VIEW")) && (data != null)) {
-            NetIdService.onAuthenticationFinished(intent)
-            updateElementsForServiceState()
-        }
-
     }
 
     override fun onRestoreInstanceState(inState: Bundle) {
@@ -85,13 +77,35 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
     }
 
     private fun setupNetIdConfig() {
-        netIdConfig = NetIdConfig(clientId, redirectUri, claims, permissionLayerConfig, loginLayerConfig)
+        var effectiveClaims = claims
+        if (binding.activityMainCheckBoxShippingAddress.isChecked) {
+            val jsonClaims = JSONObject(effectiveClaims)
+            val userinfo = jsonClaims.get("userinfo") as JSONObject
+            userinfo.put("shipping_address", JSONObject.NULL)
+            effectiveClaims = jsonClaims.toString()
+        }
+        if (binding.activityMainCheckBoxBirthdate.isChecked) {
+            val jsonClaims = JSONObject(effectiveClaims)
+            val userinfo = jsonClaims.getJSONObject("userinfo")
+            userinfo.put("birthdate", JSONObject.NULL)
+            effectiveClaims = jsonClaims.toString()
+        }
+
+        netIdConfig = NetIdConfig(
+            clientId = clientId,
+            redirectUri = redirectUri,
+            claims = effectiveClaims,
+            promptWeb = "consent",
+            permissionLayerConfig = permissionLayerConfig,
+            loginLayerConfig = loginLayerConfig)
+
         NetIdService.addListener(this)
     }
 
     private fun setupInitializeButton() {
         binding.activityMainButtonInitialize.setOnClickListener {
             it.isEnabled = false
+            setupNetIdConfig()
             NetIdService.initialize(netIdConfig, this.applicationContext)
         }
     }
@@ -118,6 +132,10 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
                 if (bottomDialogFragment.sdkContentFragment != null)
                     bottomDialogFragment.show(supportFragmentManager, null)
             }
+            builder.setOnDismissListener {
+                binding.activityMainButtonAuthorize.isEnabled = true
+                updateElementsForServiceState()
+            }
             builder.show()
         }
     }
@@ -138,9 +156,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
         binding.activityMainButtonPermissionWrite.setOnClickListener {
             it.isEnabled = false
-            // these values are only for demonstration purpose
+            // these values are only for demonstration purposes
             val permission = NetIdPermissionUpdate(
-                "VALID",
+                NetIdPermissionStatus.VALID,
                 "CPdfZIAPdfZIACnABCDECbCkAP_AAAAAAAYgIzJd9D7dbXFDefx_SPt0OYwW0NBXCuQCChSAA2AFVAOQcLQA02EaMATAhiACEQIAolIBAAEEHAFEAECQQIAEAAHsAgSEhAAKIAJEEBEQAAIQAAoKAAAAAAAIgAABoASAmBiQS5bmRUCAOIAQRgBIgggBCIADAgMBBEAIABgIAIIIgSgAAQAAAKIAAAAAARAAAASGgFABcAEMAPwAgoBaQEiAJ2AUiAxgBnwqASAEMAJgAXABHAEcALSAkEBeYDPh0EIABYAFQAMgAcgA-AEAALgAZAA0AB4AD6AIYAigBMACfAFwAXQAxABmADeAHMAPwAhgBLACYAE0AKMAUoAsQBbgDDAGiAPaAfgB-gEDAIoARaAjgCOgEpALEAWmAuYC6gF5AMUAbQA3ABxADnAHUAPQAi8BIICRAE7AKHAXmAwYBjADJAGVAMsAZmAz4BrADiwHjgPrAg0BDkhAbAAWABkAFwAQwAmABcADEAGYAN4AjgBSgCxAIoARwAlIBaQC5gGKANoAc4A6gB6AEggJEAScAz4B45KBAAAgABYAGQAOAAfAB4AEQAJgAXAAxABmADaAIYARwAowBSgC3AH4ARwAk4BaQC6gGKANwAdQBF4CRAF5gMsAZ8A1gCGoSBeAAgABYAFQAMgAcgA8AEAAMgAaAA8gCGAIoATAAngBvADmAH4AQgAhgBHACWAE0AKUAW4AwwB7QD8AP0AgYBFICNAI4ASkAuYBigDaAG4AOIAegBIgCdgFDgKRAXmAwYBkgDPoGsAayA4IB44EOREAYAQwA_AEiAJ2AUiAz4ZAHACGAEwARwBHAEnALzAZ8UgXAALAAqABkADkAHwAgABkADQAHkAQwBFACYAE8AKQAYgAzABzAD8AIYAUYApQBYgC3AGjAPwA_QCLQEcAR0AlIBcwC8gGKANoAbgA9ACLwEiAJOATsAocBeYDGAGSAMsAZ9A1gDWQHBAPHAhm.f_gAAAAAAsgA"
             )
             NetIdService.updatePermission(this.applicationContext, permission)
@@ -151,6 +169,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         binding.activityMainButtonEndSession.setOnClickListener {
             it.isEnabled = false
             appendLog("netID service session finished successfully")
+            NetIdService.endSession()
             serviceState = ServiceState.InitializationSuccessful
             updateElementsForServiceState()
         }
@@ -178,6 +197,8 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         binding.activityMainButtonEndSession.isEnabled = isAuthorized
         binding.activityMainButtonPermissionWrite.isEnabled = isAuthorized
         binding.activityMainButtonPermissionRead.isEnabled = isAuthorized
+        binding.activityMainCheckBoxShippingAddress.isEnabled = isUninitialized
+        binding.activityMainCheckBoxBirthdate.isEnabled = isUninitialized
 
         updateStateColorElements()
     }
@@ -251,9 +272,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
     override fun onUserInfoFetchedWithError(error: NetIdError) {
         if (error.msg?.isNotEmpty() == true) {
-            appendLog("netID service user info failed: ${error.code}, ${error.process}, ${error.msg}")
+            appendLog("netID service user info - fetch failed: ${error.code}, ${error.process}, ${error.msg}")
         } else {
-            appendLog("netID service user info failed: ${error.code}, ${error.process}")
+            appendLog("netID service user info - fetch failed: ${error.code}, ${error.process}")
         }
         serviceState = ServiceState.UserInfoFailed
         updateElementsForServiceState()
@@ -301,8 +322,35 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         }
     }
 
-    override fun onPermissionUpdateFinishedWithError(error: NetIdError) {
-        appendLog("netID service permission -update failed with error: ${error.code}")
+    override fun onPermissionUpdateFinishedWithError(statusCode: PermissionResponseStatus, error: NetIdError) {
+        when (statusCode) {
+            PermissionResponseStatus.NO_TOKEN ->
+                // no token was passed (handled by SDK should not happen)
+                appendLog("No bearer token in request available.")
+            PermissionResponseStatus.TOKEN_ERROR ->
+                // current token expired / is invalid
+                appendLog("Token error - token refresh / reauthorization necessary")
+            PermissionResponseStatus.TPID_EXISTENCE_ERROR ->
+                // netID Account was deleted
+                appendLog("netID Account was deleted")
+            PermissionResponseStatus.TAPP_NOT_ALLOWED ->
+                // Invalid configuration of client
+                appendLog("Client not authorized to use permission management")
+            PermissionResponseStatus.PERMISSION_PARAMETERS_ERROR ->
+                // Invalid parameter payload
+                appendLog("Syntactic or semantic error in a permission")
+            PermissionResponseStatus.NO_PERMISSIONS ->
+                // No permission parameter given
+                appendLog("Parameters are missing. At least one permission must be set.")
+            PermissionResponseStatus.NO_REQUEST_BODY ->
+                // Request body missing
+                appendLog("Required request body is missing")
+            PermissionResponseStatus.JSON_PARSE_ERROR ->
+                // Error parsing JSON body
+                appendLog("Invalid JSON body, parse error")
+            else ->
+                appendLog("netID service permission - update failed with error: ${error.code}")
+        }
         if (error.msg?.isNotEmpty() == true) {
             appendLog("original error message: ${error.msg}")
         }
@@ -310,8 +358,26 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         updateElementsForServiceState()
     }
 
-    override fun onPermissionFetchFinishedWithError(error: NetIdError) {
-        appendLog("netID service permission -fetch failed with error: ${error.code}")
+    override fun onPermissionFetchFinishedWithError(statusCode: PermissionResponseStatus, error: NetIdError) {
+        when (statusCode){
+            PermissionResponseStatus.NO_TOKEN ->
+                // no token was passed (handled by SDK should not happen)
+                appendLog("No bearer token in request available.")
+            PermissionResponseStatus.TOKEN_ERROR ->
+                // current token expired / is invalid
+                appendLog("Token error - token refresh / reauthorization necessary")
+            PermissionResponseStatus.TPID_EXISTENCE_ERROR ->
+                // netID Account was deleted
+                appendLog("netID Account was deleted")
+            PermissionResponseStatus.TAPP_NOT_ALLOWED ->
+                // Invalid configuration of client
+                appendLog("Client not authorized to use permission management")
+            PermissionResponseStatus.PERMISSIONS_NOT_FOUND ->
+                // Missing permissions
+                appendLog("Permissions for tpid not found")
+            else ->
+                appendLog("netID service permission - fetch failed with error: ${error.code}")
+        }
         if (error.msg?.isNotEmpty() == true) {
             appendLog("original error message: ${error.msg}")
         }
@@ -319,20 +385,28 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         updateElementsForServiceState()
     }
 
-    override fun onPermissionFetchFinished(permissions: Permissions) {
-        appendLog("netID service permission -fetch finished successfully: $permissions")
+    override fun onPermissionFetchFinished(permissions: PermissionReadResponse) {
+        appendLog("netID service permission - fetch finished successfully")
+
+        when (permissions.statusCode) {
+            PermissionResponseStatus.PERMISSIONS_FOUND ->
+                // Response contains existing permission
+                appendLog("Permissions: $permissions")
+            PermissionResponseStatus.PERMISSIONS_NOT_FOUND ->
+                // No existing permission found
+                appendLog("No permissions found")
+            else ->
+                appendLog("This should not happen")
+        }
         serviceState = ServiceState.PermissionReadSuccessful
         updateElementsForServiceState()
 
     }
 
-    override fun onPermissionUpdateFinished() {
-        appendLog("netID service permission -update finished successfully.")
+    override fun onPermissionUpdateFinished(subjectIdentifiers: SubjectIdentifiers) {
+        appendLog("netID service permission - update finished successfully.")
+        appendLog("Returned: $subjectIdentifiers")
         serviceState = ServiceState.PermissionWriteSuccessful
         updateElementsForServiceState()
-    }
-
-    override fun onTransmittedInvalidToken() {
-        appendLog("netID service token transmit failed.")
     }
 }

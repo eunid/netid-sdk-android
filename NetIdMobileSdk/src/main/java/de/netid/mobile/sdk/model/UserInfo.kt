@@ -34,7 +34,8 @@ data class UserInfo(
     val email: String? = null,
     ) {
     override fun toString(): String {
-        val format = Json { encodeDefaults = false }
+        // Unknown JSON claims are ignored
+        val format = Json { encodeDefaults = false; ignoreUnknownKeys = true; }
         return format.encodeToString(this)
     }
 }

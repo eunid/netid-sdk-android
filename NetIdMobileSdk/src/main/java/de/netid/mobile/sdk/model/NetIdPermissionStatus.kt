@@ -14,10 +14,11 @@
 
 package de.netid.mobile.sdk.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class NetIdPrivacySettingsStatus(val status: String) {
-    Valid("VALID"),
-    Invalid("INVALID")
+enum class NetIdPermissionStatus(val status: String) {
+    VALID("VALID"),
+    INVALID("INVALID")
 }

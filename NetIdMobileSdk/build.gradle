@@ -11,10 +11,10 @@ android {
     defaultConfig {
         minSdk 24
         targetSdk 32
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
-        manifestPlaceholders = [appAuthRedirectScheme: 'com.redirectScheme.comm']
+        manifestPlaceholders = [appAuthRedirectScheme: 'de.netid.mobile.sdk.netidmobilesdk']
+
     }
 
     buildFeatures {
@@ -37,7 +37,6 @@ android {
 }
 
 dependencies {
-
     implementation 'androidx.core:core-ktx:1.8.0'
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'

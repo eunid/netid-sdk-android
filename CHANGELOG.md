@@ -17,7 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enabled app2app workflow
 - Enabled handling of redirect uri
 - Added third flow option login + permission
-- Added parameter to forece app2app flow
+- Added parameter to force app2app flow
+- Added session persistence
+- Added possibility to add optional claims to login flow
 
 ### Changed
 - Renamed NetID to netID
@@ -45,6 +47,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Some cleanups
 - Make permission erros more transparent
 - Force use of Chrome for app2web 
+- Be less strict when parsing JSON, ignore unknown claims
+- Hide text about apps when using app2web
+- Removed unused function from documentation
+- Make us of new redirectUrl and host
 
 ### Fixed
 - Fixed UserInfo json parser error
@@ -61,4 +67,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed possible exception during permission fetch
 - Set correct value for app name
 - Fixed a crash in the context of the bottom fragment
+- Fixed a bug when authorizing/deauthorizing and authorizing again
+- Fixed a bug where for every id app the same logo was displayed
  

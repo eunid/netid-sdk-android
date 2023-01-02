@@ -67,7 +67,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             }
 
             this.netIdConfig = netIdConfig
-            setupAuthManagerAndFetchConfiguration(broker)
+            setupAuthManagerAndFetchConfiguration(context, broker)
             setupUserInfoManager()
             setupPermissionManager()
         }
@@ -82,10 +82,15 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
 
         netIdConfig?.let { config ->
-            return appAuthManager.getWebAuthorizationIntent(
+            //prompt is applied only in App2Web Flows
+            val effectivePrompt: String? =
+                if(availableAppIdentifiers.isEmpty()) config.promptWeb else null
+
+            return appAuthManager.getAuthorizationIntent(
                 config.clientId,
                 config.redirectUri,
                 config.claims,
+                effectivePrompt,
                 authFlow,
                 context
             )?.let {
@@ -258,7 +263,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             }
             error?.let {
                 for (item in netIdServiceListeners) {
-                    item.onPermissionFetchFinishedWithError(it)
+                    item.onPermissionFetchFinishedWithError(PermissionResponseStatus.UNKNOWN, it)
                 }
             }
         }
@@ -274,15 +279,15 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             }
             error?.let {
                 for (item in netIdServiceListeners) {
-                    item.onPermissionUpdateFinishedWithError(it)
+                    item.onPermissionUpdateFinishedWithError(PermissionResponseStatus.UNKNOWN, it)
                 }
             }
 
         }
     }
 
-    private fun setupAuthManagerAndFetchConfiguration(host: String) {
-        appAuthManager = AppAuthManagerFactory.createAppAuthManager()
+    private fun setupAuthManagerAndFetchConfiguration(context: Context, host: String) {
+        appAuthManager = AppAuthManagerFactory.createAppAuthManager(context)
         appAuthManager.listener = this
         appAuthManager.fetchAuthorizationServiceConfiguration(host)
     }
@@ -302,12 +307,21 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         availableAppIdentifiers.addAll(installedAppIdentifiers)
     }
 
+    fun endSession() {
+        Log.i(javaClass.simpleName, "netId service did end session successfully")
+        appAuthManager.endSession()
+    }
+
 // AppAuthManagerListener functions
 
     override fun onAuthorizationServiceConfigurationFetchedSuccessfully() {
         Log.i(javaClass.simpleName, "netId service Authorization Service Configuration fetched successfully")
         for (item in netIdServiceListeners) {
             item.onInitializationFinishedWithError(null)
+        }
+        // Do we have (already) a session (maybe from last time)? Then try to make use of it.
+        if (appAuthManager.getAuthState() != null) {
+            onAuthorizationSuccessful()
         }
     }
 
@@ -395,31 +409,31 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     }
 
     // PermissionManagerListener functions
-    override fun onPermissionsFetched(permissions: Permissions) {
+    override fun onPermissionsFetched(permissions: PermissionReadResponse) {
         Log.i(javaClass.simpleName, "netId service permissions fetched successfully")
         for (item in netIdServiceListeners) {
             item.onPermissionFetchFinished(permissions)
         }
     }
 
-    override fun onPermissionsFetchFailed(error: NetIdError) {
+    override fun onPermissionsFetchFailed(statusCode: PermissionResponseStatus, error: NetIdError) {
         Log.e(javaClass.simpleName, "netId service permissions fetch failed")
         for (item in netIdServiceListeners) {
-            item.onPermissionFetchFinishedWithError(error)
+            item.onPermissionFetchFinishedWithError(statusCode, error)
         }
     }
 
     override fun onPermissionUpdated(subjectIdentifiers: SubjectIdentifiers) {
         Log.i(javaClass.simpleName, "netId service permissions updated successfully")
         for (item in netIdServiceListeners) {
-            item.onPermissionUpdateFinished()
+            item.onPermissionUpdateFinished(subjectIdentifiers)
         }
     }
 
-    override fun onPermissionUpdateFailed(error: NetIdError) {
+    override fun onPermissionUpdateFailed(statusCode: PermissionResponseStatus, error: NetIdError) {
         Log.e(javaClass.simpleName, "netId service permission update failed")
         for (item in netIdServiceListeners) {
-            item.onPermissionUpdateFinishedWithError(error)
+            item.onPermissionUpdateFinishedWithError(statusCode, error)
         }
     }
 }
