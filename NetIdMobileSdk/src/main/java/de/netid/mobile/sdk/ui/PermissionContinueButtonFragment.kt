@@ -3,7 +3,6 @@ package de.netid.mobile.sdk.ui
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.opengl.Visibility
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.ListView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.api.NetIdAuthFlow
 import de.netid.mobile.sdk.api.NetIdService
 import de.netid.mobile.sdk.databinding.PermissionContinueButtonBinding

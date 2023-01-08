@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.api.NetIdAuthFlow
 import de.netid.mobile.sdk.api.NetIdService
 import de.netid.mobile.sdk.databinding.LoginContinueButtonBinding

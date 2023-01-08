@@ -16,11 +16,8 @@ package de.netid.mobile.sdk.api
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Resources
 import android.util.Log
 import androidx.fragment.app.Fragment
-import com.google.android.material.button.MaterialButton
-import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.appauth.AppAuthManager
 import de.netid.mobile.sdk.appauth.AppAuthManagerFactory
 import de.netid.mobile.sdk.appauth.AppAuthManagerListener
@@ -28,7 +25,6 @@ import de.netid.mobile.sdk.model.*
 import de.netid.mobile.sdk.permission.PermissionManager
 import de.netid.mobile.sdk.permission.PermissionManagerListener
 import de.netid.mobile.sdk.ui.*
-import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapter
 import de.netid.mobile.sdk.userinfo.UserInfoManager
 import de.netid.mobile.sdk.userinfo.UserInfoManagerListener
 import de.netid.mobile.sdk.util.JsonUtil
@@ -49,8 +45,6 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
 
     private val availableAppIdentifiers = mutableListOf<AppIdentifier>()
     private val netIdServiceListeners = mutableSetOf<NetIdServiceListener>()
-
-    public var currentSelection: Int = -1
 
     fun addListener(listener: NetIdServiceListener) {
         netIdServiceListeners.add(listener)
@@ -116,7 +110,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         return availableAppIdentifiers.count()
     }
 
-    public fun authIntentForFlow(flow: NetIdAuthFlow, context: Context): Intent? {
+    fun authIntentForFlow(flow: NetIdAuthFlow, context: Context): Intent? {
         netIdConfig?.let { config ->
             val authIntent = appAuthManager.getAuthorizationIntent(
                 config.clientId,
@@ -132,24 +126,16 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         return null
     }
 
-    public fun permissionContinueButtonFragment(continueText: String): Fragment {
+    fun permissionContinueButtonFragment(continueText: String): Fragment {
         return PermissionContinueButtonFragment(this, continueText, availableAppIdentifiers)
     }
 
-    public fun permissionAppButtonFragment(index: Int): Fragment {
-        return PermissionAppButtonFragment(index, availableAppIdentifiers[index])
-    }
-
-    public fun loginContinueButtonFragment(continueText: String, flow: NetIdAuthFlow): Fragment {
+    fun loginContinueButtonFragment(continueText: String, flow: NetIdAuthFlow): Fragment {
         return LoginContinueButtonFragment(this, continueText, flow)
     }
 
-    public fun appButtonFragment(index: Int, flow: NetIdAuthFlow): Fragment {
+    fun appButtonFragment(index: Int, flow: NetIdAuthFlow): Fragment {
         return AppButtonFragment(this, availableAppIdentifiers[index], flow)
-    }
-
-    public fun setAppSelection(index: Int) {
-        currentSelection = index
     }
 
     private fun handleConnection(context: Context, process: NetIdErrorProcess): Boolean {
