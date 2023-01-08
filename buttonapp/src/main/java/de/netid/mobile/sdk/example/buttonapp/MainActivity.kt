@@ -1,14 +1,15 @@
-package de.netid.mobile.sdk.netidmobilesdk.buttonapp
+package de.netid.mobile.sdk.example.buttonapp
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
 import de.netid.mobile.sdk.api.*
+import de.netid.mobile.sdk.example.buttonapp.R
+import de.netid.mobile.sdk.example.buttonapp.databinding.ActivityMainBinding
 import de.netid.mobile.sdk.model.PermissionReadResponse
 import de.netid.mobile.sdk.model.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.UserInfo
-import de.netid.mobile.sdk.netidmobilesdk.buttonapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), NetIdServiceListener {
     private lateinit var binding: ActivityMainBinding
@@ -36,7 +37,8 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
             claims = claims,
             promptWeb = "consent",
             permissionLayerConfig = permissionLayerConfig,
-            loginLayerConfig = loginLayerConfig)
+            loginLayerConfig = loginLayerConfig
+        )
 
         NetIdService.addListener(this)
         NetIdService.initialize(netIdConfig, this)

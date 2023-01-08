@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:paddingHorizontal="@dimen/main_activity_outer_padding"
     android:paddingVertical="5dp"
-    tools:context=".MainActivity">
+    tools:context="de.netid.mobile.sdk.example.buttonapp.MainActivity">
 
     <LinearLayout
         android:id="@+id/activityMainButtonContainerLayout"

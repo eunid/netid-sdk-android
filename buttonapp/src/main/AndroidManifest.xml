@@ -2,7 +2,7 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="de.netid.mobile.sdk.netidmobilesdk.buttonapp">
+    package="de.netid.mobile.sdk.example.buttonapp">
 
     <application
         android:allowBackup="true"
@@ -15,7 +15,7 @@
         android:theme="@style/Theme.NetIdMobileSdkApp"
         tools:targetApi="s">
         <activity
-            android:name="de.netid.mobile.sdk.netidmobilesdk.buttonapp.MainActivity"
+            android:name="de.netid.mobile.sdk.example.buttonapp.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

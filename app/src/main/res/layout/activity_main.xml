@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/main_activity_outer_padding"
-    tools:context="de.netid.mobile.sdk.example.MainActivity">
+    tools:context="de.netid.mobile.sdk.example.buttonapp.MainActivity">
 
     <LinearLayout
         android:id="@+id/activityMainButtonContainerLayout"

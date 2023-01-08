@@ -3,7 +3,7 @@
 ## About
 
 The `netID MobileSDK` facilitates the use of the [netID](https://netid.de) authorization and privacy management services.
-Alongside the SDK, this repository hosts a sample app, demonstarting the usage.
+Alongside the SDK, this repository hosts two sample apps, demonstarting the usage of the SDK. The first one is more complete as it demonstrates complete workflows including fetching/setting of additional values or user information. The second one is less complex and only demonstrates the basic workflow if you want to add the different buttons for interacting with the SDK in a more direct way. 
 
 ## Initialize NetIDService
 
@@ -164,3 +164,58 @@ Fetches the permissions object. On success `onFetchPermissions` is called on the
 NetIdService.updatePermissions(this.applicationContext)
 ```
 Updates the permissions object. On success `onUpdatePermissions` is called on the delegate, returning the requested information. Otherwise `onUpdatePermissionsWithError` gets called, returning a description of the error.
+
+## Button workflow
+
+As stated in the beginning, there is another way to interact with the SDK. In the so called <i>button workflow</i> you can decide to not use the preconfigured forms and texts but build your very own dialogs.
+
+Therefore, the SDK gives you the opportunity to only make use of the basic functionalities to use the SDK. As a starting point, take a look at the second demo app provided in the `buttonApp` folder.
+
+Of course, at first you have to initialize the SDK as in the example above.
+```kotlin
+val netIdConfig = NetIdConfig(
+    clientId = clientId,
+    redirectUri = redirectUri,
+    claims = claims,
+    promptWeb = "consent",
+    permissionLayerConfig = permissionLayerConfig,
+    loginLayerConfig = loginLayerConfig)
+
+NetIdService.addListener(this)
+NetIdService.initialize(netIdConfig, this)
+```
+
+Then, just request the buttons you need to trigger your desired auth flow. E.g. for the permission flow:
+
+```kotlin
+val permissionContinueButton = NetIdServicepermissionContinueButtonFragment("")
+supportFragmentManager.commit {
+    setReorderingAllowed(true)
+    add(R.id.activityMainPermissionContainer, permissionContinueButton)
+}
+```
+
+Note that if any Account Provider apps are installed, there will be the possibility to choose which one to use. In this this case, app2app flow is used, app2web otherwise.
+
+For the login and/or login+permission flow, you can request a button to initiate app2web authorization with the following call:
+
+```kotlin
+val loginContinueButton = NetIdService.loginContinueButtonFragment("", NetIdAuthFlow.Login)
+supportFragmentManager.commit {
+    setReorderingAllowed(true)
+    add(R.id.activityMainLoginContainer, loginContinueButton)
+}
+```
+
+And if you prefer app2app, you can request respective buttons for each Account provider this way:
+
+```kotlin
+val count = NetIdService.getCountOfIdApps(this)
+for (i in 0 until count) {
+    val appButton = NetIdService.appButtonFragment(i, NetIdAuthFlow.Login)
+    supportFragmentManager.commit {
+        setReorderingAllowed(true)
+        add(R.id.activityMainLoginContainer, appButton)
+    }
+}
+```

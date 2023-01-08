@@ -10,13 +10,13 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "de.netid.mobile.sdk.netidmobilesdk.buttonapp"
+        applicationId "de.netid.mobile.sdk.example.buttonapp"
         minSdk 24
         targetSdk 32
         versionCode versionCodeInt
         versionName version
 
-        manifestPlaceholders = [appAuthRedirectScheme: 'de.netid.mobile.sdk.netidmobilesdk']
+        manifestPlaceholders = [appAuthRedirectScheme: 'de.netid.mobile.sdk.example.buttonapp']
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

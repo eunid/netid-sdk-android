@@ -15,7 +15,7 @@
         android:theme="@style/Theme.NetIdMobileSdkApp"
         tools:targetApi="s">
         <activity
-            android:name="de.netid.mobile.sdk.example.MainActivity"
+            android:name="de.netid.mobile.sdk.example.buttonapp.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
