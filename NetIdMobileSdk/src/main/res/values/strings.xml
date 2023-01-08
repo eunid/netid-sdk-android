@@ -14,6 +14,7 @@
     <string name="authorization_login_login_text">Login mit Ihrer E-Mail App</string>
     <string name="authorization_login_agree_and_continue_with_net_id">Zustimmen und weiter mit netID</string>
     <string name="authorization_login_continue">Login mit %1$s</string>
+    <string name="authorization_login_continue_button">Login mit netID von %1$s</string>
     <string name="authorization_login_continue_other">Weitere Anmeldeoptionen</string>
     <string name="authorization_login_net_id">netID</string>
 

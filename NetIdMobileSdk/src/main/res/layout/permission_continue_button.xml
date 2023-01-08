@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonPermissionContinue"
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:letterSpacing="@dimen/authorization_button_letter_spacing"
+            android:text="@string/authorization_permission_agree_and_continue_with_net_id"
+            android:textAllCaps="true"
+            android:textSize="@dimen/authorization_button_text_size"
+            android:textColor="@color/authorization_agree_text_color"
+            android:layout_marginBottom="16dp"
+            app:icon="@drawable/ic_netid_logo_small"
+            app:iconSize="20dp"
+            app:iconTint="@null"
+            app:iconPadding="-20dp"
+            app:backgroundTint="@color/authorization_agree_button_color"
+            app:cornerRadius="@dimen/authorization_button_corner_radius"
+            app:strokeColor="@color/authorization_close_button_color"
+            app:strokeWidth="@dimen/authorization_close_button_stroke_width"
+            app:rippleColor="@color/authorization_close_button_color" />
+
+        <ListView
+            android:id="@+id/buttonPermissionContinueAppCellContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/buttonPermissionContinue"
+            app:layout_constraintStart_toEndOf="parent"
+            tools:listitem="@layout/netid_app_cell" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

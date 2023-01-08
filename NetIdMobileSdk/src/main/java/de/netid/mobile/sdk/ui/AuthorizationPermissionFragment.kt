@@ -166,45 +166,6 @@ class AuthorizationPermissionFragment(
     }
 
     /**
-     * Internal helper function that creates and styles a button for an id app.
-     * @param appIdentifier AppIdentifier holds all information to configure the button
-     * @return button
-     */
-    public fun createButton(appIdentifier: AppIdentifier): MaterialButton {
-        val appButton = MaterialButton(requireContext(), null, com.google.android.material.R.attr.borderlessButtonStyle)
-        val continueString = getString(R.string.authorization_login_continue, appIdentifier.name)
-        val resourceId =
-            context?.resources?.getIdentifier(appIdentifiers[0].typeFaceIcon, "drawable", requireContext().opPackageName)
-        appButton.icon = resourceId?.let {
-            ResourcesCompat.getDrawable(
-                requireContext().resources,
-                it,
-                null
-            )
-        }
-        appButton.iconTint = ColorStateList.valueOf(Color.parseColor(appIdentifier.foregroundColor))
-        appButton.iconPadding = -100
-        appButton.text = continueString.uppercase()
-        appButton.setTextColor(Color.parseColor(appIdentifier.foregroundColor))
-        appButton.isAllCaps = true
-        appButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.authorization_button_text_size))
-        appButton.setCornerRadiusResource(R.dimen.authorization_button_corner_radius)
-        appButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(appIdentifier.backgroundColor))
-
-        val letterSpacingValue = TypedValue()
-        resources.getValue(R.dimen.authorization_button_letter_spacing, letterSpacingValue, true)
-        appButton.letterSpacing = letterSpacingValue.float
-
-        val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        appButton.layoutParams = layoutParams
-
-        appButton.setOnClickListener {
-            openApp(appIdentifier)
-        }
-
-        return appButton
-    }
-    /**
      * Internal helper function that creates a link in a text view if more than one id app is installed.
      */
     private fun TextView.makeLinks(vararg links: Pair<String, View.OnClickListener>) {

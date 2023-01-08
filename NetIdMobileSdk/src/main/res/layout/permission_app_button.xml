@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/buttonPermissionApp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginVertical="8dp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/buttonPermissionAppImageView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:shapeAppearanceOverlay="@style/Shape.Image.Round"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="0dp" />
+
+    <TextView
+            android:id="@+id/buttonPermissionAppTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/authorization_button_text_size"
+            android:textAllCaps="true"
+            android:textFontWeight="700"
+            android:textColor="@color/authorization_app_button_color"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/buttonPermissionAppImageView"
+            android:layout_marginStart="8dp"
+            app:layout_constraintHorizontal_bias="1"/>
+
+    <RadioButton
+            android:id="@+id/buttonPermissionAppRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/buttonPermissionAppTextView"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintHorizontal_bias="1"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

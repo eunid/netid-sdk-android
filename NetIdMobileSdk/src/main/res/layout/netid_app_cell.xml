@@ -43,5 +43,4 @@
             android:minHeight="48dp"
             android:layout_marginEnd="16dp"
             app:layout_constraintHorizontal_bias="1"/>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

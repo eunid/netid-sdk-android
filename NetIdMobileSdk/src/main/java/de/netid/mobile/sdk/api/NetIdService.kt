@@ -27,9 +27,8 @@ import de.netid.mobile.sdk.appauth.AppAuthManagerListener
 import de.netid.mobile.sdk.model.*
 import de.netid.mobile.sdk.permission.PermissionManager
 import de.netid.mobile.sdk.permission.PermissionManagerListener
-import de.netid.mobile.sdk.ui.AuthorizationFragmentListener
-import de.netid.mobile.sdk.ui.AuthorizationLoginFragment
-import de.netid.mobile.sdk.ui.AuthorizationPermissionFragment
+import de.netid.mobile.sdk.ui.*
+import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapter
 import de.netid.mobile.sdk.userinfo.UserInfoManager
 import de.netid.mobile.sdk.userinfo.UserInfoManagerListener
 import de.netid.mobile.sdk.util.JsonUtil
@@ -51,6 +50,8 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     private val availableAppIdentifiers = mutableListOf<AppIdentifier>()
     private val netIdServiceListeners = mutableSetOf<NetIdServiceListener>()
 
+    public var currentSelection: Int = -1
+
     fun addListener(listener: NetIdServiceListener) {
         netIdServiceListeners.add(listener)
     }
@@ -70,6 +71,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             setupAuthManagerAndFetchConfiguration(context, broker)
             setupUserInfoManager()
             setupPermissionManager()
+            checkAvailableNetIdApplications(context)
         }
     }
 
@@ -109,117 +111,46 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         return null
     }
 
-    fun continueButtonPermissionFlow(context: Context): MaterialButton {
-        val button = MaterialButton(context)
-
-        button.id = R.id.fragmentAuthorizationButtonAgreeAndContinue
-        button.letterSpacing = Resources.getSystem().getDimension(R.dimen.authorization_button_letter_spacing)
-        button.text = Resources.getSystem().getText(R.string.authorization_permission_agree_and_continue_with_net_id)
-        button.textSize = Resources.getSystem().getDimension(R.dimen.authorization_button_text_size)
-        button.icon = Resources.getSystem().getDrawable(R.drawable.ic_netid_logo_small)
-        button.iconSize = 20
-        button.iconTint = null
-        button.cornerRadius = Resources.getSystem().getDimension(R.dimen.authorization_button_corner_radius).toInt()
-        button.strokeColor = Resources.getSystem().getColorStateList(R.color.authorization_close_button_color)
-        button.strokeWidth =
-            Resources.getSystem().getDimension(R.dimen.authorization_close_button_stroke_width).toInt()
-        button.rippleColor =  Resources.getSystem().getColorStateList(R.color.authorization_close_button_color)
-
-        return button
-    }
-
-    fun continueButtonLoginFlow(context: Context): MaterialButton {
-        val button = MaterialButton(context)
-
-        button.id = R.id.fragmentAuthorizationButtonAgreeAndContinue
-        button.letterSpacing = Resources.getSystem().getDimension(R.dimen.authorization_button_letter_spacing)
-        button.text = Resources.getSystem().getText(R.string.authorization_permission_agree_and_continue_with_net_id)
-        button.textSize = Resources.getSystem().getDimension(R.dimen.authorization_button_text_size)
-        button.cornerRadius = Resources.getSystem().getDimension(R.dimen.authorization_button_corner_radius).toInt()
-        button.backgroundTintList = Resources.getSystem().getColorStateList(R.color.authorization_net_id_button_color)
-
-        return button
-    }
-
     fun getCountOfIdApps(context: Context): Int {
         checkAvailableNetIdApplications(context)
         return availableAppIdentifiers.count()
     }
 
-    fun permissionButtonForIdApp(context: Context, index: Int): MaterialButton? {
-        val button = MaterialButton(context)
-        checkAvailableNetIdApplications(context)
-        // If there are no ID apps installed, return with an error.
-        if (availableAppIdentifiers.isEmpty() || (index >= availableAppIdentifiers.count())) {
-            this.onAuthorizationFailed(NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.NoIdAppInstalled))
-            return null
-        }
+    public fun authIntentForFlow(flow: NetIdAuthFlow, context: Context): Intent? {
         netIdConfig?.let { config ->
             val authIntent = appAuthManager.getAuthorizationIntent(
                 config.clientId,
                 config.redirectUri,
                 config.claims,
                 config.promptWeb,
-                NetIdAuthFlow.Permission,
+                flow,
                 context
             )
 
-            if (authIntent != null) {
-                val authFragment = AuthorizationPermissionFragment(
-                    this,
-                    availableAppIdentifiers,
-                    authIntent,
-                    (config.permissionLayerConfig?.logoId)?: "",
-                    (config.permissionLayerConfig?.headlineText)?: "",
-                    (config.permissionLayerConfig?.legalText)?: "",
-                    (config.permissionLayerConfig?.continueText)?: ""
-                )
-//                AuthorizationAppListAdapter(activity.applicationContext, availableAppIdentifiers).getView(index, )
-                return authFragment.createButton(availableAppIdentifiers[index])
-            }
-        }
-
-
-        return button
-    }
-
-    fun loginButtonForIdApp(context: Context, index: Int, authFlow: NetIdAuthFlow): MaterialButton? {
-        checkAvailableNetIdApplications(context)
-        // If there are no ID apps installed, return with an error.
-        if (availableAppIdentifiers.isEmpty() || (index >= availableAppIdentifiers.count())) {
-            this.onAuthorizationFailed(NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.NoIdAppInstalled))
-            return null
-        }
-
-        // Wrong auth flow for this type of button
-        if (authFlow == NetIdAuthFlow.Permission)
-            return null
-
-        netIdConfig?.let { config ->
-            val authIntent = appAuthManager.getAuthorizationIntent(
-                config.clientId,
-                config.redirectUri,
-                config.claims,
-                config.promptWeb,
-                authFlow,
-                context
-            )
-
-            if (authIntent != null) {
-                val authFragment = AuthorizationLoginFragment(
-                    this,
-                    availableAppIdentifiers,
-                    authIntent,
-                    (config.loginLayerConfig?.headlineText)?: "",
-                    (config.loginLayerConfig?.loginText)?: "",
-                    (config.loginLayerConfig?.continueText)?: ""
-                )
-                return authFragment.createButton(availableAppIdentifiers[index])
-            }
+            return authIntent
         }
         return null
     }
 
+    public fun permissionContinueButtonFragment(continueText: String): Fragment {
+        return PermissionContinueButtonFragment(this, continueText, availableAppIdentifiers)
+    }
+
+    public fun permissionAppButtonFragment(index: Int): Fragment {
+        return PermissionAppButtonFragment(index, availableAppIdentifiers[index])
+    }
+
+    public fun loginContinueButtonFragment(continueText: String, flow: NetIdAuthFlow): Fragment {
+        return LoginContinueButtonFragment(this, continueText, flow)
+    }
+
+    public fun appButtonFragment(index: Int, flow: NetIdAuthFlow): Fragment {
+        return AppButtonFragment(this, availableAppIdentifiers[index], flow)
+    }
+
+    public fun setAppSelection(index: Int) {
+        currentSelection = index
+    }
 
     private fun handleConnection(context: Context, process: NetIdErrorProcess): Boolean {
         return if (ReachabilityUtil.hasConnection(context)) {
