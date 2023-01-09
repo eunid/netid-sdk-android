@@ -60,5 +60,6 @@ class SdkContentBottomDialogFragment : BottomSheetDialogFragment() {
     override fun dismiss() {
         super.dismissAllowingStateLoss()
         isClosed = true
+        onDestroyView()
     }
 }
