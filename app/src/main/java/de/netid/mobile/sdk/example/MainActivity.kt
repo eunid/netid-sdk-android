@@ -317,9 +317,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
             else -> ServiceState.Uninitialized
         }
         updateElementsForServiceState()
-        if ((this::bottomDialogFragment.isInitialized) && (bottomDialogFragment.isAdded)) {
-            bottomDialogFragment.dismiss()
-        }
+        bottomDialogFragment.dismiss()
     }
 
     override fun onPermissionUpdateFinishedWithError(statusCode: PermissionResponseStatus, error: NetIdError) {
