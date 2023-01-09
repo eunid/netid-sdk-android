@@ -44,6 +44,7 @@ class AppButtonFragment(
         savedInstanceState: Bundle?
     ): View {
         _binding = AppButtonBinding.inflate(inflater, container, false)
+        retainInstance = true
         return binding.root
     }
 

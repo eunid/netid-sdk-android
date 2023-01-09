@@ -43,6 +43,7 @@ class LoginContinueButtonFragment(
         savedInstanceState: Bundle?
     ): View {
         _binding = LoginContinueButtonBinding.inflate(inflater, container, false)
+        retainInstance = true
         return binding.root
     }
 

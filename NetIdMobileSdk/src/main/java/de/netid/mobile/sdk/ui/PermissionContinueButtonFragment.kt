@@ -53,6 +53,8 @@ class PermissionContinueButtonFragment(
         listView.adapter = listAdapter
         listView.visibility = View.VISIBLE
 
+        retainInstance = true
+
         return binding.root
     }
 

@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
 import de.netid.mobile.sdk.api.*
-import de.netid.mobile.sdk.example.buttonapp.R
 import de.netid.mobile.sdk.example.buttonapp.databinding.ActivityMainBinding
 import de.netid.mobile.sdk.model.PermissionReadResponse
 import de.netid.mobile.sdk.model.PermissionResponseStatus
@@ -19,8 +18,8 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
      *  Nevertheless, we set a standard set of claims here.
      */
     companion object {
-        private const val clientId = "082531ba-1b22-4381-81b1-64add4b85b8a"
-        private const val redirectUri = "https://netid-sdk-web.letsdev.de/redirect"
+        private const val clientId = "ec54097f-83f6-4bb1-86f3-f7c584c649cd"
+        private const val redirectUri = "https://eunid.github.io/redirectApp"
         private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
         private val permissionLayerConfig = null
         private val loginLayerConfig = null
@@ -30,6 +29,10 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        if (savedInstanceState != null) {
+            return
+        }
 
         val netIdConfig = NetIdConfig(
             clientId = clientId,
@@ -49,7 +52,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         // This is the button to continue with the permission flow.
         // If account provider apps are installed, this button will use app2app, app2web otherwise.
         // If there are account provider apps installed, a list is shown beneath the button to choose one app.
-        val permissionContinueButton = NetIdService.permissionContinueButtonFragment("")
+        val permissionContinueButton = NetIdService.permissionContinueButtonFragment("HUHU")
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             add(R.id.activityMainPermissionContainer, permissionContinueButton)
