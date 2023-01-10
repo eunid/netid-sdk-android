@@ -50,12 +50,6 @@ class LoginContinueButtonFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        authorizationIntent = context?.let { it1 ->
-            NetIdService.authIntentForFlow(NetIdAuthFlow.Permission,
-                it1
-            )
-        }
-
         binding.buttonLoginContinue.setOnClickListener {
             authorizationIntent = NetIdService.authIntentForFlow(flow, it.context)
             resultLauncher.launch(authorizationIntent)
@@ -69,21 +63,5 @@ class LoginContinueButtonFragment(
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
-    }
-
-    /**
-     * Open an id app via a VerifiedAppLink.
-     * @param appIdentifier AppIdentifier of the app to be opened.
-     */
-    private fun openApp(appIdentifier: AppIdentifier) {
-        authorizationIntent?.extras?.apply {
-            val authIntent = getParcelable<Intent>("authIntent") ?: return@apply
-            val authUri = authIntent.data as Uri
-            val uri = authUri.toString().replaceBefore("?", appIdentifier.android.verifiedAppLink)
-            authIntent.setPackage(appIdentifier.android.applicationId)
-            authIntent.data = Uri.parse(uri)
-            putParcelable("authIntent", authIntent)
-        }
-        resultLauncher.launch(authorizationIntent)
     }
 }

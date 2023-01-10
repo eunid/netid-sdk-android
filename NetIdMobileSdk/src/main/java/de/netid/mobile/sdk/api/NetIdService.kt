@@ -105,7 +105,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         return null
     }
 
-    fun getCountOfIdApps(context: Context): Int {
+    fun getCountOfAccountProviderApps(context: Context): Int {
         checkAvailableNetIdApplications(context)
         return availableAppIdentifiers.count()
     }
@@ -127,15 +127,15 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     }
 
     fun permissionContinueButtonFragment(continueText: String): Fragment {
-        return PermissionContinueButtonFragment(this, continueText, availableAppIdentifiers)
+        return PermissionContinueButtonFragment(this, continueText)
     }
 
     fun loginContinueButtonFragment(continueText: String, flow: NetIdAuthFlow): Fragment {
         return LoginContinueButtonFragment(this, continueText, flow)
     }
 
-    fun appButtonFragment(index: Int, flow: NetIdAuthFlow): Fragment {
-        return AppButtonFragment(this, availableAppIdentifiers[index], flow)
+    fun accountProviderAppButtonFragment(index: Int, flow: NetIdAuthFlow): Fragment {
+        return AccountProviderAppButtonFragment(this, availableAppIdentifiers[index], flow)
     }
 
     private fun handleConnection(context: Context, process: NetIdErrorProcess): Boolean {
@@ -229,6 +229,9 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     fun endSession() {
         Log.i(javaClass.simpleName, "netId service did end session successfully")
         appAuthManager.endSession()
+        for (item in netIdServiceListeners) {
+            item.onSessionEnd()
+        }
     }
 
 // AppAuthManagerListener functions

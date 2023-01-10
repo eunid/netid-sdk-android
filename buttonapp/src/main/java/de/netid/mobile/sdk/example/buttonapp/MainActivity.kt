@@ -12,6 +12,7 @@ import de.netid.mobile.sdk.model.UserInfo
 
 class MainActivity : AppCompatActivity(), NetIdServiceListener {
     private lateinit var binding: ActivityMainBinding
+    private var serviceState = ServiceState.Uninitialized
 
     /** Companion object for basic configuration of the [NetIdService] via [NetIdConfig] object.
      *  clientId and redirectUri are mandatory, all other parameters are optional.
@@ -49,13 +50,28 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         // If there has been a saved session, we end it here - just for the sake of this demo to always start with a clean SDK.
         NetIdService.endSession()
 
+        binding.activityMainButtonEndSession.setOnClickListener {
+            NetIdService.endSession()
+        }
+
+        val count = NetIdService.getCountOfAccountProviderApps(this)
+
         // This is the button to continue with the permission flow.
-        // If account provider apps are installed, this button will use app2app, app2web otherwise.
-        // If there are account provider apps installed, a list is shown beneath the button to choose one app.
-        val permissionContinueButton = NetIdService.permissionContinueButtonFragment("HUHU")
+        // This button will always trigger app2web as there will be extra buttons for dedicated account provider apps.
+        val permissionContinueButton = NetIdService.permissionContinueButtonFragment("")
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             add(R.id.activityMainPermissionContainer, permissionContinueButton)
+        }
+
+        // If there are account provider apps installed, list their buttons here.
+        // They will always trigger app2app.
+        for (i in 0 until count) {
+            val appButton = NetIdService.accountProviderAppButtonFragment(i, NetIdAuthFlow.Permission)
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                add(R.id.activityMainPermissionContainer, appButton)
+            }
         }
 
         // This is the button to continue with login/login+permission flow.
@@ -68,14 +84,15 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
         // If there are account provider apps installed, list their buttons here.
         // They will always trigger app2app.
-        val count = NetIdService.getCountOfIdApps(this)
         for (i in 0 until count) {
-            val appButton = NetIdService.appButtonFragment(i, NetIdAuthFlow.Login)
+            val appButton = NetIdService.accountProviderAppButtonFragment(i, NetIdAuthFlow.Login)
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
                 add(R.id.activityMainLoginContainer, appButton)
             }
         }
+
+        updateElementsForServiceState()
     }
 
     private fun appendLog(message: String) {
@@ -84,20 +101,31 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         binding.activityMainLogs.text = newText
     }
 
+    private fun updateElementsForServiceState() {
+        val isAuthorized =
+            serviceState == ServiceState.AuthorizationSuccessful || serviceState == ServiceState.UserInfoFailed
+                    || serviceState == ServiceState.UserInfoSuccessful || serviceState == ServiceState.PermissionWriteSuccessful || serviceState == ServiceState.PermissionWriteFailed
+                    || serviceState == ServiceState.PermissionReadFailed || serviceState == ServiceState.PermissionReadSuccessful
+
+        binding.activityMainButtonEndSession.isEnabled = isAuthorized
+    }
+
     override fun onInitializationFinishedWithError(error: NetIdError?) {
         error?.let {
             appendLog("netID service initialization failed: ${it.code}, ${it.process}")
-//            serviceState = ServiceState.InitializationFailed
+            serviceState = ServiceState.InitializationFailed
 
         } ?: run {
             appendLog("netID service initialized successfully")
-//            serviceState = ServiceState.InitializationSuccessful
+            serviceState = ServiceState.InitializationSuccessful
         }
+        updateElementsForServiceState()
     }
 
     override fun onAuthenticationFinished(accessToken: String) {
         appendLog("netID service authorized successfully\nAccess Token:\n$accessToken")
-//        serviceState = ServiceState.AuthorizationSuccessful
+        serviceState = ServiceState.AuthorizationSuccessful
+        updateElementsForServiceState()
     }
 
     override fun onAuthenticationFinishedWithError(error: NetIdError) {
@@ -106,12 +134,12 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         } else {
             appendLog("netID service authorization failed: ${error.code}, ${error.process}")
         }
-//        serviceState = ServiceState.AuthorizationFailed
+        serviceState = ServiceState.AuthorizationFailed
+        updateElementsForServiceState()
     }
 
     override fun onUserInfoFinished(userInfo: UserInfo) {
         appendLog("netID service user info - fetch finished successfully: $userInfo")
-//        serviceState = ServiceState.UserInfoSuccessful
     }
 
     override fun onUserInfoFetchedWithError(error: NetIdError) {
@@ -120,11 +148,11 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         } else {
             appendLog("netID service user info - fetch failed: ${error.code}, ${error.process}")
         }
-//        serviceState = ServiceState.UserInfoFailed
     }
 
     override fun onSessionEnd() {
         appendLog("netID service session end")
+        updateElementsForServiceState()
     }
 
     override fun onEncounteredNetworkError(error: NetIdError) {

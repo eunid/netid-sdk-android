@@ -31,19 +31,6 @@
             app:strokeWidth="@dimen/authorization_close_button_stroke_width"
             app:rippleColor="@color/authorization_close_button_color" />
 
-        <ListView
-            android:id="@+id/buttonPermissionContinueAppCellContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:clickable="true"
-            android:focusable="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/buttonPermissionContinue"
-            app:layout_constraintStart_toEndOf="parent"
-            tools:listitem="@layout/netid_app_cell" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>
