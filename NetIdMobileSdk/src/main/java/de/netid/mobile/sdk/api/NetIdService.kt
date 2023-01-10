@@ -62,7 +62,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             }
 
             this.netIdConfig = netIdConfig
-            setupAuthManagerAndFetchConfiguration(context, broker)
+            setupAuthManagerAndFetchConfiguration(context)
             setupUserInfoManager()
             setupPermissionManager()
             checkAvailableNetIdApplications(context)
@@ -112,7 +112,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
 
     fun authIntentForFlow(flow: NetIdAuthFlow, context: Context): Intent? {
         netIdConfig?.let { config ->
-            val authIntent = appAuthManager.getAuthorizationIntent(
+            return appAuthManager.getAuthorizationIntent(
                 config.clientId,
                 config.redirectUri,
                 config.claims,
@@ -120,8 +120,6 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                 flow,
                 context
             )
-
-            return authIntent
         }
         return null
     }
@@ -205,10 +203,10 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
-    private fun setupAuthManagerAndFetchConfiguration(context: Context, host: String) {
+    private fun setupAuthManagerAndFetchConfiguration(context: Context) {
         appAuthManager = AppAuthManagerFactory.createAppAuthManager(context)
         appAuthManager.listener = this
-        appAuthManager.fetchAuthorizationServiceConfiguration(host)
+        appAuthManager.fetchAuthorizationServiceConfiguration(broker)
     }
 
     private fun setupUserInfoManager() {
