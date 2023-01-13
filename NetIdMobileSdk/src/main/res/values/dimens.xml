@@ -21,5 +21,5 @@
     <dimen name="authorization_title_text_size">18sp</dimen>
     <dimen name="authorization_legal_text_size">12sp</dimen>
     <dimen name="authorization_button_text_size">14sp</dimen>
-    <dimen name="authorization_button_letter_spacing">0.15</dimen>
+    <dimen name="authorization_button_letter_spacing">0.09</dimen>
 </resources>
