@@ -15,6 +15,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginTop="@dimen/main_activity_vertical_margin"
+        android:background="@drawable/ic_netid_logo_button"
+        android:tileMode="repeat"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -79,7 +81,16 @@
         android:backgroundTint="@android:color/holo_red_light"
         android:textColor="@drawable/netid_button"
         android:text="@string/net_id_service_end_session"
-        android:textAllCaps="false"
+        android:textAllCaps="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/activityMainStyleSpinner" />
+
+    <Spinner
+        android:id="@+id/activityMainStyleSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/buttonStyles"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />

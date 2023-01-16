@@ -14,10 +14,15 @@
 
 package de.netid.mobile.sdk.api
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.widget.Button
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.google.android.material.button.MaterialButton
+import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.appauth.AppAuthManager
 import de.netid.mobile.sdk.appauth.AppAuthManagerFactory
 import de.netid.mobile.sdk.appauth.AppAuthManagerListener
@@ -36,6 +41,12 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
 
     private const val appIdentifierFilename = "netIdAppIdentifiers.json"
     private const val broker = "broker.netid.de"
+    private var layerStyle: NetIdLayerStyle = NetIdLayerStyle.Solid
+    private var buttonStyle: NetIdButtonStyle = NetIdButtonStyle.WhiteSolid
+    private var netIdLogoResource:Int = R.drawable.ic_netid_logo_button
+    private var buttonBackgroundResource:Int = R.color.authorization_agree_button_color
+    private var buttonForegroundResource:Int = R.color.authorization_agree_text_color
+    private var buttonOutlineResource:Int = R.color.authorization_close_button_color
 
     private var netIdConfig: NetIdConfig? = null
 
@@ -45,6 +56,10 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
 
     private val availableAppIdentifiers = mutableListOf<AppIdentifier>()
     private val netIdServiceListeners = mutableSetOf<NetIdServiceListener>()
+
+    private var permissionContinueButtonFragment:Fragment? = null
+    private var loginContinueButtonFragment:Fragment? = null
+    private var appButtonFragment = mutableMapOf<String, Fragment>()
 
     fun addListener(listener: NetIdServiceListener) {
         netIdServiceListeners.add(listener)
@@ -69,6 +84,13 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
+    /**
+     * Gets the authorization fragment for a requested authorization flow.
+     * @param context Context to use.
+     * @param authFlow Authorization flow to use, see ``NetIdAuthFlow``.
+     * @param forceApp2App Set to true, if only app2app is allowed.
+     * @return Fragment for authorization.
+     */
     fun getAuthorizationFragment(context: Context, authFlow: NetIdAuthFlow, forceApp2App: Boolean = false): Fragment? {
         checkAvailableNetIdApplications(context)
         // If there are no ID apps installed, but forceApp2App is true, return with an error.
@@ -105,11 +127,105 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         return null
     }
 
+    /**
+     * Sets the style to use for all layers when using the layer flow.
+     * @param layerStyle button style to set, can be any of ``NetIdLayerStyle``, defaults to ``NetIdLayerStyle.Solid``
+     */
+    fun setLayerStyle(layerStyle: NetIdLayerStyle) {
+        this.layerStyle = layerStyle
+
+        when (layerStyle) {
+            NetIdLayerStyle.Outline -> {
+                this.netIdLogoResource = R.drawable.ic_netid_logo_small
+//                this.buttonBackgroundResource = "netIdTransparentColor"
+//                this.buttonForegroundResource = "netIdButtonColor"
+//                this.buttonOutlineResource = "netIdButtonOutlineColor"
+            }
+            else -> {
+                this.netIdLogoResource = R.drawable.ic_netid_logo_small
+//                this.buttonBackgroundResource = "netIdOtherOptionsColor"
+//                this.buttonForegroundResource = "netIdButtonColor"
+//                this.buttonOutlineResource = "netIdButtonStrokeColor"
+            }
+        }
+    }
+
+    /**
+     * Sets the style to use for all buttons when using the button flow.
+     * @param buttonStyle button style to set, can be any of ``NetIdButtonStyle``, defaults to ``NetIdButtonStyle.GraySolid``
+     */
+    fun setButtonStyle(buttonStyle: NetIdButtonStyle, activity: Activity) {
+        this.buttonStyle = buttonStyle
+
+        when (buttonStyle) {
+            NetIdButtonStyle.GreenSolid -> {
+                netIdLogoResource = R.drawable.ic_netid_logo_button_white
+                buttonBackgroundResource = R.color.green_background_color
+                buttonForegroundResource = R.color.green_text_color
+                buttonOutlineResource = R.color.green_outline_color
+            }
+            NetIdButtonStyle.GrayOutline -> {
+                netIdLogoResource = R.drawable.ic_netid_logo_small
+                buttonBackgroundResource = R.color.outline_background_color
+                buttonForegroundResource = R.color.outline_text_color
+                buttonOutlineResource = R.color.outline_outline_color
+
+            }
+            else -> {
+                netIdLogoResource = R.drawable.ic_netid_logo_small
+                buttonBackgroundResource = R.color.authorization_agree_button_color
+                buttonForegroundResource = R.color.authorization_agree_text_color
+                buttonOutlineResource = R.color.authorization_close_button_color
+            }
+        }
+
+        val permissionButton = activity.findViewById<MaterialButton>(R.id.buttonPermissionContinue)
+        if (permissionButton != null) {
+            (permissionButton as Button).setTextColor(ContextCompat.getColorStateList(activity.baseContext, buttonForegroundResource))
+            permissionButton.setBackgroundColor(ContextCompat.getColor(activity.baseContext, buttonBackgroundResource))
+            permissionButton.strokeColor = ContextCompat.getColorStateList(activity.baseContext, buttonOutlineResource)
+            permissionButton.icon = ContextCompat.getDrawable(activity.baseContext, netIdLogoResource)
+        }
+
+        val loginButton = activity.findViewById<MaterialButton>(R.id.buttonLoginContinue)
+        if (loginButton != null) {
+            (loginButton as Button).setTextColor(ContextCompat.getColorStateList(activity.baseContext, buttonForegroundResource))
+            loginButton.setBackgroundColor(ContextCompat.getColor(activity.baseContext, buttonBackgroundResource))
+            loginButton.strokeColor = ContextCompat.getColorStateList(activity.baseContext, buttonOutlineResource)
+            loginButton.icon = ContextCompat.getDrawable(activity.baseContext, netIdLogoResource)
+        }
+
+    }
+
+    /**
+     * Returns the count of installed account provider apps.
+     * Use this function only if you intent to build your very own authorization dialog.
+     * @return: Count of installed account provider apps.
+     */
     fun getCountOfAccountProviderApps(context: Context): Int {
         checkAvailableNetIdApplications(context)
         return availableAppIdentifiers.count()
     }
 
+    /**
+     * Returns the keys of installed account provider apps. With these keys, you can request buttons for specific account provider apps identified by their key aka name.
+     * Use this function only if you intent to build your very own authorization dialog.
+     * @return: Array of keys of installed account provider apps.
+     */
+    fun getKeysForAccountProviderApps(): Array<String> {
+        val result = mutableListOf<String>()
+        availableAppIdentifiers.forEach {
+            result.add(it.name)
+        }
+        return result.toTypedArray()
+    }
+
+    /**
+     * Returns the authorization intent for a requested flow.
+     * @param flow Requested flow.
+     * @param context Context to use.
+     * @return Authorization intent.
+     */
     fun authIntentForFlow(flow: NetIdAuthFlow, context: Context): Intent? {
         netIdConfig?.let { config ->
             return appAuthManager.getAuthorizationIntent(
@@ -124,18 +240,62 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         return null
     }
 
+    /**
+     * Returns the continue button (as a fragment) in case of a permission flow dialog.
+     * Use this function only if you intent to build your very own authorization dialog.
+     * @param continueText Alternative text to set on the button. If empty, the default will be used.
+     * @return Fragment for authorization.
+     */
     fun permissionContinueButtonFragment(continueText: String): Fragment {
-        return PermissionContinueButtonFragment(this, continueText)
+        if (permissionContinueButtonFragment == null) {
+            permissionContinueButtonFragment = PermissionContinueButtonFragment(this, continueText)
+        }
+        return permissionContinueButtonFragment as Fragment
     }
 
+    /**
+     * Returns the continue button (as a fragment) in case of a login flow dialog.
+     * Use this function only if you intent to build your very own authorization dialog.
+     * @param continueText Alternative text to set on the button. If empty, the default will be used.
+     * @param authFlow Must either be .Login or .LoginPermission. If is set to .Permission, an error will be thrown.
+     * @return Fragment for authorization.
+     */
     fun loginContinueButtonFragment(continueText: String, flow: NetIdAuthFlow): Fragment {
-        return LoginContinueButtonFragment(this, continueText, flow)
+        if (loginContinueButtonFragment == null) {
+            loginContinueButtonFragment = LoginContinueButtonFragment(this, continueText, flow)
+        }
+        return loginContinueButtonFragment as Fragment
     }
 
-    fun accountProviderAppButtonFragment(index: Int, flow: NetIdAuthFlow): Fragment {
-        return AccountProviderAppButtonFragment(this, availableAppIdentifiers[index], flow)
+    /**
+     * Returns the button for a certain account provider app for a requested ``NetIdAuthFlow``
+     * Use this function only if you intent to build your very own authorization dialog.
+     * @param key Key denoting one of the installed account provider apps. Use ``getKeysForAccountProviderApps`` first to get the keys/names of all installed account provider apps.
+     * @param authFlow Can be any of .Permission, .Login or .LoginPermission.
+     * @param continueText Alternative text to set on the button. If empty, the default will be used.
+     * @returns Button with text and label for the choosen id app. If index is out of bounds or no app is installed, returns an empty view.
+     */
+    fun accountProviderAppButtonFragment(key: String, flow: NetIdAuthFlow, continueText: String = ""): Fragment {
+        val keys = getKeysForAccountProviderApps()
+        if (keys.contains(key)) {
+            if (appButtonFragment.containsKey(key)) {
+                return appButtonFragment[key] as Fragment
+            } else {
+                val index = keys.binarySearch(key)
+                val app = AccountProviderAppButtonFragment(this, availableAppIdentifiers[index], flow, continueText)
+                appButtonFragment.put(key, app)
+                return app
+            }
+        }
+        throw ArrayIndexOutOfBoundsException()
     }
 
+    /**
+     * Checks whether there is a network connection or not.
+     * @param context Context to use.
+     * @param process: In case of an error, denotes the process that the error is responsible for.
+     * @returns bool
+     */
     private fun handleConnection(context: Context, process: NetIdErrorProcess): Boolean {
         return if (ReachabilityUtil.hasConnection(context)) {
             true
@@ -147,6 +307,10 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
+    /**
+     * Fetches the user info.
+     * @param context Context to use.
+     */
     fun fetchUserInfo(context: Context) {
         if (handleConnection(context, NetIdErrorProcess.UserInfo)) {
             var error: NetIdError? = null
@@ -170,6 +334,11 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
+    /**
+     * Fetch permissions.
+     * @param context Context to use.
+     * @param collapseSyncId: Boolean value to indicate whether syncId is used or not.
+     */
     fun fetchPermissions(context: Context, collapseSyncId: Boolean = true) {
         if (handleConnection(context, NetIdErrorProcess.PermissionRead)) {
             var error: NetIdError? = null
@@ -186,6 +355,12 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
+    /**
+     * Update permissions.
+     * @param context Context to use.
+     * @param permission Permissions to set, of type ``NetIdPermissionUpdate``.
+     * @param collapseSyncId Boolean value to indicate if syncId is used or not.
+     */
     fun updatePermission(context: Context, permission: NetIdPermissionUpdate, collapseSyncId: Boolean = true) {
         if (handleConnection(context, NetIdErrorProcess.PermissionWrite)) {
             var error: NetIdError? = null
@@ -200,6 +375,19 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                 }
             }
 
+        }
+    }
+
+    /**
+     * Function to end a session.
+     * The net ID service itself still remains initialized but all information about authorization/authentication is discarded.
+     * To start a new session, call ``authorize(destinationScheme:currentViewController:authFlow)`` again.
+     */
+    fun endSession() {
+        Log.i(javaClass.simpleName, "netId service did end session successfully")
+        appAuthManager.endSession()
+        for (item in netIdServiceListeners) {
+            item.onSessionEnd()
         }
     }
 
@@ -224,13 +412,6 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         availableAppIdentifiers.addAll(installedAppIdentifiers)
     }
 
-    fun endSession() {
-        Log.i(javaClass.simpleName, "netId service did end session successfully")
-        appAuthManager.endSession()
-        for (item in netIdServiceListeners) {
-            item.onSessionEnd()
-        }
-    }
 
 // AppAuthManagerListener functions
 

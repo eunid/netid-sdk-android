@@ -1,7 +1,14 @@
 package de.netid.mobile.sdk.example.buttonapp
 
+import android.app.Activity
+import android.graphics.Color
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import de.netid.mobile.sdk.api.*
 import de.netid.mobile.sdk.example.buttonapp.databinding.ActivityMainBinding
@@ -10,7 +17,8 @@ import de.netid.mobile.sdk.model.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.UserInfo
 
-class MainActivity : AppCompatActivity(), NetIdServiceListener {
+
+class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedListener {
     private lateinit var binding: ActivityMainBinding
     private var serviceState = ServiceState.Uninitialized
 
@@ -30,6 +38,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.activityMainStyleSpinner.onItemSelectedListener = this
 
         if (savedInstanceState != null) {
             return
@@ -66,8 +75,15 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
         // If there are account provider apps installed, list their buttons here.
         // They will always trigger app2app.
-        for (i in 0 until count) {
+/*        for (i in 0 until count) {
             val appButton = NetIdService.accountProviderAppButtonFragment(i, NetIdAuthFlow.Permission)
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                add(R.id.activityMainPermissionContainer, appButton)
+            }
+        }*/
+        NetIdService.getKeysForAccountProviderApps().forEach {
+            val appButton = NetIdService.accountProviderAppButtonFragment(it, NetIdAuthFlow.Permission)
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
                 add(R.id.activityMainPermissionContainer, appButton)
@@ -84,11 +100,18 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
 
         // If there are account provider apps installed, list their buttons here.
         // They will always trigger app2app.
-        for (i in 0 until count) {
+/*        for (i in 0 until count) {
             val appButton = NetIdService.accountProviderAppButtonFragment(i, NetIdAuthFlow.Login)
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
                 add(R.id.activityMainLoginContainer, appButton)
+            }
+        }*/
+        NetIdService.getKeysForAccountProviderApps().forEach {
+            val appButton = NetIdService.accountProviderAppButtonFragment(it, NetIdAuthFlow.Login)
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                add(R.id.activityMainPermissionContainer, appButton)
             }
         }
 
@@ -190,5 +213,14 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         error: NetIdError
     ) {
         TODO("Not yet implemented")
+    }
+
+    //
+    override fun onItemSelected(arg0: AdapterView<*>?, arg1: View?, position: Int, id: Long) {
+        NetIdService.setButtonStyle(NetIdButtonStyle.values()[position], this as Activity)
+    }
+
+    override fun onNothingSelected(arg0: AdapterView<*>?) {
+        // TODO Auto-generated method stub
     }
 }

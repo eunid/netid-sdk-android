@@ -9,4 +9,8 @@
         <item name="android:layout_height">1dp</item>
         <item name="android:background">@color/divider_color</item>
     </style>
+    <style name="SolidGreen">
+        <item name="android:textColor">#00FF00</item>
+        <item name="android:text">BLUBBER</item>
+    </style>
 </resources>

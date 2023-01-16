@@ -18,7 +18,8 @@ import de.netid.mobile.sdk.model.AppIdentifier
 class AccountProviderAppButtonFragment(
     private val listener: AuthorizationFragmentListener,
     private val appIdentifier: AppIdentifier,
-    private val flow: NetIdAuthFlow
+    private val flow: NetIdAuthFlow,
+    private val continueText: String
 ): Fragment() {
 
     private var _binding: AccountProviderAppButtonBinding? = null
@@ -52,9 +53,12 @@ class AccountProviderAppButtonFragment(
         super.onViewCreated(view, savedInstanceState)
 
         when (flow) {
-            NetIdAuthFlow.Permission -> binding.buttonApp.text = String.format(getString(R.string.authorization_permission_continue_button), appIdentifier.name).uppercase()
-            NetIdAuthFlow.Login -> binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue_button), appIdentifier.name).uppercase()
-            NetIdAuthFlow.LoginPermission -> binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue_button), appIdentifier.name).uppercase()
+            NetIdAuthFlow.Permission -> binding.buttonApp.text = String.format(getString(R.string.authorization_permission_continue_button)).uppercase()
+            NetIdAuthFlow.Login -> binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue_button)).uppercase()
+            NetIdAuthFlow.LoginPermission -> binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue_button)).uppercase()
+        }
+        if (continueText.isNotEmpty()) {
+            binding.buttonApp.text = continueText
         }
 
         binding.buttonApp.setOnClickListener {

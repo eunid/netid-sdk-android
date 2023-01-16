@@ -14,4 +14,13 @@
     <color name="divider_color">#24000000</color>
 
     <color name="netid_logo_color">#878787</color>
+
+    <color name="green_text_color">#FFFFFF</color>
+    <color name="green_background_color">#76B82A</color>
+    <color name="green_outline_color">#76B82A</color>
+
+    <color name="outline_text_color">#333333</color>
+    <color name="outline_background_color">#00FFFFFF</color>
+    <color name="outline_outline_color">#70000000</color>
+
 </resources>
