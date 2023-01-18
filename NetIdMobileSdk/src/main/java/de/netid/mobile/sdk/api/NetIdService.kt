@@ -236,7 +236,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
      * @param continueText Alternative text to set on the button. If empty, the default will be used.
      * @return Fragment for authorization.
      */
-    fun permissionContinueButtonFragment(continueText: String): Fragment {
+    fun permissionContinueButtonFragment(continueText: String = ""): Fragment {
         if (permissionContinueButtonFragment == null) {
             permissionContinueButtonFragment = PermissionContinueButtonFragment(this, continueText)
         }
@@ -250,7 +250,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
      * @param authFlow Must either be .Login or .LoginPermission. If is set to .Permission, an error will be thrown.
      * @return Fragment for authorization.
      */
-    fun loginContinueButtonFragment(continueText: String, flow: NetIdAuthFlow): Fragment {
+    fun loginContinueButtonFragment(continueText: String = "", flow: NetIdAuthFlow): Fragment {
         if (loginContinueButtonFragment == null) {
             loginContinueButtonFragment = LoginContinueButtonFragment(this, continueText, flow)
         }

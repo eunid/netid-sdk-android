@@ -39,7 +39,6 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.activityMainStyleSpinner.onItemSelectedListener = this
-        NetIdService.addListener(this)
 
         if (savedInstanceState != null) {
             return
@@ -54,6 +53,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
             loginLayerConfig = loginLayerConfig
         )
 
+        NetIdService.addListener(this)
         NetIdService.initialize(netIdConfig, this)
 
         // If there has been a saved session, we end it here - just for the sake of this demo to always start with a clean SDK.
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
 
         // This is the button to continue with the permission flow.
         // This button will always trigger app2web as there will be extra buttons for dedicated account provider apps.
-        val permissionContinueButton = NetIdService.permissionContinueButtonFragment("")
+        val permissionContinueButton = NetIdService.permissionContinueButtonFragment()
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             add(R.id.activityMainPermissionContainer, permissionContinueButton)
