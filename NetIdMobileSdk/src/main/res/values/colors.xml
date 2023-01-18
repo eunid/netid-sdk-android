@@ -23,4 +23,8 @@
     <color name="outline_background_color">#00FFFFFF</color>
     <color name="outline_outline_color">#70000000</color>
 
+    <color name="outline_layer_text_color">#333333</color>
+    <color name="outline_layer_background_color">#00FFFFFF</color>
+    <color name="outline_layer_outline_color">#333333</color>
+
 </resources>

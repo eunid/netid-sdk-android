@@ -7,10 +7,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.api.NetIdAuthFlow
+import de.netid.mobile.sdk.api.NetIdButtonStyle
 import de.netid.mobile.sdk.api.NetIdService
 import de.netid.mobile.sdk.databinding.AccountProviderAppButtonBinding
 import de.netid.mobile.sdk.model.AppIdentifier
@@ -52,6 +55,8 @@ class AccountProviderAppButtonFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setButtonStyle(NetIdService.getButtonStyle())
+
         when (flow) {
             NetIdAuthFlow.Permission -> binding.buttonApp.text = String.format(getString(R.string.authorization_permission_continue_button)).uppercase()
             NetIdAuthFlow.Login -> binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue_button)).uppercase()
@@ -70,6 +75,48 @@ class AccountProviderAppButtonFragment(
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
+    }
+
+    /**
+     * Sets the style of the button
+     * @param buttonStyle Button style to set.
+     */
+    fun setButtonStyle(buttonStyle: NetIdButtonStyle) {
+        var netIdLogoResource = R.drawable.ic_netid_logo_small
+        var buttonBackgroundResource = R.color.authorization_agree_button_color
+        var buttonForegroundResource = R.color.authorization_agree_text_color
+        var buttonOutlineResource = R.color.authorization_close_button_color
+        var buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_width
+
+        when (NetIdService.getButtonStyle()) {
+            NetIdButtonStyle.GreenSolid -> {
+                netIdLogoResource = R.drawable.ic_netid_logo_button_white
+                buttonBackgroundResource = R.color.green_background_color
+                buttonForegroundResource = R.color.green_text_color
+                buttonOutlineResource = R.color.green_outline_color
+                buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_zero_width
+            }
+            NetIdButtonStyle.GrayOutline -> {
+                netIdLogoResource = R.drawable.ic_netid_logo_small
+                buttonBackgroundResource = R.color.outline_background_color
+                buttonForegroundResource = R.color.outline_text_color
+                buttonOutlineResource = R.color.outline_outline_color
+                buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_width
+            }
+            else -> {
+                netIdLogoResource = R.drawable.ic_netid_logo_small
+                buttonBackgroundResource = R.color.authorization_agree_button_color
+                buttonForegroundResource = R.color.authorization_agree_text_color
+                buttonOutlineResource = R.color.authorization_close_button_color
+                buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_width
+            }
+        }
+
+        binding.buttonApp.setTextColor(resources.getColor(buttonForegroundResource))
+        binding.buttonApp.setBackgroundColor(resources.getColor(buttonBackgroundResource))
+        binding.buttonApp.setStrokeColorResource(buttonOutlineResource)
+        binding.buttonApp.icon = resources.getDrawable(netIdLogoResource)
+        binding.buttonApp.setStrokeWidthResource(buttonStrokeWidthResource)
     }
 
     /**

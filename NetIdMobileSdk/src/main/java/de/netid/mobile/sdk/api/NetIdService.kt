@@ -18,7 +18,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
@@ -47,6 +49,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     private var buttonBackgroundResource:Int = R.color.authorization_agree_button_color
     private var buttonForegroundResource:Int = R.color.authorization_agree_text_color
     private var buttonOutlineResource:Int = R.color.authorization_close_button_color
+    private var buttonStrokeWidthResource:Int = R.dimen.authorization_close_button_stroke_width
 
     private var netIdConfig: NetIdConfig? = null
 
@@ -59,7 +62,9 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
 
     private var permissionContinueButtonFragment:Fragment? = null
     private var loginContinueButtonFragment:Fragment? = null
-    private var appButtonFragment = mutableMapOf<String, Fragment>()
+    private var appButtonFragmentsForPermission = mutableMapOf<String, Fragment>()
+    private var appButtonFragmentsForLogin = mutableMapOf<String, Fragment>()
+    private var appButtonFragmentsForLoginPermission = mutableMapOf<String, Fragment>()
 
     fun addListener(listener: NetIdServiceListener) {
         netIdServiceListeners.add(listener)
@@ -133,21 +138,14 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
      */
     fun setLayerStyle(layerStyle: NetIdLayerStyle) {
         this.layerStyle = layerStyle
+    }
 
-        when (layerStyle) {
-            NetIdLayerStyle.Outline -> {
-                this.netIdLogoResource = R.drawable.ic_netid_logo_small
-//                this.buttonBackgroundResource = "netIdTransparentColor"
-//                this.buttonForegroundResource = "netIdButtonColor"
-//                this.buttonOutlineResource = "netIdButtonOutlineColor"
-            }
-            else -> {
-                this.netIdLogoResource = R.drawable.ic_netid_logo_small
-//                this.buttonBackgroundResource = "netIdOtherOptionsColor"
-//                this.buttonForegroundResource = "netIdButtonColor"
-//                this.buttonOutlineResource = "netIdButtonStrokeColor"
-            }
-        }
+    /**
+     * Gets the currently set style that's used for all layers when using the layer flow.
+     * @return Currently set style
+     */
+    fun getLayerStyle(): NetIdLayerStyle {
+        return layerStyle
     }
 
     /**
@@ -157,44 +155,36 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     fun setButtonStyle(buttonStyle: NetIdButtonStyle, activity: Activity) {
         this.buttonStyle = buttonStyle
 
-        when (buttonStyle) {
-            NetIdButtonStyle.GreenSolid -> {
-                netIdLogoResource = R.drawable.ic_netid_logo_button_white
-                buttonBackgroundResource = R.color.green_background_color
-                buttonForegroundResource = R.color.green_text_color
-                buttonOutlineResource = R.color.green_outline_color
-            }
-            NetIdButtonStyle.GrayOutline -> {
-                netIdLogoResource = R.drawable.ic_netid_logo_small
-                buttonBackgroundResource = R.color.outline_background_color
-                buttonForegroundResource = R.color.outline_text_color
-                buttonOutlineResource = R.color.outline_outline_color
-
-            }
-            else -> {
-                netIdLogoResource = R.drawable.ic_netid_logo_small
-                buttonBackgroundResource = R.color.authorization_agree_button_color
-                buttonForegroundResource = R.color.authorization_agree_text_color
-                buttonOutlineResource = R.color.authorization_close_button_color
-            }
+        if (permissionContinueButtonFragment != null) {
+            (permissionContinueButtonFragment as PermissionContinueButtonFragment).setButtonStyle(buttonStyle)
         }
 
-        val permissionButton = activity.findViewById<MaterialButton>(R.id.buttonPermissionContinue)
-        if (permissionButton != null) {
-            (permissionButton as Button).setTextColor(ContextCompat.getColorStateList(activity.baseContext, buttonForegroundResource))
-            permissionButton.setBackgroundColor(ContextCompat.getColor(activity.baseContext, buttonBackgroundResource))
-            permissionButton.strokeColor = ContextCompat.getColorStateList(activity.baseContext, buttonOutlineResource)
-            permissionButton.icon = ContextCompat.getDrawable(activity.baseContext, netIdLogoResource)
+        if (loginContinueButtonFragment != null) {
+            (loginContinueButtonFragment as LoginContinueButtonFragment).setButtonStyle(buttonStyle)
         }
 
-        val loginButton = activity.findViewById<MaterialButton>(R.id.buttonLoginContinue)
-        if (loginButton != null) {
-            (loginButton as Button).setTextColor(ContextCompat.getColorStateList(activity.baseContext, buttonForegroundResource))
-            loginButton.setBackgroundColor(ContextCompat.getColor(activity.baseContext, buttonBackgroundResource))
-            loginButton.strokeColor = ContextCompat.getColorStateList(activity.baseContext, buttonOutlineResource)
-            loginButton.icon = ContextCompat.getDrawable(activity.baseContext, netIdLogoResource)
+        appButtonFragmentsForPermission.forEach {
+            val frag = it.value as AccountProviderAppButtonFragment
+            frag.setButtonStyle(buttonStyle)
         }
 
+        appButtonFragmentsForLogin.forEach {
+            val frag = it.value as AccountProviderAppButtonFragment
+            frag.setButtonStyle(buttonStyle)
+        }
+
+        appButtonFragmentsForLoginPermission.forEach {
+            val frag = it.value as AccountProviderAppButtonFragment
+            frag.setButtonStyle(buttonStyle)
+        }
+    }
+
+    /**
+     * Gets the currently set style that's used for all buttons when using the button flow.
+     * @return Currently set style
+     */
+    fun getButtonStyle(): NetIdButtonStyle {
+        return buttonStyle
     }
 
     /**
@@ -273,18 +263,23 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
      * @param key Key denoting one of the installed account provider apps. Use ``getKeysForAccountProviderApps`` first to get the keys/names of all installed account provider apps.
      * @param authFlow Can be any of .Permission, .Login or .LoginPermission.
      * @param continueText Alternative text to set on the button. If empty, the default will be used.
-     * @returns Button with text and label for the choosen id app. If index is out of bounds or no app is installed, returns an empty view.
+     * @returns Button with text and label for the chosen id app. If index is out of bounds or no app is installed, returns an empty view.
      */
     fun accountProviderAppButtonFragment(key: String, flow: NetIdAuthFlow, continueText: String = ""): Fragment {
         val keys = getKeysForAccountProviderApps()
+        val appButtonFragments = when (flow) {
+            NetIdAuthFlow.Permission -> appButtonFragmentsForPermission
+            NetIdAuthFlow.Login -> appButtonFragmentsForLogin
+            NetIdAuthFlow.LoginPermission -> appButtonFragmentsForLoginPermission
+        }
         if (keys.contains(key)) {
-            if (appButtonFragment.containsKey(key)) {
-                return appButtonFragment[key] as Fragment
+            return if (appButtonFragments.containsKey(key)) {
+                appButtonFragments[key] as Fragment
             } else {
                 val index = keys.binarySearch(key)
                 val app = AccountProviderAppButtonFragment(this, availableAppIdentifiers[index], flow, continueText)
-                appButtonFragment.put(key, app)
-                return app
+                appButtonFragments[key] = app
+                app
             }
         }
         throw ArrayIndexOutOfBoundsException()

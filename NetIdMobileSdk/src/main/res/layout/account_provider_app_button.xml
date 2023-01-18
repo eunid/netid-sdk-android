@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
-    <com.google.android.material.button.MaterialButton
+    <com.google.android.material.button.MaterialButton xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/buttonApp"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,13 +12,10 @@
         android:textSize="@dimen/authorization_button_text_size"
         android:textColor="@color/authorization_agree_text_color"
         app:icon="@drawable/ic_netid_logo_small"
-        app:iconSize="20dp"
         app:iconTint="@null"
-        app:iconPadding="-20dp"
+        app:iconPadding="0dp"
         app:backgroundTint="@color/authorization_agree_button_color"
         app:cornerRadius="@dimen/authorization_button_corner_radius"
         app:strokeColor="@color/authorization_close_button_color"
-        app:strokeWidth="@dimen/authorization_close_button_stroke_width"
-        app:rippleColor="@color/authorization_close_button_color" />
-
-</LinearLayout>
+        app:strokeWidth="@dimen/authorization_close_button_stroke_zero_width"
+        app:rippleColor="@color/authorization_agree_text_color" />

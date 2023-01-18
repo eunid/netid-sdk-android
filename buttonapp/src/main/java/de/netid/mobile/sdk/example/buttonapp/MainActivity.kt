@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.activityMainStyleSpinner.onItemSelectedListener = this
+        NetIdService.addListener(this)
 
         if (savedInstanceState != null) {
             return
@@ -53,7 +54,6 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
             loginLayerConfig = loginLayerConfig
         )
 
-        NetIdService.addListener(this)
         NetIdService.initialize(netIdConfig, this)
 
         // If there has been a saved session, we end it here - just for the sake of this demo to always start with a clean SDK.
@@ -75,15 +75,8 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
 
         // If there are account provider apps installed, list their buttons here.
         // They will always trigger app2app.
-/*        for (i in 0 until count) {
-            val appButton = NetIdService.accountProviderAppButtonFragment(i, NetIdAuthFlow.Permission)
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                add(R.id.activityMainPermissionContainer, appButton)
-            }
-        }*/
         NetIdService.getKeysForAccountProviderApps().forEach {
-            val appButton = NetIdService.accountProviderAppButtonFragment(it, NetIdAuthFlow.Permission)
+            val appButton = NetIdService.accountProviderAppButtonFragment(it, NetIdAuthFlow.Permission, it)
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
                 add(R.id.activityMainPermissionContainer, appButton)
@@ -100,18 +93,11 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
 
         // If there are account provider apps installed, list their buttons here.
         // They will always trigger app2app.
-/*        for (i in 0 until count) {
-            val appButton = NetIdService.accountProviderAppButtonFragment(i, NetIdAuthFlow.Login)
+        NetIdService.getKeysForAccountProviderApps().forEach {
+            val appButton = NetIdService.accountProviderAppButtonFragment(it, NetIdAuthFlow.Login, it)
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
                 add(R.id.activityMainLoginContainer, appButton)
-            }
-        }*/
-        NetIdService.getKeysForAccountProviderApps().forEach {
-            val appButton = NetIdService.accountProviderAppButtonFragment(it, NetIdAuthFlow.Login)
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                add(R.id.activityMainPermissionContainer, appButton)
             }
         }
 
@@ -215,8 +201,8 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
         TODO("Not yet implemented")
     }
 
-    //
-    override fun onItemSelected(arg0: AdapterView<*>?, arg1: View?, position: Int, id: Long) {
+    // OnItemSelectedListener
+    override fun onItemSelected(adapter: AdapterView<*>?, view: View?, position: Int, id: Long) {
         NetIdService.setButtonStyle(NetIdButtonStyle.values()[position], this as Activity)
     }
 

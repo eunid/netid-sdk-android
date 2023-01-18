@@ -31,14 +31,18 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
+import de.netid.mobile.sdk.api.NetIdLayerStyle
+import de.netid.mobile.sdk.api.NetIdService
 import de.netid.mobile.sdk.databinding.FragmentAuthorizationPermissionBinding
 import de.netid.mobile.sdk.model.AppIdentifier
 import de.netid.mobile.sdk.ui.adapter.AuthorizationAppListAdapter
@@ -74,6 +78,7 @@ class AuthorizationPermissionFragment(
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAuthorizationPermissionBinding.inflate(inflater, container, false)
+        retainInstance = true
         return binding.root
     }
 
@@ -108,6 +113,31 @@ class AuthorizationPermissionFragment(
      * The button to continue is configured so that it can either use app2web- or (if id apps are installed) app2app-flow.
      */
     private fun configureStandardButtons() {
+        var netIdLogoResource = R.drawable.ic_netid_logo_small
+        var buttonBackgroundResource = R.color.authorization_agree_button_color
+        var buttonForegroundResource = R.color.authorization_agree_text_color
+        var buttonOutlineResource = R.color.authorization_close_button_color
+
+        when (NetIdService.getLayerStyle()) {
+            NetIdLayerStyle.Outline -> {
+                netIdLogoResource = R.drawable.ic_netid_logo_small
+                buttonBackgroundResource = R.color.outline_background_color
+                buttonForegroundResource = R.color.outline_text_color
+                buttonOutlineResource = R.color.outline_outline_color
+            }
+            else -> {
+                netIdLogoResource = R.drawable.ic_netid_logo_small
+                buttonBackgroundResource = R.color.authorization_agree_button_color
+                buttonForegroundResource = R.color.authorization_agree_text_color
+                buttonOutlineResource = R.color.authorization_close_button_color
+            }
+        }
+
+        binding.fragmentAuthorizationButtonAgreeAndContinue.setTextColor(resources.getColor(buttonForegroundResource))
+        binding.fragmentAuthorizationButtonAgreeAndContinue.setBackgroundColor(resources.getColor(buttonBackgroundResource))
+        binding.fragmentAuthorizationButtonAgreeAndContinue.setStrokeColorResource(buttonOutlineResource)
+        binding.fragmentAuthorizationButtonAgreeAndContinue.icon = resources.getDrawable(netIdLogoResource)
+
         binding.fragmentAuthorizationButtonAgreeAndContinue.text = getString(R.string.authorization_permission_agree_and_continue_with_net_id).uppercase()
         binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
             var adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter

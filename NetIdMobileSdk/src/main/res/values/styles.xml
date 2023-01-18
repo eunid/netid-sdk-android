@@ -9,8 +9,20 @@
         <item name="android:layout_height">1dp</item>
         <item name="android:background">@color/divider_color</item>
     </style>
-    <style name="SolidGreen">
-        <item name="android:textColor">#00FF00</item>
-        <item name="android:text">BLUBBER</item>
+    <!-- Base application theme. -->
+    <style name="NetIdMobileSdkApp">
+        <item name="android:textColor">@color/green_background_color</item>
     </style>
+
+    <string-array name="buttonStyles">
+        <item>WhiteSolid</item>
+        <item>GreenSolid</item>
+        <item>Outline</item>
+    </string-array>
+
+    <string-array name="layerStyles">
+        <item>Solid</item>
+        <item>Outline</item>
+    </string-array>
+
 </resources>
