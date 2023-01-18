@@ -1,0 +1,58 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-parcelize'
+}
+
+def versionCodeInt = versionCode as Integer
+
+android {
+    compileSdk 32
+
+    defaultConfig {
+        applicationId "de.netid.mobile.sdk.example.buttonapp"
+        minSdk 24
+        targetSdk 32
+        versionCode versionCodeInt
+        versionName version
+
+        manifestPlaceholders = [appAuthRedirectScheme: 'de.netid.mobile.sdk.example.buttonapp']
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation "androidx.fragment:fragment-ktx:1.2.5"
+    implementation project(path: ':NetIdMobileSdk')
+    implementation 'net.openid:appauth:0.11.1'
+    testImplementation 'junit:junit:4.13.2'
+    implementation 'androidx.test.ext:junit-ktx:1.1.4'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-web:3.5.0'
+}

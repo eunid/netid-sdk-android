@@ -3,11 +3,11 @@
 ## About
 
 The `netID MobileSDK` facilitates the use of the [netID](https://netid.de) authorization and privacy management services.
-Alongside the SDK, this repository hosts a sample app, demonstarting the usage.
+Alongside the SDK, this repository hosts two sample apps, demonstarting the usage of the SDK. The first one is more complete as it demonstrates complete workflows including fetching/setting of additional values and/or user information. The second one is less complex and only demonstrates the basic workflow, if you want to add the different buttons for interacting with the SDK in a more direct way. 
 
 ## Initialize NetIDService
 
-The `NetIdService` is the main interface to communicate with the netID SDK. It handles all the communication with the backend services and provides ui elements for the autherization flow.
+The `NetIdService` is the main interface to communicate with the netID SDK. It handles all the communication with the backend services and provides UI elements for the authorization flow.
 
 First, construct a configuration object of type NetIdConfig for the NetIDService:
 ```kotlin
@@ -133,6 +133,12 @@ The SDK will figure out by itself, if Account Provider apps like [GMX](https://p
 
 If the user did decide on how to proceed with the login process (e.g. which Account Provider provider to use), a redirect to actually execute the authorization is called automatically.
 
+As can be seen from the first screenshot, ui elements are organzied in layers to ease the authorization process. The SDK supports two different graphical styles, called ``Solid`` and ``Outline``. Switching between those two styles can be done in the demo app by using the picker element at the end of the screen. Programatically you can change the style by calling:
+
+```kotlin
+ NetIdService.setLayerStyle(style)
+```
+
 ## Session persistence
 The SDK implements session persistence. So if a user has been authorized successfully, this state stays persistent even when closing and reopening the app again.
 
@@ -164,3 +170,94 @@ Fetches the permissions object. On success `onFetchPermissions` is called on the
 NetIdService.updatePermissions(this.applicationContext)
 ```
 Updates the permissions object. On success `onUpdatePermissions` is called on the delegate, returning the requested information. Otherwise `onUpdatePermissionsWithError` gets called, returning a description of the error.
+
+
+## Button workflow
+
+As stated in the beginning, there is another way to interact with the SDK. In the so called <i>button workflow</i> you can decide to not use the preconfigured forms and texts but build your very own dialogs.
+
+Therefore, the SDK gives you the opportunity to only make use of the basic functionalities to use the SDK. As a starting point, take a look at the second demo app provided in the `buttonApp` folder. Just like in the demo app, there is a possibility to change between different design sets to show off the different styles for the buttons. This can be done by calling the following function:
+
+```kotlin
+NetIdService.setButtonStyle(style)
+```
+And ``style`` can be any style provided by ``NetIdButtonStyle``.
+
+<table>
+    <tr>
+        <th>Style SolidWhite</th>
+        <th>Style SolidGreen</th>
+        <th>Style Outline</th>
+    </tr>
+    <tr>
+        <td width=30%>
+            <img src="images/netIdSdk_android_button_style_solidWhite.png" alt="netID SDK example button app - style SolidWhite" style="width:200px;"/>
+        </td>
+        <td width=30%>
+            <img src="images/netIdSdk_android_button_style_solidGreen.png" alt="netID SDK example button app - style SolidGreen" style="width:200px"/>
+        </td>
+        <td width=30%>
+            <img src="images/netIdSdk_android_button_style_outline.png" alt="netID SDK example button app - style Outline" style="width:200px"/>
+        </td>
+    </tr>
+</table>
+
+Of course, at first you have to initialize the SDK as in the example above.
+```kotlin
+val netIdConfig = NetIdConfig(
+    clientId = clientId,
+    redirectUri = redirectUri,
+    claims = claims,
+    promptWeb = "consent",
+    permissionLayerConfig = permissionLayerConfig,
+    loginLayerConfig = loginLayerConfig
+)
+NetIdService.addListener(this)
+NetIdService.initialize(netIdConfig, this)
+```
+
+Then, just request the buttons you need to trigger your desired auth flow. E.g. for the permission flow:
+
+```kotlin
+val permissionContinueButton = NetIdService.permissionContinueButtonFragment("")
+supportFragmentManager.commit {
+    setReorderingAllowed(true)
+    add(R.id.activityMainPermissionContainer, permissionContinueButton)
+}
+```
+With the optional parameter ``continueText``it is possible to alter the default text to a more personal liking. If set to an empty string or omitted completely, a default will be used.
+
+Note that if any Account Provider apps are installed, there will be the possibility to choose which one to use (triggering app2app flow). For example, to display a button for each installed app, use this code:
+
+```kotlin
+NetIdService.getKeysForAccountProviderApps().forEach {
+    val appButton = NetIdService.accountProviderAppButtonFragment(it, NetIdAuthFlow.Permission, it)
+    supportFragmentManager.commit {
+        setReorderingAllowed(true)
+        add(R.id.activityMainPermissionContainer, appButton)
+    }
+}
+```
+Again, using the optional parameter ``continuteText`` will alter the text on the button - otherwise all buttons will have the standard text displayed.
+
+For the login and/or login+permission flow, you can request a button to initiate app2web authorization with the following call:
+
+```kotlin
+val loginContinueButton = NetIdService.loginContinueButtonFragment("", NetIdAuthFlow.Login)
+supportFragmentManager.commit {
+    setReorderingAllowed(true)
+    add(R.id.activityMainLoginContainer, loginContinueButton)
+}
+```
+
+And if you prefer app2app, you can request respective buttons for each Account Provider this way:
+
+```kotlin
+NetIdService.getKeysForAccountProviderApps().forEach {
+    val appButton = NetIdService.accountProviderAppButtonFragment(it, NetIdAuthFlow.Login, it)
+    supportFragmentManager.commit {
+        setReorderingAllowed(true)
+        add(R.id.activityMainLoginContainer, appButton)
+    }
+}
+```

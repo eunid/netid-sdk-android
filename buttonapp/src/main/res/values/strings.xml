@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">netID SDK Button Demo</string>
+    <string name="net_id_service_logs">Logs:\n\n</string>
+    <string name="net_id_service_end_session">Session beenden</string>
+
+</resources>

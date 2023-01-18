@@ -16,6 +16,8 @@ package de.netid.mobile.sdk.example
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -24,7 +26,7 @@ import de.netid.mobile.sdk.example.databinding.ActivityMainBinding
 import de.netid.mobile.sdk.model.*
 import org.json.JSONObject
 
-class MainActivity : AppCompatActivity(), NetIdServiceListener {
+class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnItemSelectedListener {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -50,6 +52,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.activityMainStyleSpinner.onItemSelectedListener = this
 
         setupInitializeButton()
         setupAuthorizeButton()
@@ -407,4 +410,14 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener {
         serviceState = ServiceState.PermissionWriteSuccessful
         updateElementsForServiceState()
     }
+
+    // OnItemSelectedListener
+    override fun onItemSelected(adapter: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        NetIdService.setLayerStyle(NetIdLayerStyle.values()[position])
+    }
+
+    override fun onNothingSelected(arg0: AdapterView<*>?) {
+        // TODO Auto-generated method stub
+    }
+
 }

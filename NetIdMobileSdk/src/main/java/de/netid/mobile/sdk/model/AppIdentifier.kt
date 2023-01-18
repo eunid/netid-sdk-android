@@ -22,6 +22,8 @@ data class AppIdentifier(
     val name: String,
     val backgroundColor: String,
     val foregroundColor: String,
+    val backgroundColorOutline: String,
+    val foregroundColorOutline: String,
     val icon: String,
     val typeFaceIcon: String,
     val iOS: AppDetailsIOS,

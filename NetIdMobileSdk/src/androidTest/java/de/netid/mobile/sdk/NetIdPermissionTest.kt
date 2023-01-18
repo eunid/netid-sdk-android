@@ -14,14 +14,29 @@
 
 package de.netid.mobile.sdk
 
+import android.R
+import android.os.Handler
+import android.util.Log
+import android.view.ContextThemeWrapper
+import android.view.LayoutInflater
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.api.*
+import de.netid.mobile.sdk.appauth.AppAuthManagerListener
 import de.netid.mobile.sdk.model.*
+import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 
-import org.junit.Assert.*
+class NetIdPermissionTest: NetIdServiceListener, AppAuthManagerListener
+ {
+//     AuthorizationFragmentListener,
+//    UserInfoManagerListener, PermissionManagerListener
 
-class NetIdPermissionTest: NetIdServiceListener {
+     var ready : Boolean = false
+
+     private var handler: Handler? = null
+
     companion object {
         private const val clientId = "ec54097f-83f6-4bb1-86f3-f7c584c649cd"
         private const val redirectUri = "https://eunid.github.io/redirectApp"
@@ -30,7 +45,9 @@ class NetIdPermissionTest: NetIdServiceListener {
         private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     }
 
-    private fun setup() {
+    @Before
+    public fun setup() {
+        ready = false
         assertEquals("de.netid.mobile.sdk.test", appContext.packageName)
         val netIdConfig = NetIdConfig(clientId, redirectUri, claims)
         NetIdService.addListener(this)
@@ -41,16 +58,12 @@ class NetIdPermissionTest: NetIdServiceListener {
     // Don't do all initialization steps, so this must failed as UNAUTHORIZED
     @Test
     fun fetchPermissionsShouldFail() {
-        setup()
-
         NetIdService.fetchPermissions(appContext)
     }
-    
+
     // Don't do all initialization steps, so this must failed as UNAUTHORIZED
     @Test
     fun updatePermissionsShouldFail() {
-        setup()
-
         val permission = NetIdPermissionUpdate(
             NetIdPermissionStatus.VALID,
             "CPdfZIAPdfZIACnABCDECbCkAP_AAAAAAAYgIzJd9D7dbXFDefx_SPt0OYwW0NBXCuQCChSAA2AFVAOQcLQA02EaMATAhiACEQIAolIBAAEEHAFEAECQQIAEAAHsAgSEhAAKIAJEEBEQAAIQAAoKAAAAAAAIgAABoASAmBiQS5bmRUCAOIAQRgBIgggBCIADAgMBBEAIABgIAIIIgSgAAQAAAKIAAAAAARAAAASGgFABcAEMAPwAgoBaQEiAJ2AUiAxgBnwqASAEMAJgAXABHAEcALSAkEBeYDPh0EIABYAFQAMgAcgA-AEAALgAZAA0AB4AD6AIYAigBMACfAFwAXQAxABmADeAHMAPwAhgBLACYAE0AKMAUoAsQBbgDDAGiAPaAfgB-gEDAIoARaAjgCOgEpALEAWmAuYC6gF5AMUAbQA3ABxADnAHUAPQAi8BIICRAE7AKHAXmAwYBjADJAGVAMsAZmAz4BrADiwHjgPrAg0BDkhAbAAWABkAFwAQwAmABcADEAGYAN4AjgBSgCxAIoARwAlIBaQC5gGKANoAc4A6gB6AEggJEAScAz4B45KBAAAgABYAGQAOAAfAB4AEQAJgAXAAxABmADaAIYARwAowBSgC3AH4ARwAk4BaQC6gGKANwAdQBF4CRAF5gMsAZ8A1gCGoSBeAAgABYAFQAMgAcgA8AEAAMgAaAA8gCGAIoATAAngBvADmAH4AQgAhgBHACWAE0AKUAW4AwwB7QD8AP0AgYBFICNAI4ASkAuYBigDaAG4AOIAegBIgCdgFDgKRAXmAwYBkgDPoGsAayA4IB44EOREAYAQwA_AEiAJ2AUiAz4ZAHACGAEwARwBHAEnALzAZ8UgXAALAAqABkADkAHwAgABkADQAHkAQwBFACYAE8AKQAYgAzABzAD8AIYAUYApQBYgC3AGjAPwA_QCLQEcAR0AlIBcwC8gGKANoAbgA9ACLwEiAJOATsAocBeYDGAGSAMsAZ9A1gDWQHBAPHAhm.f_gAAAAAAsgA"
@@ -64,9 +77,33 @@ class NetIdPermissionTest: NetIdServiceListener {
         NetIdService.updatePermission(appContext, permission)
     }
 
+    // AppAuthManagerListener functions
+
+    override fun onAuthorizationServiceConfigurationFetchedSuccessfully() {
+        Log.i(javaClass.simpleName, "netId service Authorization Service Configuration fetched successfully")
+        onInitializationFinishedWithError(null)
+    }
+
+    override fun onAuthorizationServiceConfigurationFetchFailed(error: NetIdError) {
+        Log.e(javaClass.simpleName, "netId service Authorization Service Configuration fetch failed")
+        onInitializationFinishedWithError(error)
+    }
+
+    override fun onAuthorizationSuccessful() {
+        Log.i(javaClass.simpleName, "netId service Authorization successful")
+    }
+
+    override fun onAuthorizationFailed(error: NetIdError) {
+        Log.e(javaClass.simpleName, "netId service Authorization failed")
+        onAuthenticationFinishedWithError(error)
+    }
+
+
+
     // Listener functions
     override fun onInitializationFinishedWithError(error: NetIdError?) {
-        assertNull(error)
+        assertEquals(error, null)
+        ready = true
     }
 
     override fun onAuthenticationFinished(accessToken: String) {

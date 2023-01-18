@@ -49,7 +49,7 @@ interface AppAuthManager {
         claims: String?,
         prompt: String?,
         flow: NetIdAuthFlow,
-        activity: Activity
+        context: Context
     ): Intent?
 
     /**

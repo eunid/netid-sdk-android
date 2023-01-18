@@ -155,7 +155,7 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
         claims: String?,
         prompt: String?,
         flow: NetIdAuthFlow,
-        activity: Activity
+        context: Context
     ): Intent? {
         authorizationServiceConfiguration?.let { serviceConfiguration ->
             val scopes = mutableListOf<String>()
@@ -189,7 +189,7 @@ class AppAuthManagerImpl(context: Context) : AppAuthManager {
             val appAuthConfiguration = AppAuthConfiguration.Builder()
             .setBrowserMatcher(browserDenyList)
             .build()
-            authService = AuthorizationService(activity, appAuthConfiguration)
+            authService = AuthorizationService(context, appAuthConfiguration)
 
             return authService?.getAuthorizationRequestIntent(authRequest)
         } ?: run {

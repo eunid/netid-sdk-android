@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added parameter to force app2app flow
 - Added session persistence
 - Added possibility to add optional claims to login flow
+- Added button workflow, with own demo app
 
 ### Changed
 - Renamed NetID to netID
