@@ -15,14 +15,12 @@
 package de.netid.mobile.sdk
 
 import android.R
-import android.app.Activity
-import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
-import androidx.appcompat.app.AppCompatActivity
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.api.*
 import de.netid.mobile.sdk.appauth.AppAuthManagerListener
 import de.netid.mobile.sdk.model.*
@@ -63,25 +61,6 @@ class NetIdPermissionTest: NetIdServiceListener, AppAuthManagerListener
         NetIdService.fetchPermissions(appContext)
     }
 
-    @Test
-    fun fetchPermissions() {
-        while (!ready) {}
-        val appDetailsIOS = AppDetailsIOS("", "", "")
-        val appDetailsAndroid = AppDetailsAndroid("de.web.mobile.android.mail", "https://sso.web.de/authorize-app2app", "de.web.mobile.android.mail.NetIdActivityV1")
-        val appIdentifier = AppIdentifier(0, "WEB.DE", "", "", "", "", appDetailsIOS, appDetailsAndroid)
-        ready = false
-        NetIdService.onAppButtonClicked(appIdentifier)
-        val themedContext = ContextThemeWrapper(appContext, R.style.Theme_Material)
-        val view = LayoutInflater.from(themedContext).inflate(R.layout.activity_list_item, null, false)
-        appContext.setTheme(R.style.Theme_Material)
-        val continueButton = NetIdService.continueButtonPermissionFlow(appContext)
-        continueButton.performClick()
-        while (!ready) {}
-
-        NetIdService.fetchPermissions(appContext)
-    }
-
-    
     // Don't do all initialization steps, so this must failed as UNAUTHORIZED
     @Test
     fun updatePermissionsShouldFail() {
@@ -112,12 +91,6 @@ class NetIdPermissionTest: NetIdServiceListener, AppAuthManagerListener
 
     override fun onAuthorizationSuccessful() {
         Log.i(javaClass.simpleName, "netId service Authorization successful")
-
-/*        NetIdService.appAuthManager.getAccessToken()?.let {
-            for (item in NetIdService.netIdServiceListeners) {
-                item.onAuthenticationFinished(it)
-            }
-        }*/
     }
 
     override fun onAuthorizationFailed(error: NetIdError) {
