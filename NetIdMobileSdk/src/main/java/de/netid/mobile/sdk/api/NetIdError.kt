@@ -16,5 +16,6 @@ package de.netid.mobile.sdk.api
 
 data class NetIdError(
     val process: NetIdErrorProcess,
-    val code: NetIdErrorCode
+    val code: NetIdErrorCode,
+    val msg: String? = ""
 )

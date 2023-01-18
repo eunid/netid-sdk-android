@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="netid_green">#76B82A</color>
+    <color name="netid_gray">#707070</color>
+    <color name="webde_yellow">#F7AD0A</color>
+    <color name="gmx_blue">#1C449B</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

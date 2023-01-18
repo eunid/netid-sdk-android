@@ -18,30 +18,39 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.view.View
+import android.widget.Button
+import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.google.android.material.button.MaterialButton
+import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.appauth.AppAuthManager
 import de.netid.mobile.sdk.appauth.AppAuthManagerFactory
 import de.netid.mobile.sdk.appauth.AppAuthManagerListener
-import de.netid.mobile.sdk.model.AppIdentifier
-import de.netid.mobile.sdk.model.Permissions
-import de.netid.mobile.sdk.model.SubjectIdentifiers
-import de.netid.mobile.sdk.model.UserInfo
+import de.netid.mobile.sdk.model.*
 import de.netid.mobile.sdk.permission.PermissionManager
 import de.netid.mobile.sdk.permission.PermissionManagerListener
-import de.netid.mobile.sdk.ui.AuthorizationFragmentListener
-import de.netid.mobile.sdk.ui.AuthorizationHardFragment
-import de.netid.mobile.sdk.ui.AuthorizationSoftFragment
+import de.netid.mobile.sdk.ui.*
 import de.netid.mobile.sdk.userinfo.UserInfoManager
 import de.netid.mobile.sdk.userinfo.UserInfoManagerListener
 import de.netid.mobile.sdk.util.JsonUtil
 import de.netid.mobile.sdk.util.PackageUtil
 import de.netid.mobile.sdk.util.ReachabilityUtil
-import de.netid.mobile.sdk.util.TokenUtil
 
 object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     UserInfoManagerListener, PermissionManagerListener {
 
     private const val appIdentifierFilename = "netIdAppIdentifiers.json"
+    private const val broker = "broker.netid.de"
+    private var layerStyle: NetIdLayerStyle = NetIdLayerStyle.Solid
+    private var buttonStyle: NetIdButtonStyle = NetIdButtonStyle.WhiteSolid
+    private var netIdLogoResource:Int = R.drawable.ic_netid_logo_button
+    private var buttonBackgroundResource:Int = R.color.authorization_agree_button_color
+    private var buttonForegroundResource:Int = R.color.authorization_agree_text_color
+    private var buttonOutlineResource:Int = R.color.authorization_close_button_color
+    private var buttonStrokeWidthResource:Int = R.dimen.authorization_close_button_stroke_width
+
     private var netIdConfig: NetIdConfig? = null
 
     private lateinit var appAuthManager: AppAuthManager
@@ -50,6 +59,12 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
 
     private val availableAppIdentifiers = mutableListOf<AppIdentifier>()
     private val netIdServiceListeners = mutableSetOf<NetIdServiceListener>()
+
+    private var permissionContinueButtonFragment:Fragment? = null
+    private var loginContinueButtonFragment:Fragment? = null
+    private var appButtonFragmentsForPermission = mutableMapOf<String, Fragment>()
+    private var appButtonFragmentsForLogin = mutableMapOf<String, Fragment>()
+    private var appButtonFragmentsForLoginPermission = mutableMapOf<String, Fragment>()
 
     fun addListener(listener: NetIdServiceListener) {
         netIdServiceListeners.add(listener)
@@ -62,54 +77,220 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     fun initialize(netIdConfig: NetIdConfig, context: Context) {
         if (handleConnection(context, NetIdErrorProcess.Configuration)) {
             if (this.netIdConfig != null) {
-                Log.w(javaClass.simpleName, "NetId Service configuration has been set already")
+                Log.w(javaClass.simpleName, "netId service configuration has been set already")
                 return
             }
 
             this.netIdConfig = netIdConfig
-            setupAuthManagerAndFetchConfiguration(netIdConfig.host)
+            setupAuthManagerAndFetchConfiguration(context)
             setupUserInfoManager()
             setupPermissionManager()
+            checkAvailableNetIdApplications(context)
         }
     }
 
-    fun transmitToken(token: String) {
-        if (TokenUtil.isValidJwtToken(token)) {
-            appAuthManager.setIdToken(token)
-        } else {
-            for (item in netIdServiceListeners) {
-                item.onTransmittedInvalidToken()
-            }
+    /**
+     * Gets the authorization fragment for a requested authorization flow.
+     * @param context Context to use.
+     * @param authFlow Authorization flow to use, see ``NetIdAuthFlow``.
+     * @param forceApp2App Set to true, if only app2app is allowed.
+     * @return Fragment for authorization.
+     */
+    fun getAuthorizationFragment(context: Context, authFlow: NetIdAuthFlow, forceApp2App: Boolean = false): Fragment? {
+        checkAvailableNetIdApplications(context)
+        // If there are no ID apps installed, but forceApp2App is true, return with an error.
+        if ((availableAppIdentifiers.isEmpty()) && forceApp2App) {
+            this.onAuthorizationFailed(NetIdError(NetIdErrorProcess.Authentication, NetIdErrorCode.NoIdAppInstalled))
+            return null
         }
-    }
-
-    fun getAuthorizationFragment(activity: Activity, authFlow: NetIdAuthFlow): Fragment? {
-        checkAvailableNetIdApplications(activity)
 
         netIdConfig?.let { config ->
-            return appAuthManager.getWebAuthorizationIntent(
+            //prompt is applied only in App2Web Flows
+            val effectivePrompt: String? =
+                if(availableAppIdentifiers.isEmpty()) config.promptWeb else null
+
+            return appAuthManager.getAuthorizationIntent(
                 config.clientId,
                 config.redirectUri,
                 config.claims,
+                effectivePrompt,
                 authFlow,
-                activity
+                context
             )?.let {
                 when (authFlow) {
-                    NetIdAuthFlow.Hard ->
-                        AuthorizationHardFragment(
-                            this, availableAppIdentifiers, it
+                    NetIdAuthFlow.Login, NetIdAuthFlow.LoginPermission ->
+                        AuthorizationLoginFragment(
+                            this, availableAppIdentifiers, it, (config.loginLayerConfig?.headlineText) ?: "", (config.loginLayerConfig?.loginText) ?:"", (config.loginLayerConfig?.continueText)?: ""
                         )
-                    NetIdAuthFlow.Soft ->
-                        AuthorizationSoftFragment(
-                            this, availableAppIdentifiers, it
+                    NetIdAuthFlow.Permission ->
+                        AuthorizationPermissionFragment(
+                            this, availableAppIdentifiers, it, (config.permissionLayerConfig?.logoId)?: "", (config.permissionLayerConfig?.headlineText)?: "", (config.permissionLayerConfig?.legalText)?: "", (config.permissionLayerConfig?.continueText)?: ""
                         )
                 }
             }
         }
-        //TODO optimise error handling
         return null
     }
 
+    /**
+     * Sets the style to use for all layers when using the layer flow.
+     * @param layerStyle button style to set, can be any of ``NetIdLayerStyle``, defaults to ``NetIdLayerStyle.Solid``
+     */
+    fun setLayerStyle(layerStyle: NetIdLayerStyle) {
+        this.layerStyle = layerStyle
+    }
+
+    /**
+     * Gets the currently set style that's used for all layers when using the layer flow.
+     * @return Currently set style
+     */
+    fun getLayerStyle(): NetIdLayerStyle {
+        return layerStyle
+    }
+
+    /**
+     * Sets the style to use for all buttons when using the button flow.
+     * @param buttonStyle button style to set, can be any of ``NetIdButtonStyle``, defaults to ``NetIdButtonStyle.GraySolid``
+     */
+    fun setButtonStyle(buttonStyle: NetIdButtonStyle, activity: Activity) {
+        this.buttonStyle = buttonStyle
+
+        if (permissionContinueButtonFragment != null) {
+            (permissionContinueButtonFragment as PermissionContinueButtonFragment).setButtonStyle(buttonStyle)
+        }
+
+        if (loginContinueButtonFragment != null) {
+            (loginContinueButtonFragment as LoginContinueButtonFragment).setButtonStyle(buttonStyle)
+        }
+
+        appButtonFragmentsForPermission.forEach {
+            val frag = it.value as AccountProviderAppButtonFragment
+            frag.setButtonStyle(buttonStyle)
+        }
+
+        appButtonFragmentsForLogin.forEach {
+            val frag = it.value as AccountProviderAppButtonFragment
+            frag.setButtonStyle(buttonStyle)
+        }
+
+        appButtonFragmentsForLoginPermission.forEach {
+            val frag = it.value as AccountProviderAppButtonFragment
+            frag.setButtonStyle(buttonStyle)
+        }
+    }
+
+    /**
+     * Gets the currently set style that's used for all buttons when using the button flow.
+     * @return Currently set style
+     */
+    fun getButtonStyle(): NetIdButtonStyle {
+        return buttonStyle
+    }
+
+    /**
+     * Returns the count of installed account provider apps.
+     * Use this function only if you intent to build your very own authorization dialog.
+     * @return: Count of installed account provider apps.
+     */
+    fun getCountOfAccountProviderApps(context: Context): Int {
+        checkAvailableNetIdApplications(context)
+        return availableAppIdentifiers.count()
+    }
+
+    /**
+     * Returns the keys of installed account provider apps. With these keys, you can request buttons for specific account provider apps identified by their key aka name.
+     * Use this function only if you intent to build your very own authorization dialog.
+     * @return: Array of keys of installed account provider apps.
+     */
+    fun getKeysForAccountProviderApps(): Array<String> {
+        val result = mutableListOf<String>()
+        availableAppIdentifiers.forEach {
+            result.add(it.name)
+        }
+        return result.toTypedArray()
+    }
+
+    /**
+     * Returns the authorization intent for a requested flow.
+     * @param flow Requested flow.
+     * @param context Context to use.
+     * @return Authorization intent.
+     */
+    fun authIntentForFlow(flow: NetIdAuthFlow, context: Context): Intent? {
+        netIdConfig?.let { config ->
+            return appAuthManager.getAuthorizationIntent(
+                config.clientId,
+                config.redirectUri,
+                config.claims,
+                config.promptWeb,
+                flow,
+                context
+            )
+        }
+        return null
+    }
+
+    /**
+     * Returns the continue button (as a fragment) in case of a permission flow dialog.
+     * Use this function only if you intent to build your very own authorization dialog.
+     * @param continueText Alternative text to set on the button. If empty, the default will be used.
+     * @return Fragment for authorization.
+     */
+    fun permissionContinueButtonFragment(continueText: String = ""): Fragment {
+        if (permissionContinueButtonFragment == null) {
+            permissionContinueButtonFragment = PermissionContinueButtonFragment(this, continueText)
+        }
+        return permissionContinueButtonFragment as Fragment
+    }
+
+    /**
+     * Returns the continue button (as a fragment) in case of a login flow dialog.
+     * Use this function only if you intent to build your very own authorization dialog.
+     * @param continueText Alternative text to set on the button. If empty, the default will be used.
+     * @param authFlow Must either be .Login or .LoginPermission. If is set to .Permission, an error will be thrown.
+     * @return Fragment for authorization.
+     */
+    fun loginContinueButtonFragment(continueText: String = "", flow: NetIdAuthFlow): Fragment {
+        if (loginContinueButtonFragment == null) {
+            loginContinueButtonFragment = LoginContinueButtonFragment(this, continueText, flow)
+        }
+        return loginContinueButtonFragment as Fragment
+    }
+
+    /**
+     * Returns the button for a certain account provider app for a requested ``NetIdAuthFlow``
+     * Use this function only if you intent to build your very own authorization dialog.
+     * @param key Key denoting one of the installed account provider apps. Use ``getKeysForAccountProviderApps`` first to get the keys/names of all installed account provider apps.
+     * @param authFlow Can be any of .Permission, .Login or .LoginPermission.
+     * @param continueText Alternative text to set on the button. If empty, the default will be used.
+     * @returns Button with text and label for the chosen id app. If index is out of bounds or no app is installed, returns an empty view.
+     */
+    fun accountProviderAppButtonFragment(key: String, flow: NetIdAuthFlow, continueText: String = ""): Fragment {
+        val keys = getKeysForAccountProviderApps()
+        val appButtonFragments = when (flow) {
+            NetIdAuthFlow.Permission -> appButtonFragmentsForPermission
+            NetIdAuthFlow.Login -> appButtonFragmentsForLogin
+            NetIdAuthFlow.LoginPermission -> appButtonFragmentsForLoginPermission
+        }
+        if (keys.contains(key)) {
+            return if (appButtonFragments.containsKey(key)) {
+                appButtonFragments[key] as Fragment
+            } else {
+                val index = keys.binarySearch(key)
+                val app = AccountProviderAppButtonFragment(this, availableAppIdentifiers[index], flow, continueText)
+                appButtonFragments[key] = app
+                app
+            }
+        }
+        throw ArrayIndexOutOfBoundsException()
+    }
+
+    /**
+     * Checks whether there is a network connection or not.
+     * @param context Context to use.
+     * @param process: In case of an error, denotes the process that the error is responsible for.
+     * @returns bool
+     */
     private fun handleConnection(context: Context, process: NetIdErrorProcess): Boolean {
         return if (ReachabilityUtil.hasConnection(context)) {
             true
@@ -121,30 +302,23 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
-    //TODO
-//    fun authorize(packageName: String?, activity: Activity): Intent? {
-//        if (handleConnection(activity.applicationContext, NetIdErrorProcess.Authentication)) {
-//            packageName?.let { applicationId ->
-//                openApp(activity.applicationContext, applicationId)
-//            } ?: run {
-//
-//            }
-//        }
-//        return null
-//    }
-
+    /**
+     * Fetches the user info.
+     * @param context Context to use.
+     */
     fun fetchUserInfo(context: Context) {
         if (handleConnection(context, NetIdErrorProcess.UserInfo)) {
             var error: NetIdError? = null
 
-            netIdConfig?.let { config ->
-                appAuthManager.getAccessToken()?.let { token ->
-                    userInfoManager.fetchUserInfo(config.host, token)
-                } ?: {
-                    error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.UnauthorizedClient)
-                }
-            } ?: run {
-                error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.Uninitialized)
+            appAuthManager.getAccessToken()?.let { token ->
+                appAuthManager.getAuthState()?.authorizationServiceConfiguration?.discoveryDoc?.userinfoEndpoint?.let{ endpoint ->
+                    userInfoManager.fetchUserInfo(
+                        endpoint,
+                        token)
+                } ?:{
+                    error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.InvalidDiscoveryDocument)
+                }            } ?: run {
+                error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.UnauthorizedClient)
             }
 
             error?.let {
@@ -155,7 +329,12 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
-    fun fetchPermissions(context: Context, collapseSyncId: Boolean) {
+    /**
+     * Fetch permissions.
+     * @param context Context to use.
+     * @param collapseSyncId: Boolean value to indicate whether syncId is used or not.
+     */
+    fun fetchPermissions(context: Context, collapseSyncId: Boolean = true) {
         if (handleConnection(context, NetIdErrorProcess.PermissionRead)) {
             var error: NetIdError? = null
             appAuthManager.getPermissionToken()?.let { token ->
@@ -165,14 +344,19 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             }
             error?.let {
                 for (item in netIdServiceListeners) {
-                    item.onPermissionFetchFinishedWithError(it)
+                    item.onPermissionFetchFinishedWithError(PermissionResponseStatus.UNKNOWN, it)
                 }
             }
         }
     }
 
-
-    fun updatePermission(context: Context, permission: NetIdPermissionUpdate, collapseSyncId: Boolean) {
+    /**
+     * Update permissions.
+     * @param context Context to use.
+     * @param permission Permissions to set, of type ``NetIdPermissionUpdate``.
+     * @param collapseSyncId Boolean value to indicate if syncId is used or not.
+     */
+    fun updatePermission(context: Context, permission: NetIdPermissionUpdate, collapseSyncId: Boolean = true) {
         if (handleConnection(context, NetIdErrorProcess.PermissionWrite)) {
             var error: NetIdError? = null
             appAuthManager.getPermissionToken()?.let { token ->
@@ -182,17 +366,30 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             }
             error?.let {
                 for (item in netIdServiceListeners) {
-                    item.onPermissionUpdateFinishedWithError(it)
+                    item.onPermissionUpdateFinishedWithError(PermissionResponseStatus.UNKNOWN, it)
                 }
             }
 
         }
     }
 
-    private fun setupAuthManagerAndFetchConfiguration(host: String) {
-        appAuthManager = AppAuthManagerFactory.createAppAuthManager()
+    /**
+     * Function to end a session.
+     * The net ID service itself still remains initialized but all information about authorization/authentication is discarded.
+     * To start a new session, call ``authorize(destinationScheme:currentViewController:authFlow)`` again.
+     */
+    fun endSession() {
+        Log.i(javaClass.simpleName, "netId service did end session successfully")
+        appAuthManager.endSession()
+        for (item in netIdServiceListeners) {
+            item.onSessionEnd()
+        }
+    }
+
+    private fun setupAuthManagerAndFetchConfiguration(context: Context) {
+        appAuthManager = AppAuthManagerFactory.createAppAuthManager(context)
         appAuthManager.listener = this
-        appAuthManager.fetchAuthorizationServiceConfiguration(host)
+        appAuthManager.fetchAuthorizationServiceConfiguration(broker)
     }
 
     private fun setupUserInfoManager() {
@@ -210,24 +407,29 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         availableAppIdentifiers.addAll(installedAppIdentifiers)
     }
 
+
 // AppAuthManagerListener functions
 
     override fun onAuthorizationServiceConfigurationFetchedSuccessfully() {
-        Log.i(javaClass.simpleName, "NetId Service Authorization Service Configuration fetched successfully")
+        Log.i(javaClass.simpleName, "netId service Authorization Service Configuration fetched successfully")
         for (item in netIdServiceListeners) {
             item.onInitializationFinishedWithError(null)
+        }
+        // Do we have (already) a session (maybe from last time)? Then try to make use of it.
+        if (appAuthManager.getAuthState() != null) {
+            onAuthorizationSuccessful()
         }
     }
 
     override fun onAuthorizationServiceConfigurationFetchFailed(error: NetIdError) {
-        Log.e(javaClass.simpleName, "NetId Service Authorization Service Configuration fetch failed")
+        Log.e(javaClass.simpleName, "netId service Authorization Service Configuration fetch failed")
         for (item in netIdServiceListeners) {
             item.onInitializationFinishedWithError(error)
         }
     }
 
     override fun onAuthorizationSuccessful() {
-        Log.i(javaClass.simpleName, "NetId Service Authorization successful")
+        Log.i(javaClass.simpleName, "netId service Authorization successful")
         appAuthManager.getAccessToken()?.let {
             for (item in netIdServiceListeners) {
                 item.onAuthenticationFinished(it)
@@ -236,7 +438,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     }
 
     override fun onAuthorizationFailed(error: NetIdError) {
-        Log.e(javaClass.simpleName, "NetId Service Authorization failed")
+        Log.e(javaClass.simpleName, "netId service Authorization failed")
         for (item in netIdServiceListeners) {
             item.onAuthenticationFinishedWithError(error)
         }
@@ -271,7 +473,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     }
 
     override fun onCloseClicked() {
-        Log.i(javaClass.simpleName, "NetId Service close authentication")
+        Log.i(javaClass.simpleName, "netId service close authentication")
         for (item in netIdServiceListeners) {
             item.onAuthenticationCanceled(
                 NetIdError(
@@ -283,51 +485,51 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     }
 
     override fun onAppButtonClicked(appIdentifier: AppIdentifier) {
-        Log.i(javaClass.simpleName, "NetId Service will use app ${appIdentifier.name} for authentication")
+        Log.i(javaClass.simpleName, "netId service will use app ${appIdentifier.name} for authentication")
     }
 
 // UserInfoManagerListener functions
 
     override fun onUserInfoFetched(userInfo: UserInfo) {
-        Log.i(javaClass.simpleName, "NetId Service user info fetched successfully")
+        Log.i(javaClass.simpleName, "netId service user info fetched successfully")
         for (item in netIdServiceListeners) {
             item.onUserInfoFinished(userInfo)
         }
     }
 
     override fun onUserInfoFetchFailed(error: NetIdError) {
-        Log.e(javaClass.simpleName, "NetId Service user info fetch failed")
+        Log.e(javaClass.simpleName, "netId service user info fetch failed")
         for (item in netIdServiceListeners) {
             item.onUserInfoFetchedWithError(error)
         }
     }
 
     // PermissionManagerListener functions
-    override fun onPermissionsFetched(permissions: Permissions) {
-        Log.i(javaClass.simpleName, "NetId Service permissions fetched successfully")
+    override fun onPermissionsFetched(permissions: PermissionReadResponse) {
+        Log.i(javaClass.simpleName, "netId service permissions fetched successfully")
         for (item in netIdServiceListeners) {
             item.onPermissionFetchFinished(permissions)
         }
     }
 
-    override fun onPermissionsFetchFailed(error: NetIdError) {
-        Log.e(javaClass.simpleName, "NetId Service permissions fetch failed")
+    override fun onPermissionsFetchFailed(statusCode: PermissionResponseStatus, error: NetIdError) {
+        Log.e(javaClass.simpleName, "netId service permissions fetch failed")
         for (item in netIdServiceListeners) {
-            item.onPermissionFetchFinishedWithError(error)
+            item.onPermissionFetchFinishedWithError(statusCode, error)
         }
     }
 
     override fun onPermissionUpdated(subjectIdentifiers: SubjectIdentifiers) {
-        Log.i(javaClass.simpleName, "NetId Service permissions updated successfully")
+        Log.i(javaClass.simpleName, "netId service permissions updated successfully")
         for (item in netIdServiceListeners) {
-            item.onPermissionUpdateFinished()
+            item.onPermissionUpdateFinished(subjectIdentifiers)
         }
     }
 
-    override fun onPermissionUpdateFailed(error: NetIdError) {
-        Log.e(javaClass.simpleName, "NetId Service permission update failed")
+    override fun onPermissionUpdateFailed(statusCode: PermissionResponseStatus, error: NetIdError) {
+        Log.e(javaClass.simpleName, "netId service permission update failed")
         for (item in netIdServiceListeners) {
-            item.onPermissionUpdateFinishedWithError(error)
+            item.onPermissionUpdateFinishedWithError(statusCode, error)
         }
     }
 }

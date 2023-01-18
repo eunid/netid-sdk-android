@@ -4,4 +4,25 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/divider_color</item>
+    </style>
+    <!-- Base application theme. -->
+    <style name="NetIdMobileSdkApp">
+        <item name="android:textColor">@color/green_background_color</item>
+    </style>
+
+    <string-array name="buttonStyles">
+        <item>WhiteSolid</item>
+        <item>GreenSolid</item>
+        <item>Outline</item>
+    </string-array>
+
+    <string-array name="layerStyles">
+        <item>Solid</item>
+        <item>Outline</item>
+    </string-array>
+
 </resources>

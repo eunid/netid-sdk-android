@@ -15,13 +15,12 @@
 package de.netid.mobile.sdk.api
 
 enum class NetIdErrorCode {
-    Timeout,
     NetworkError,
-    Uninitialized,
     JsonDeserializationError,
     InvalidDiscoveryDocument,
     Unknown,
     AuthorizationCanceledByUser,
+    AuthorizationCanceledByProgram,
     MissingBrowser,
     InvalidRequest,
     UnauthorizedClient,
@@ -31,5 +30,11 @@ enum class NetIdErrorCode {
     ServerError,
     TemporarilyUnavailable,
     ClientError,
-    StateMismatch
+    StateMismatch,
+    NoIdAppInstalled,
+    InvalidClient,
+    InvalidGrant,
+    UnsupportedGrantType,
+    InvalidAuthState,
+    Other
 }

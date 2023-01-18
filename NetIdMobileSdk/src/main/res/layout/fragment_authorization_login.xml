@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/authorization_outer_padding">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/fragmentAuthorizationTitleContainerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="26dp"
+        android:layout_marginTop="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+                android:id="@+id/fragmentAuthorizationNetidLogoImageView"
+                android:layout_width="@dimen/authorization_logo_login_width"
+                android:layout_height="@dimen/authorization_logo_login_height"
+                android:src="@drawable/ic_netid_logo_small"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                android:contentDescription="@string/authorization_logo_content_description" />
+
+        <TextView
+            android:id="@+id/fragmentAuthorizationNetidTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:gravity="left"
+            android:text="@string/authorization_login_title_text"
+            android:textColor="@color/authorization_title_logo_color"
+            android:textSize="@dimen/authorization_title_logo_size"
+            android:paddingLeft="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/fragmentAuthorizationNetidLogoImageView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+        android:id="@+id/fragmentAuthorizationDivider"
+        style="@style/Divider"
+        android:layout_marginTop="@dimen/authorization_vertical_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fragmentAuthorizationTitleContainerLayout" />
+
+    <TextView
+        android:id="@+id/fragmentAuthorizationTitleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:gravity="left"
+        android:text="@string/authorization_login_login_text"
+        android:textColor="@color/authorization_title_text_color"
+        android:textSize="@dimen/authorization_title_text_size"
+        android:textFontWeight="600"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fragmentAuthorizationDivider" />
+
+    <LinearLayout
+            android:id="@+id/fragmentAuthorizationButtonContainerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/authorization_vertical_margin"
+            app:layout_constraintEnd_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fragmentAuthorizationTitleTextView">
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+            android:id="@+id/fragmentAuthorizationButtonAgreeAndContinue"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/authorization_login_title_text"
+            android:textColor="@color/authorization_agree_text_color"
+            android:textAllCaps="true"
+            android:textSize="@dimen/authorization_button_text_size"
+            android:textFontWeight="500"
+            android:letterSpacing="@dimen/authorization_button_letter_spacing"
+            app:icon="@drawable/ic_netid_logo_small"
+            app:iconSize="20dp"
+            app:iconTint="@null"
+            app:iconPadding="-20dp"
+            app:backgroundTint="@color/authorization_net_id_button_color"
+            app:cornerRadius="@dimen/authorization_button_corner_radius"
+            app:strokeColor="@color/authorization_close_button_color"
+            app:strokeWidth="@dimen/authorization_close_button_stroke_width"
+            app:rippleColor="@color/authorization_close_button_color"  />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+            android:id="@+id/fragmentAuthorizationButtonClose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:height="36dp"
+            android:text="@string/authorization_login_continue_other"
+            android:textColor="@color/authorization_close_button_color"
+            android:textSize="@dimen/authorization_button_text_size"
+            android:textAllCaps="true"
+            android:letterSpacing="@dimen/authorization_button_letter_spacing"
+            android:textFontWeight="500"
+            app:backgroundTint="@color/authorization_close_button_background_color"
+            app:cornerRadius="@dimen/authorization_button_corner_radius"
+            app:strokeColor="@color/authorization_close_button_color"
+            app:strokeWidth="@dimen/authorization_close_button_stroke_width"
+            app:rippleColor="@color/authorization_close_button_color" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

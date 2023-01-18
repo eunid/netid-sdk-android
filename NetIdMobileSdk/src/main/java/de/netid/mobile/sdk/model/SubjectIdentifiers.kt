@@ -16,15 +16,18 @@ package de.netid.mobile.sdk.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Serializable
 data class SubjectIdentifiers(
     @SerialName("tpid")
-    val tpId: String,
+    val tpId: String?,
     @SerialName("sync_id")
-    val syncId: String = ""
+    val syncId: String? = null
 ) {
     override fun toString(): String {
-        return "SubjectIdentifiers(tpId='$tpId', syncId='$syncId')"
+        val format = Json { encodeDefaults = false }
+        return format.encodeToString(this)
     }
 }

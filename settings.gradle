@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 rootProject.name = "NetIdMobileSdk-App"
 include ':app'
 include ':NetIdMobileSdk'
+include ':buttonapp'

@@ -34,7 +34,7 @@ class JsonUtil {
          * Loads a specific JSON file from the assets.
          *
          * @param filename the filename of the JSON file to load from the assets
-         * @param context a context with which the assets are accessed
+         * @param context a context in which the assets are accessed
          *
          * @return A string containing the content of the loaded JSON file.
          * If the file does not exist or could not be loaded, the returned string is `null`.
