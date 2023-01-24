@@ -45,11 +45,6 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     private const val broker = "broker.netid.de"
     private var layerStyle: NetIdLayerStyle = NetIdLayerStyle.Solid
     private var buttonStyle: NetIdButtonStyle = NetIdButtonStyle.WhiteSolid
-    private var netIdLogoResource:Int = R.drawable.ic_netid_logo_button
-    private var buttonBackgroundResource:Int = R.color.authorization_agree_button_color
-    private var buttonForegroundResource:Int = R.color.authorization_agree_text_color
-    private var buttonOutlineResource:Int = R.color.authorization_close_button_color
-    private var buttonStrokeWidthResource:Int = R.dimen.authorization_close_button_stroke_width
 
     private var netIdConfig: NetIdConfig? = null
 

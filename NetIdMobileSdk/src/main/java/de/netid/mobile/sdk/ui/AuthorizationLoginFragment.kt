@@ -20,11 +20,9 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -109,7 +107,7 @@ class AuthorizationLoginFragment(
         binding.fragmentAuthorizationButtonAgreeAndContinue.icon = resources.getDrawable(netIdLogoResource)
 
 //        binding.fragmentAuthorizationButtonClose.setBackgroundColor(resources.getColor(buttonBackgroundResource))
-        binding.fragmentAuthorizationButtonClose.setOnClickListener {
+        binding.fragmentAuthorizationButtonCloseContinue.setOnClickListener {
             listener.onCloseClicked()
         }
     }
@@ -135,7 +133,7 @@ class AuthorizationLoginFragment(
             binding.fragmentAuthorizationButtonContainerLayout.addView(appButton, index)
         }
         if (continueText.isNotEmpty()) {
-            binding.fragmentAuthorizationButtonClose.text = continueText
+            binding.fragmentAuthorizationButtonCloseContinue.text = continueText
         }
     }
 

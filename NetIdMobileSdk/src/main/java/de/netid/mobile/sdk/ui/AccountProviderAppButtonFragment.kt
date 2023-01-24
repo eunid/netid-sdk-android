@@ -59,8 +59,8 @@ class AccountProviderAppButtonFragment(
 
         when (flow) {
             NetIdAuthFlow.Permission -> binding.buttonApp.text = String.format(getString(R.string.authorization_permission_continue_button)).uppercase()
-            NetIdAuthFlow.Login -> binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue_button)).uppercase()
-            NetIdAuthFlow.LoginPermission -> binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue_button)).uppercase()
+            NetIdAuthFlow.Login -> binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue), appIdentifier.name).uppercase()
+            NetIdAuthFlow.LoginPermission -> binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue), appIdentifier.name).uppercase()
         }
         if (continueText.isNotEmpty()) {
             binding.buttonApp.text = continueText

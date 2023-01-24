@@ -115,7 +115,7 @@
             app:icon="@drawable/ic_netid_logo_small"
             app:iconSize="20dp"
             app:iconTint="@null"
-            app:iconPadding="-20dp"
+            app:iconPadding="-24dp"
             app:backgroundTint="@color/authorization_agree_button_color"
             app:cornerRadius="@dimen/authorization_button_corner_radius"
             app:strokeColor="@color/authorization_close_button_color"
