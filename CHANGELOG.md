@@ -51,7 +51,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Be less strict when parsing JSON, ignore unknown claims
 - Hide text about apps when using app2web
 - Removed unused function from documentation
-- Make us of new redirectUrl and host
+- Make use of new redirectUrl and host
+- Changed icon sizing
 
 ### Fixed
 - Fixed UserInfo json parser error
