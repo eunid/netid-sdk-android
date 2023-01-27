@@ -14,17 +14,10 @@
 
 package de.netid.mobile.sdk.api
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import android.view.View
-import android.widget.Button
-import android.widget.LinearLayout
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.google.android.material.button.MaterialButton
-import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.appauth.AppAuthManager
 import de.netid.mobile.sdk.appauth.AppAuthManagerFactory
 import de.netid.mobile.sdk.appauth.AppAuthManagerListener
@@ -147,7 +140,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
      * Sets the style to use for all buttons when using the button flow.
      * @param buttonStyle button style to set, can be any of ``NetIdButtonStyle``, defaults to ``NetIdButtonStyle.GraySolid``
      */
-    fun setButtonStyle(buttonStyle: NetIdButtonStyle, activity: Activity) {
+    fun setButtonStyle(buttonStyle: NetIdButtonStyle) {
         this.buttonStyle = buttonStyle
 
         if (permissionContinueButtonFragment != null) {

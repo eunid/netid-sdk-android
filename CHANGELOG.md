@@ -53,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed unused function from documentation
 - Make use of new redirectUrl and host
 - Changed icon sizing
+- Removed unused parameter from call
 
 ### Fixed
 - Fixed UserInfo json parser error
