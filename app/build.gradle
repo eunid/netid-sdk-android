@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "de.netid.mobile.sdk.example"
-        minSdk 24
+        minSdk 23
         targetSdk 32
         versionCode versionCodeInt
         versionName version
