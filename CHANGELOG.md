@@ -74,5 +74,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a bug when authorizing/deauthorizing and authorizing again
 - Fixed a bug where for every id app the same logo was displayed
 - Fixed an issue when the overlay was not closed after chaning day/night mode
+- Fixed wrong color for button outline in dark mode
 
  
