@@ -54,6 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make use of new redirectUrl and host
 - Changed icon sizing
 - Removed unused parameter from call
+- Set minimum sdk to 23
 
 ### Fixed
 - Fixed UserInfo json parser error
