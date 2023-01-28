@@ -72,7 +72,7 @@ class LoginContinueButtonFragment(
         var netIdLogoResource = R.drawable.ic_netid_logo_small
         var buttonBackgroundResource = R.color.authorization_agree_button_color
         var buttonForegroundResource = R.color.authorization_agree_text_color
-        var buttonOutlineResource = R.color.authorization_close_button_color
+        var buttonOutlineResource = R.color.authorization_agree_outline_color
         var buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_width
 
         when (NetIdService.getButtonStyle()) {
@@ -94,7 +94,7 @@ class LoginContinueButtonFragment(
                 netIdLogoResource = R.drawable.ic_netid_logo_small
                 buttonBackgroundResource = R.color.authorization_agree_button_color
                 buttonForegroundResource = R.color.authorization_agree_text_color
-                buttonOutlineResource = R.color.authorization_close_button_color
+                buttonOutlineResource = R.color.authorization_agree_outline_color
                 buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_width
             }
         }

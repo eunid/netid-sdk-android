@@ -108,7 +108,7 @@ class AuthorizationPermissionFragment(
         var netIdLogoResource = R.drawable.ic_netid_logo_small
         var buttonBackgroundResource = R.color.authorization_agree_button_color
         var buttonForegroundResource = R.color.authorization_agree_text_color
-        var buttonOutlineResource = R.color.authorization_close_button_color
+        var buttonOutlineResource = R.color.authorization_agree_outline_color
 
         when (NetIdService.getLayerStyle()) {
             NetIdLayerStyle.Outline -> {
@@ -121,7 +121,7 @@ class AuthorizationPermissionFragment(
                 netIdLogoResource = R.drawable.ic_netid_logo_small
                 buttonBackgroundResource = R.color.authorization_agree_button_color
                 buttonForegroundResource = R.color.authorization_agree_text_color
-                buttonOutlineResource = R.color.authorization_close_button_color
+                buttonOutlineResource = R.color.authorization_agree_outline_color
             }
         }
 
