@@ -106,7 +106,6 @@ class AuthorizationLoginFragment(
         binding.fragmentAuthorizationButtonAgreeAndContinue.setStrokeColorResource(buttonOutlineResource)
         binding.fragmentAuthorizationButtonAgreeAndContinue.icon = resources.getDrawable(netIdLogoResource)
 
-//        binding.fragmentAuthorizationButtonClose.setBackgroundColor(resources.getColor(buttonBackgroundResource))
         binding.fragmentAuthorizationButtonCloseContinue.setOnClickListener {
             listener.onCloseClicked()
         }

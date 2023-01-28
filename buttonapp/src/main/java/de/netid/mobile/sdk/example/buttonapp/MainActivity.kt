@@ -1,14 +1,11 @@
 package de.netid.mobile.sdk.example.buttonapp
 
-import android.app.Activity
-import android.graphics.Color
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
-import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import de.netid.mobile.sdk.api.*
 import de.netid.mobile.sdk.example.buttonapp.databinding.ActivityMainBinding
@@ -19,8 +16,6 @@ import de.netid.mobile.sdk.model.UserInfo
 
 
 class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedListener {
-    private lateinit var binding: ActivityMainBinding
-    private var serviceState = ServiceState.Uninitialized
 
     /** Companion object for basic configuration of the [NetIdService] via [NetIdConfig] object.
      *  clientId and redirectUri are mandatory, all other parameters are optional.
@@ -32,6 +27,11 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
         private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
         private val permissionLayerConfig = null
         private val loginLayerConfig = null
+
+        private var serviceState = ServiceState.Uninitialized
+
+        @SuppressLint("StaticFieldLeak")
+        private lateinit var binding: ActivityMainBinding
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,9 +39,12 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.activityMainStyleSpinner.onItemSelectedListener = this
-
-        if (savedInstanceState != null) {
-            return
+        binding.activityMainButtonEndSession.setOnClickListener {
+            it.isEnabled = false
+            appendLog("netID service session finished successfully")
+            NetIdService.endSession()
+            serviceState = ServiceState.InitializationSuccessful
+            updateElementsForServiceState()
         }
 
         val netIdConfig = NetIdConfig(
@@ -56,14 +59,12 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
         NetIdService.addListener(this)
         NetIdService.initialize(netIdConfig, this)
 
-        // If there has been a saved session, we end it here - just for the sake of this demo to always start with a clean SDK.
-        NetIdService.endSession()
-
-        binding.activityMainButtonEndSession.setOnClickListener {
-            NetIdService.endSession()
+        if (savedInstanceState != null) {
+            return
         }
 
-        val count = NetIdService.getCountOfAccountProviderApps(this)
+        // If there has been a saved session, we end it here - just for the sake of this demo to always start with a clean SDK.
+        NetIdService.endSession()
 
         // This is the button to continue with the permission flow.
         // This button will always trigger app2web as there will be extra buttons for dedicated account provider apps.
@@ -102,6 +103,20 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
         }
 
         updateElementsForServiceState()
+    }
+
+    override fun onRestoreInstanceState(inState: Bundle) {
+        super.onRestoreInstanceState(inState)
+        serviceState = inState.getSerializable("serviceState") as ServiceState
+        // Restore log messages.
+        binding.activityMainLogs.text = inState.getString("log","Logs:\n\n")
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putSerializable("serviceState", serviceState)
+        // Save log messages.
+        outState.putString("log", binding.activityMainLogs.text.toString())
     }
 
     private fun appendLog(message: String) {
@@ -203,7 +218,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
 
     // OnItemSelectedListener
     override fun onItemSelected(adapter: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        NetIdService.setButtonStyle(NetIdButtonStyle.values()[position], this as Activity)
+        NetIdService.setButtonStyle(NetIdButtonStyle.values()[position])
     }
 
     override fun onNothingSelected(arg0: AdapterView<*>?) {

@@ -4,6 +4,7 @@
     <color name="authorization_title_text_color">#525252</color>
     <color name="authorization_legal_info_text_color">#292929</color>
     <color name="authorization_agree_text_color">#333333</color>
+    <color name="authorization_agree_outline_color">#333333</color>
     <color name="authorization_agree_button_color">#FFFFFF</color>
 
     <color name="authorization_net_id_button_color">#FFFFFF</color>

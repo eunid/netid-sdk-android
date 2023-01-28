@@ -41,25 +41,33 @@ class SdkContentBottomDialogFragment : BottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        if (savedInstanceState != null) {
+            onDestroy()
+            return
+        }
+
         isClosed = false
 
         sdkContentFragment?.let { contentFragment ->
             childFragmentManager.beginTransaction().replace(binding.bottomDialogSdkContentContainerLayout.id, contentFragment).commit()
         }
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onDestroyView() {
         _binding = null
-        if (!isClosed)
+        if (!isClosed) {
+            isClosed = true
             NetIdService.onCloseClicked()
+        }
         isClosed = true
         super.onDestroyView()
     }
 
     override fun dismiss() {
-        super.dismissAllowingStateLoss()
         isClosed = true
         onDestroyView()
+        if (isAdded)
+            super.dismissAllowingStateLoss()
     }
 }
