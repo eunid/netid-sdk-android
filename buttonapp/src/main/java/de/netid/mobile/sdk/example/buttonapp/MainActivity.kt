@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
         // They will always trigger app2app.
         NetIdService.getKeysForAccountProviderApps().forEach {
             val appButton = NetIdService.accountProviderAppButtonFragment(it, NetIdAuthFlow.Login)
-                supportFragmentManager.commit {
+            supportFragmentManager.commit {
                 setReorderingAllowed(true)
                 add(R.id.activityMainLoginContainer, appButton)
             }

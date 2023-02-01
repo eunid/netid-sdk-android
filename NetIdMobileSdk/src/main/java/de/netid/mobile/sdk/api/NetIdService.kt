@@ -204,7 +204,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
      * @param context Context to use.
      * @return Authorization intent.
      */
-    fun authIntentForFlow(flow: NetIdAuthFlow, context: Context): Intent? {
+    internal fun authIntentForFlow(flow: NetIdAuthFlow, context: Context): Intent? {
         netIdConfig?.let { config ->
             return appAuthManager.getAuthorizationIntent(
                 config.clientId,

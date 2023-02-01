@@ -16,7 +16,7 @@ package de.netid.mobile.sdk.appauth
 
 import de.netid.mobile.sdk.api.NetIdError
 
-interface AppAuthManagerListener {
+internal interface AppAuthManagerListener {
 
     fun onAuthorizationServiceConfigurationFetchedSuccessfully()
 

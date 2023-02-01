@@ -18,7 +18,7 @@ import de.netid.mobile.sdk.api.NetIdError
 import de.netid.mobile.sdk.model.PermissionReadResponse
 import de.netid.mobile.sdk.model.PermissionResponseStatus
 
-interface PermissionReadCallback {
+internal interface PermissionReadCallback {
 
     fun onPermissionsFetched(permissionResponse: PermissionReadResponse)
 

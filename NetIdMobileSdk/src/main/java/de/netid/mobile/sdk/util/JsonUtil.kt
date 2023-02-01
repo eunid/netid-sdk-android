@@ -26,7 +26,7 @@ import java.io.IOException
 /**
  * Provides functionalities to load and process JSON files.
  */
-class JsonUtil {
+internal class JsonUtil {
 
     companion object {
 

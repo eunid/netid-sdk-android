@@ -20,7 +20,7 @@ import de.netid.mobile.sdk.model.AppIdentifier
 /**
  * Provides functionalities for checks related to a [PackageManager].
  */
-class PackageUtil {
+internal class PackageUtil {
 
     companion object {
 
