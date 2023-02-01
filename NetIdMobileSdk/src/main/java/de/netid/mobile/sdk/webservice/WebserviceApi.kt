@@ -37,7 +37,7 @@ import java.io.IOException
 /**
  * Provides functions to perform web requests.
  */
-object WebserviceApi {
+internal object WebserviceApi {
 
     /**
      * A [OkHttpClient] instance to enqueue web calls

@@ -14,7 +14,6 @@
 
 package de.netid.mobile.sdk.appauth
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -32,8 +31,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.util.concurrent.locks.ReentrantLock
 
-
-class AppAuthManagerImpl(context: Context) : AppAuthManager {
+internal class AppAuthManagerImpl(context: Context) : AppAuthManager {
 
     companion object {
         private const val scheme = "https://"

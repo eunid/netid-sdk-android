@@ -20,7 +20,7 @@ import de.netid.mobile.sdk.model.UserInfo
 import de.netid.mobile.sdk.webservice.UserInfoCallback
 import de.netid.mobile.sdk.webservice.WebserviceApi
 
-class UserInfoManager(private val listener: UserInfoManagerListener) {
+internal class UserInfoManager(private val listener: UserInfoManagerListener) {
 
     fun fetchUserInfo(userinfoEndpoint: Uri, accessToken: String) {
         WebserviceApi.performUserInfoRequest(

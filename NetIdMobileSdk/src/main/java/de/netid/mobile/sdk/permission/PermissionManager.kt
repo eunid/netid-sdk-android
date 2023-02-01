@@ -23,7 +23,7 @@ import de.netid.mobile.sdk.webservice.PermissionReadCallback
 import de.netid.mobile.sdk.webservice.PermissionUpdateCallback
 import de.netid.mobile.sdk.webservice.WebserviceApi
 
-class PermissionManager(private val listener: PermissionManagerListener) {
+internal class PermissionManager(private val listener: PermissionManagerListener) {
 
     fun fetchPermissions(accessToken: String, collapseSyncId: Boolean) {
         WebserviceApi.performPermissionReadRequest(

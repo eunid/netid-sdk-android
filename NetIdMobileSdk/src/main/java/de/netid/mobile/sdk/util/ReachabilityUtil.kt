@@ -21,7 +21,7 @@ import android.net.NetworkCapabilities
 /**
  * Provides functionalities for network connection availability checks.
  */
-class ReachabilityUtil {
+internal class ReachabilityUtil {
 
     companion object {
 

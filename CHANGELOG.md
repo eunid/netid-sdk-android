@@ -55,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed icon sizing
 - Removed unused parameter from call
 - Set minimum sdk to 23
+- Set visibility to internal for certain classes
 
 ### Fixed
 - Fixed UserInfo json parser error

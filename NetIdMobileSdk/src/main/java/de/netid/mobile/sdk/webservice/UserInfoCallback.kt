@@ -20,7 +20,7 @@ import de.netid.mobile.sdk.model.UserInfo
 /**
  * Defines functions which are called after a user info request is complete.
  */
-interface UserInfoCallback {
+internal interface UserInfoCallback {
 
     /**
      * Is called, when a user info request was successful. Provides the fetched information.
