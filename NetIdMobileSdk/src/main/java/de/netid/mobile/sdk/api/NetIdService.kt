@@ -31,6 +31,19 @@ import de.netid.mobile.sdk.util.JsonUtil
 import de.netid.mobile.sdk.util.PackageUtil
 import de.netid.mobile.sdk.util.ReachabilityUtil
 
+/**
+ * The ``NetIdService`` is the main class of the sdk.
+ * An application communicates via this class with the authorization service.
+ *
+ * To do so, an application first registers itself as a listener to the service.
+ * ``NetIdService.addListener(this)``
+ *
+ * Next, initialize the service with a configuration object of kind ``NetIdConfig``.
+ *
+ * The application has to conform to the ``NetIdServiceDelegate`` protocol and implement the required functions (see below).
+ *
+ * ``NetIdService.initialize(netIdConfig, this)``
+ */
 object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     UserInfoManagerListener, PermissionManagerListener {
 
@@ -54,14 +67,27 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     private var appButtonFragmentsForLogin = mutableMapOf<String, Fragment>()
     private var appButtonFragmentsForLoginPermission = mutableMapOf<String, Fragment>()
 
+    /**
+     * Registers a new listener of type NetIdServiceListener
+     * @param listener The new listener.
+     */
     fun addListener(listener: NetIdServiceListener) {
         netIdServiceListeners.add(listener)
     }
 
+    /**
+     * Removes a listener of type NetIdServiceListener from the list of registered listeners.
+     * @param listener The listener to remove.
+     */
     fun removeListener(listener: NetIdServiceListener) {
         netIdServiceListeners.remove(listener)
     }
 
+    /**
+     * Initializes the sdk and loads the authentication configuration document.
+     * @param  netIdConfig The client configuration of type ``NetIdConfig``
+     * @param  context Context to use.
+     */
     fun initialize(netIdConfig: NetIdConfig, context: Context) {
         if (handleConnection(context, NetIdErrorProcess.Configuration)) {
             if (this.netIdConfig != null) {
@@ -251,7 +277,8 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
      * @param key Key denoting one of the installed account provider apps. Use ``getKeysForAccountProviderApps`` first to get the keys/names of all installed account provider apps.
      * @param authFlow Can be any of .Permission, .Login or .LoginPermission.
      * @param continueText Alternative text to set on the button. If empty, the default will be used.
-     * @returns Button with text and label for the chosen id app. If index is out of bounds or no app is installed, returns an empty view.
+     * @returns Button with text and label for the chosen id app. If index is out of bounds or no app is installed, ArrayIndexOutOfBoundsException is thrown.
+     * @throws ArrayIndexOutOfBoundsException
      */
     fun accountProviderAppButtonFragment(key: String, flow: NetIdAuthFlow, continueText: String = ""): Fragment {
         val keys = getKeysForAccountProviderApps()
