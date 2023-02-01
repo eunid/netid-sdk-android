@@ -14,6 +14,9 @@
 
 package de.netid.mobile.sdk.api
 
+/**
+ * Enum for the different authorization flows supported by this SDK.
+ */
 enum class NetIdAuthFlow {
     Permission,
     Login,

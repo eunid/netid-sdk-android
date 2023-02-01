@@ -27,7 +27,7 @@ internal interface AppAuthManager {
      * Fetches the discovery document which includes the configuration for the authentication endpoints.
      * During this call, it is checked if there is an AuthState present from a former session.
      * If so, this AuthState is used, otherwise a new one is created based on the service configuration.
-     * @param host: server address
+     * @param host server address
      */
     fun fetchAuthorizationServiceConfiguration(host: String)
 
@@ -52,7 +52,7 @@ internal interface AppAuthManager {
 
     /**
      * Processes the authorization intent.
-     * @param intent the intent
+     * @param data the intent
      */
     fun processAuthorizationIntent(data: Intent)
 
