@@ -14,6 +14,7 @@
 
 package de.netid.mobile.sdk.example
 
+import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -46,17 +47,20 @@ class ExampleInstrumentedTest {
     private val login = "your-mail@account.provider"
     private val password = "superSecretPassword"
 
+    private lateinit var scenario: ActivityScenario<MainActivity>
+
     @Before
     fun setup() {
-        val activityScenario: ActivityScenario<MainActivity> =
-            ActivityScenario.launch(MainActivity::class.java)
+        scenario = ActivityScenario.launch(MainActivity::class.java)
     }
 
     @After
     fun tearDown() {
+        scenario.close()
     }
 
-    fun findInLog(search: String) : Boolean {
+    // Helper function to search for a certain string in the logs.
+    private fun findInLog(search: String) : Boolean {
         onView(withId(R.id.activityMainLogsTextView)).check(matches(withText(containsString(search))))
         return true
     }
@@ -120,18 +124,18 @@ class ExampleInstrumentedTest {
         onView(withId(android.R.id.button2)).perform(click());
         onView(withId(de.netid.mobile.sdk.R.id.fragmentAuthorizationButtonAgreeAndContinue)).perform(click())
 
-        var device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val selector = UiSelector()
-        var link = device.findObject(selector.resourceId("edit"))
+        val link = device.findObject(selector.resourceId("edit"))
         if (link.exists()) {
             link.click()
         }
 
-        var email = device.findObject(selector.resourceId("email"))
+        val email = device.findObject(selector.resourceId("email"))
         email.text = this.login
         device.findObject(selector.resourceId("proceed")).click()
 
-        var password = device.findObject(selector.resourceId("password"))
+        val password = device.findObject(selector.resourceId("password"))
         password.text = this.password
         device.findObject(selector.resourceId("login-submit")).click()
 
@@ -170,18 +174,18 @@ class ExampleInstrumentedTest {
         onView(withId(android.R.id.button1)).perform(click());
         onView(withId(de.netid.mobile.sdk.R.id.fragmentAuthorizationButtonAgreeAndContinue)).perform(click())
 
-        var device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val selector = UiSelector()
-        var link = device.findObject(selector.resourceId("edit"))
+        val link = device.findObject(selector.resourceId("edit"))
         if (link.exists()) {
             link.click()
         }
 
-        var email = device.findObject(selector.resourceId("email"))
+        val email = device.findObject(selector.resourceId("email"))
         email.text = this.login
         device.findObject(selector.resourceId("proceed")).click()
 
-        var password = device.findObject(selector.resourceId("password"))
+        val password = device.findObject(selector.resourceId("password"))
         password.text = this.password
         device.findObject(selector.resourceId("login-submit")).click()
         sleep(2000)
