@@ -12,21 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.example
+package de.netid.mobile.sdk.example
 
+import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.espresso.web.sugar.Web.onWebView
-import androidx.test.espresso.web.webdriver.DriverAtoms
 import androidx.test.espresso.web.webdriver.DriverAtoms.*
-import androidx.test.espresso.web.webdriver.Locator
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import de.netid.mobile.sdk.example.MainActivity
-import de.netid.mobile.sdk.example.R
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.After
 import org.junit.Assert.*
@@ -44,17 +42,25 @@ import java.lang.Thread.sleep
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
 
+    // These constants define data for logging into one of the account providers.
+    // These value have to be adjusted.
+    private val login = "your-mail@account.provider"
+    private val password = "superSecretPassword"
+
+    private lateinit var scenario: ActivityScenario<MainActivity>
+
     @Before
     fun setup() {
-        val activityScenario: ActivityScenario<MainActivity> =
-            ActivityScenario.launch(MainActivity::class.java)
+        scenario = ActivityScenario.launch(MainActivity::class.java)
     }
 
     @After
     fun tearDown() {
+        scenario.close()
     }
 
-    fun findInLog(search: String) : Boolean {
+    // Helper function to search for a certain string in the logs.
+    private fun findInLog(search: String) : Boolean {
         onView(withId(R.id.activityMainLogsTextView)).check(matches(withText(containsString(search))))
         return true
     }
@@ -67,6 +73,7 @@ class ExampleInstrumentedTest {
     }
 
     @Test
+    // All buttons but the first one have to be disabled at start.
     fun testButtonStatesAtStartup() {
         onView(withId(R.id.activityMainButtonInitialize)).check(matches(isEnabled()))
         onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isNotEnabled()))
@@ -76,6 +83,7 @@ class ExampleInstrumentedTest {
     }
 
     @Test
+    // Test log functionality.
     fun testLog() {
         onView(withId(R.id.activityMainButtonInitialize)).check(matches(isEnabled()))
         onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isNotEnabled()))
@@ -84,6 +92,7 @@ class ExampleInstrumentedTest {
     }
 
     @Test
+    // Start with a login flow but cancel it before entering the web view.
     fun testLoginFlowCancel() {
         onView(withId(R.id.activityMainButtonInitialize)).check(matches(isEnabled()))
         onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isNotEnabled()))
@@ -101,10 +110,12 @@ class ExampleInstrumentedTest {
     }
 
     @Test
+    // Do complete login flow cycle.
     fun testLoginFlowOkay() {
         onView(withId(R.id.activityMainButtonInitialize)).check(matches(isEnabled()))
         onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isNotEnabled()))
         onView(withId(R.id.activityMainButtonInitialize)).perform(click())
+        sleep(2000)
 
         onView(withId(R.id.activityMainButtonInitialize)).check(matches(isNotEnabled()))
         onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isEnabled()))
@@ -113,20 +124,44 @@ class ExampleInstrumentedTest {
         onView(withId(android.R.id.button2)).perform(click());
         onView(withId(de.netid.mobile.sdk.R.id.fragmentAuthorizationButtonAgreeAndContinue)).perform(click())
 
-        onView(withText("Weiter")).perform(click())
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val selector = UiSelector()
+        val link = device.findObject(selector.resourceId("edit"))
+        if (link.exists()) {
+            link.click()
+        }
 
+        val email = device.findObject(selector.resourceId("email"))
+        email.text = this.login
+        device.findObject(selector.resourceId("proceed")).click()
 
-        onWebView().withElement(findElement(Locator.ID, "proceed")).perform(webClick())
+        val password = device.findObject(selector.resourceId("password"))
+        password.text = this.password
+        device.findObject(selector.resourceId("login-submit")).click()
 
-
-        onWebView().withElement(findElement(Locator.ID, "email")).perform(clearElement())
-        onWebView().withElement(findElement(Locator.ID, "email")).perform(webClick())
-        onWebView().withElement(findElement(Locator.ID, "email")).perform(webKeys("blubber"))
-        onWebView().withElement(findElement(Locator.ID, "submitBtn")).perform(webClick())
+        device.findObject(selector.resourceId("approve")).click()
         sleep(2000)
+
+        onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isNotEnabled()))
+        assert(findInLog("Access Token:"))
+
+        onView(withId(R.id.activityMainButtonUserInfo)).check(matches(isEnabled()))
+        onView(withId(R.id.activityMainButtonUserInfo)).perform(click())
+        sleep(2000)
+        assert(findInLog("netID service user info - fetch finished successfully"))
+
+        onView(withId(R.id.activityMainButtonPermissionRead)).check(matches(isEnabled()))
+        onView(withId(R.id.activityMainButtonPermissionRead)).perform(click())
+        sleep(2000)
+        assert(findInLog("netID service permission - fetch failed with error"))
+
+        // At the end, we end the session and test if the "Authorisieren" button is enabled again.
+        onView(withId(R.id.activityMainButtonEndSession)).check(matches(isEnabled()))
+        onView(withId(R.id.activityMainButtonEndSession)).perform(click())
     }
 
     @Test
+    // Do complete permission flow cycle.
     fun testPermissionFlowOkay() {
         onView(withId(R.id.activityMainButtonInitialize)).check(matches(isEnabled()))
         onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isNotEnabled()))
@@ -139,13 +174,42 @@ class ExampleInstrumentedTest {
         onView(withId(android.R.id.button1)).perform(click());
         onView(withId(de.netid.mobile.sdk.R.id.fragmentAuthorizationButtonAgreeAndContinue)).perform(click())
 
-        sleep(5000)
-        onWebView().withElement(findElement(Locator.ID, "email")).perform(clearElement())
-        onWebView().withElement(findElement(Locator.ID, "email")).perform(webKeys("blubber"))
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val selector = UiSelector()
+        val link = device.findObject(selector.resourceId("edit"))
+        if (link.exists()) {
+            link.click()
+        }
+
+        val email = device.findObject(selector.resourceId("email"))
+        email.text = this.login
+        device.findObject(selector.resourceId("proceed")).click()
+
+        val password = device.findObject(selector.resourceId("password"))
+        password.text = this.password
+        device.findObject(selector.resourceId("login-submit")).click()
         sleep(2000)
+
+        onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isNotEnabled()))
+        assert(findInLog("Access Token:"))
+
+        onView(withId(R.id.activityMainButtonUserInfo)).check(matches(isEnabled()))
+        onView(withId(R.id.activityMainButtonUserInfo)).perform(click())
+        sleep(2000)
+        assert(findInLog("netID service user info - fetch failed"))
+
+        onView(withId(R.id.activityMainButtonPermissionRead)).check(matches(isEnabled()))
+        onView(withId(R.id.activityMainButtonPermissionRead)).perform(click())
+        sleep(2000)
+        assert(findInLog("netID service permission - fetch finished successfully"))
+
+        // At the end, we end the session and test if the "Authorisieren" button is enabled again.
+        onView(withId(R.id.activityMainButtonEndSession)).check(matches(isEnabled()))
+        onView(withId(R.id.activityMainButtonEndSession)).perform(click())
     }
 
     @Test
+    // Test that extra claims can only be changed before initialisation.
     fun testExtraClaimsOnlyBeforeInitialising() {
         onView(withId(R.id.activityMainButtonInitialize)).check(matches(isEnabled()))
         onView(withId(R.id.activityMainCheckBoxShippingAddress)).check(matches(isEnabled()))
