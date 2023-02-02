@@ -57,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set minimum sdk to 23
 - Set visibility to internal for certain classes
 - Updated documentation
+- Updated some tests
 
 ### Fixed
 - Fixed UserInfo json parser error
