@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.example
+package de.netid.mobile.sdk.example
 
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
@@ -24,8 +24,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
-import de.netid.mobile.sdk.example.MainActivity
-import de.netid.mobile.sdk.example.R
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.After
 import org.junit.Assert.*
@@ -45,8 +43,8 @@ class ExampleInstrumentedTest {
 
     // These constants define data for logging into one of the account providers.
     // These value have to be adjusted.
-    private val LOGIN = "your-mail@account.provider"
-    private val PASSWORD = "superSecretPassword"
+    private val login = "your-mail@account.provider"
+    private val password = "superSecretPassword"
 
     @Before
     fun setup() {
@@ -130,11 +128,11 @@ class ExampleInstrumentedTest {
         }
 
         var email = device.findObject(selector.resourceId("email"))
-        email.text = this.LOGIN
+        email.text = this.login
         device.findObject(selector.resourceId("proceed")).click()
 
         var password = device.findObject(selector.resourceId("password"))
-        password.text = this.PASSWORD
+        password.text = this.password
         device.findObject(selector.resourceId("login-submit")).click()
 
         device.findObject(selector.resourceId("approve")).click()
@@ -180,11 +178,11 @@ class ExampleInstrumentedTest {
         }
 
         var email = device.findObject(selector.resourceId("email"))
-        email.text = this.LOGIN
+        email.text = this.login
         device.findObject(selector.resourceId("proceed")).click()
 
         var password = device.findObject(selector.resourceId("password"))
-        password.text = this.PASSWORD
+        password.text = this.password
         device.findObject(selector.resourceId("login-submit")).click()
         sleep(2000)
 
