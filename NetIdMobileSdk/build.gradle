@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlinx-serialization'
     id 'kotlin-parcelize'
+    id 'maven-publish'
 }
 
 android {
@@ -18,23 +19,14 @@ android {
         aarMetadata {
             minCompileSdk = 23
         }
+        versionName = "1.0.0"
     }
 
     publishing {
-        singleVariant('release') {
+        singleVariant("release") {
             withSourcesJar()
+            withJavadocJar()
         }
-/*        publications {
-            release(MavenPublication) {
-                groupId = 'de.netid'
-                artifactId = 'netidmobilesdk'
-                version = '1.0.0'
-
-                afterEvaluate {
-                    from components.release
-                }
-            }
-        }*/
     }
 
     buildFeatures {
@@ -53,6 +45,19 @@ android {
     }
         kotlinOptions {
         jvmTarget = '1.8'
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId 'de.netid'
+                artifactId 'netidmobilesdk'
+                version = android.defaultConfig.versionName
+            }
+        }
     }
 }
 
