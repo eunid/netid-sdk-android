@@ -6,6 +6,7 @@ plugins {
 }
 
 android {
+    namespace = 'de.netid.mobile.sdk'
     compileSdk 32
 
     defaultConfig {
@@ -14,7 +15,26 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
         manifestPlaceholders = [appAuthRedirectScheme: 'de.netid.mobile.sdk.netidmobilesdk']
+        aarMetadata {
+            minCompileSdk = 23
+        }
+    }
 
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+        }
+/*        publications {
+            release(MavenPublication) {
+                groupId = 'de.netid'
+                artifactId = 'netidmobilesdk'
+                version = '1.0.0'
+
+                afterEvaluate {
+                    from components.release
+                }
+            }
+        }*/
     }
 
     buildFeatures {
@@ -31,7 +51,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
+        kotlinOptions {
         jvmTarget = '1.8'
     }
 }

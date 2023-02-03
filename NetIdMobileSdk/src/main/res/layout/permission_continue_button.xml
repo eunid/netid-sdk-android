@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
@@ -28,7 +27,10 @@
             app:cornerRadius="@dimen/authorization_button_corner_radius"
             app:strokeColor="@color/authorization_close_button_color"
             app:strokeWidth="@dimen/authorization_close_button_stroke_width"
-            app:rippleColor="@color/authorization_close_button_color" />
+            app:rippleColor="@color/authorization_close_button_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
