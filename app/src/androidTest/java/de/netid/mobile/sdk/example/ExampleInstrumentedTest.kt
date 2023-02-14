@@ -14,7 +14,6 @@
 
 package de.netid.mobile.sdk.example
 
-import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -29,16 +28,22 @@ import org.hamcrest.CoreMatchers.containsString
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.MethodSorters
 import java.lang.Thread.sleep
 
 
 /**
  * Instrumented test, which will execute on an Android device.
  *
+ * Because Android does not destroy companion objects when running tests,
+ * we enforce a certain order of the tests.
+ *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
 
@@ -46,6 +51,10 @@ class ExampleInstrumentedTest {
     // These value have to be adjusted.
     private val login = "your-mail@account.provider"
     private val password = "superSecretPassword"
+
+    companion object {
+        private var isInitialized = false
+    }
 
     private lateinit var scenario: ActivityScenario<MainActivity>
 
@@ -65,45 +74,45 @@ class ExampleInstrumentedTest {
         return true
     }
 
+    // Helper function to ensure that the SDK is only initialized once.
+    private fun initializeSdkIfNeeded() {
+        if (isInitialized)
+            return
+        onView(withId(R.id.activityMainButtonInitialize)).check(matches(isEnabled()))
+        onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isNotEnabled()))
+        onView(withId(R.id.activityMainButtonInitialize)).perform(click())
+        sleep(2000)
+        onView(withId(R.id.activityMainLogsTextView)).check(matches(withText(containsString("netID service initialized successfully"))))
+        isInitialized = true
+    }
+
+
     @Test
-    fun useAppContext() {
+    fun testAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("de.netid.mobile.sdk", appContext.packageName)
+        assertEquals("de.netid.mobile.sdk.example", appContext.packageName)
     }
 
     @Test
     // All buttons but the first one have to be disabled at start.
     fun testButtonStatesAtStartup() {
-        onView(withId(R.id.activityMainButtonInitialize)).check(matches(isEnabled()))
-        onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isNotEnabled()))
-        onView(withId(R.id.activityMainButtonUserInfo)).check(matches(isNotEnabled()))
+        initializeSdkIfNeeded()
         onView(withId(R.id.activityMainButtonPermissionRead)).check(matches(isNotEnabled()))
         onView(withId(R.id.activityMainButtonPermissionWrite)).check(matches(isNotEnabled()))
     }
 
     @Test
-    // Test log functionality.
-    fun testLog() {
-        onView(withId(R.id.activityMainButtonInitialize)).check(matches(isEnabled()))
-        onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isNotEnabled()))
-        onView(withId(R.id.activityMainButtonInitialize)).perform(click())
-        onView(withId(R.id.activityMainLogsTextView)).check(matches(withText(containsString("netID service initialized successfully"))))
-    }
-
-    @Test
     // Start with a login flow but cancel it before entering the web view.
     fun testLoginFlowCancel() {
-        onView(withId(R.id.activityMainButtonInitialize)).check(matches(isEnabled()))
-        onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isNotEnabled()))
-        onView(withId(R.id.activityMainButtonInitialize)).perform(click())
+        initializeSdkIfNeeded()
 
         onView(withId(R.id.activityMainButtonInitialize)).check(matches(isNotEnabled()))
         onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isEnabled()))
         onView(withId(R.id.activityMainButtonAuthorize)).perform(click())
 
         onView(withId(android.R.id.button2)).perform(click());
-        onView(withId(de.netid.mobile.sdk.R.id.fragmentAuthorizationButtonClose)).perform(click())
+        onView(withId(de.netid.mobile.sdk.R.id.fragmentAuthorizationButtonCloseContinue)).perform(click())
         onView(withId(R.id.activityMainButtonInitialize)).check(matches(isNotEnabled()))
         onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isEnabled()))
         onView(withId(R.id.activityMainLogsTextView)).check(matches(withText(containsString("netID service user canceled authentication in process: Authentication"))))
@@ -112,10 +121,7 @@ class ExampleInstrumentedTest {
     @Test
     // Do complete login flow cycle.
     fun testLoginFlowOkay() {
-        onView(withId(R.id.activityMainButtonInitialize)).check(matches(isEnabled()))
-        onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isNotEnabled()))
-        onView(withId(R.id.activityMainButtonInitialize)).perform(click())
-        sleep(2000)
+        initializeSdkIfNeeded()
 
         onView(withId(R.id.activityMainButtonInitialize)).check(matches(isNotEnabled()))
         onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isEnabled()))
@@ -163,9 +169,7 @@ class ExampleInstrumentedTest {
     @Test
     // Do complete permission flow cycle.
     fun testPermissionFlowOkay() {
-        onView(withId(R.id.activityMainButtonInitialize)).check(matches(isEnabled()))
-        onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isNotEnabled()))
-        onView(withId(R.id.activityMainButtonInitialize)).perform(click())
+        initializeSdkIfNeeded()
 
         onView(withId(R.id.activityMainButtonInitialize)).check(matches(isNotEnabled()))
         onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isEnabled()))
@@ -210,11 +214,11 @@ class ExampleInstrumentedTest {
 
     @Test
     // Test that extra claims can only be changed before initialisation.
-    fun testExtraClaimsOnlyBeforeInitialising() {
+    fun testBeforeInitialisingAddExtraClaims() {
         onView(withId(R.id.activityMainButtonInitialize)).check(matches(isEnabled()))
         onView(withId(R.id.activityMainCheckBoxShippingAddress)).check(matches(isEnabled()))
         onView(withId(R.id.activityMainCheckBoxBirthdate)).check(matches(isEnabled()))
-        onView(withId(R.id.activityMainButtonInitialize)).perform(click())
+        initializeSdkIfNeeded()
 
         onView(withId(R.id.activityMainButtonInitialize)).check(matches(isNotEnabled()))
         onView(withId(R.id.activityMainCheckBoxShippingAddress)).check(matches(isNotEnabled()))
