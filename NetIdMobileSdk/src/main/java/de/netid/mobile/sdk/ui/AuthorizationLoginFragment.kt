@@ -101,10 +101,10 @@ class AuthorizationLoginFragment(
             }
         }
 
-        binding.fragmentAuthorizationButtonAgreeAndContinue.setTextColor(resources.getColor(buttonForegroundResource))
-        binding.fragmentAuthorizationButtonAgreeAndContinue.setBackgroundColor(resources.getColor(buttonBackgroundResource))
+        binding.fragmentAuthorizationButtonAgreeAndContinue.setTextColor(resources.getColor(buttonForegroundResource, null))
+        binding.fragmentAuthorizationButtonAgreeAndContinue.setBackgroundColor(resources.getColor(buttonBackgroundResource, null))
         binding.fragmentAuthorizationButtonAgreeAndContinue.setStrokeColorResource(buttonOutlineResource)
-        binding.fragmentAuthorizationButtonAgreeAndContinue.icon = resources.getDrawable(netIdLogoResource)
+        binding.fragmentAuthorizationButtonAgreeAndContinue.icon = resources.getDrawable(netIdLogoResource, null)
 
         binding.fragmentAuthorizationButtonCloseContinue.setOnClickListener {
             listener.onCloseClicked()
@@ -151,7 +151,7 @@ class AuthorizationLoginFragment(
             NetIdLayerStyle.Outline -> {
                 netIdLogoResource = appIdentifier.typeFaceIcon + "_outline"
                 buttonBackgroundResource = appIdentifier.backgroundColorOutline
-                buttonForegroundResource = resources.getColor(R.color.authorization_agree_text_color)
+                buttonForegroundResource = resources.getColor(R.color.authorization_agree_text_color, null)
                 strokeWidth = R.dimen.authorization_close_button_stroke_width
             }
             else -> {

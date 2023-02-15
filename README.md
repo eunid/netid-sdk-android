@@ -271,3 +271,11 @@ NetIdService.getKeysForAccountProviderApps().forEach {
     }
 }
 ```
+
+## Add the library to your project
+
+`netID MobielSDK for Android` is available from Maven Central. To include it in your own project, add the following dependency:
+
+```gradle
+implementation 'de.netid.mobile:netidmobilesdk:<VERSION>'
+```
