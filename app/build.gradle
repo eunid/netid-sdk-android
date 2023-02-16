@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "de.netid.mobile.sdk.example"
-        minSdk 24
+        minSdk 23
         targetSdk 32
         versionCode versionCodeInt
         versionName version
@@ -41,7 +41,6 @@ android {
 }
 
 dependencies {
-
     implementation 'androidx.core:core-ktx:1.8.0'
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
@@ -49,9 +48,10 @@ dependencies {
     implementation project(path: ':NetIdMobileSdk')
     implementation 'net.openid:appauth:0.11.1'
     testImplementation 'junit:junit:4.13.2'
-    implementation 'androidx.test.ext:junit-ktx:1.1.4'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-web:3.5.0'
+    implementation 'androidx.test.ext:junit-ktx:1.1.5'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-web:3.5.1'
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
 }

@@ -16,7 +16,7 @@ package de.netid.mobile.sdk.appauth
 
 import android.content.Context
 
-class AppAuthManagerFactory {
+internal class AppAuthManagerFactory {
 
     companion object {
 

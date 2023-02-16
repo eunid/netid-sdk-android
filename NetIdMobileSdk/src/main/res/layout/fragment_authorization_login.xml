@@ -90,7 +90,7 @@
             app:icon="@drawable/ic_netid_logo_small"
             app:iconSize="20dp"
             app:iconTint="@null"
-            app:iconPadding="-20dp"
+            app:iconPadding="-24dp"
             app:backgroundTint="@color/authorization_net_id_button_color"
             app:cornerRadius="@dimen/authorization_button_corner_radius"
             app:strokeColor="@color/authorization_close_button_color"
@@ -99,7 +99,7 @@
 
         <com.google.android.material.button.MaterialButton
             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-            android:id="@+id/fragmentAuthorizationButtonClose"
+            android:id="@+id/fragmentAuthorizationButtonCloseContinue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"

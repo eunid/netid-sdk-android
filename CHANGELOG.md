@@ -51,7 +51,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Be less strict when parsing JSON, ignore unknown claims
 - Hide text about apps when using app2web
 - Removed unused function from documentation
-- Make us of new redirectUrl and host
+- Make use of new redirectUrl and host
+- Changed icon sizing
+- Removed unused parameter from call
+- Set minimum sdk to 23
+- Set visibility to internal for certain classes
+- Updated documentation
+- Updated some tests
 
 ### Fixed
 - Fixed UserInfo json parser error
@@ -71,5 +77,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a bug when authorizing/deauthorizing and authorizing again
 - Fixed a bug where for every id app the same logo was displayed
 - Fixed an issue when the overlay was not closed after chaning day/night mode
+- Fixed wrong color for button outline in dark mode
 
  

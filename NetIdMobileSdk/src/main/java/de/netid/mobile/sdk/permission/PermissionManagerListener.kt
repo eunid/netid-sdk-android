@@ -19,7 +19,7 @@ import de.netid.mobile.sdk.model.PermissionReadResponse
 import de.netid.mobile.sdk.model.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 
-interface PermissionManagerListener {
+internal interface PermissionManagerListener {
 
     fun onPermissionsFetched(permissions: PermissionReadResponse)
 

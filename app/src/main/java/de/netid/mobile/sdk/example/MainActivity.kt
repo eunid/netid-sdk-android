@@ -14,6 +14,7 @@
 
 package de.netid.mobile.sdk.example
 
+import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
@@ -28,24 +29,29 @@ import org.json.JSONObject
 
 class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnItemSelectedListener {
 
-    private lateinit var binding: ActivityMainBinding
-
     private lateinit var netIdConfig: NetIdConfig
 
-    private var serviceState = ServiceState.Uninitialized
-    private lateinit var bottomDialogFragment: SdkContentBottomDialogFragment
-
-    /** Companion object for basic configuration of the [NetIdService] via [NetIdConfig] object.
-     *  clientId and redirectUri are mandatory, all other parameters are optional.
-     *  Nevertheless, we set a standard set of claims here.
+    /** Companion object for basic configuration and static parts.
      */
     companion object {
+        /* Basic configuration of the [NetIdService] via [NetIdConfig] object.
+        *  clientId and redirectUri are mandatory, all other parameters are optional.
+        *  Nevertheless, we set a standard set of claims here.
+        */
         private const val clientId = "ec54097f-83f6-4bb1-86f3-f7c584c649cd"
         private const val redirectUri = "https://eunid.github.io/redirectApp"
         private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
+
         // Using default text / icon
         private val permissionLayerConfig = null
         private val loginLayerConfig = null
+
+        private var serviceState = ServiceState.Uninitialized
+
+        @SuppressLint("StaticFieldLeak")
+        private lateinit var binding: ActivityMainBinding
+
+        private var bottomDialogFragment = SdkContentBottomDialogFragment()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,11 +78,15 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
     override fun onRestoreInstanceState(inState: Bundle) {
         super.onRestoreInstanceState(inState)
         serviceState = inState.getSerializable("serviceState") as ServiceState
+        // Restore log messages.
+        binding.activityMainLogsTextView.text = inState.getString("log","Logs:\n\n")
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putSerializable("serviceState", serviceState)
+        // Save log messages.
+        outState.putString("log", binding.activityMainLogsTextView.text.toString())
     }
 
     private fun setupNetIdConfig() {
@@ -248,9 +258,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
     override fun onAuthenticationFinished(accessToken: String) {
         appendLog("netID service authorized successfully\nAccess Token:\n$accessToken")
         serviceState = ServiceState.AuthorizationSuccessful
-        if ((this::bottomDialogFragment.isInitialized) && (bottomDialogFragment.isAdded)) {
-            bottomDialogFragment.dismiss()
-        }
+        bottomDialogFragment.dismiss()
         updateElementsForServiceState()
     }
 
@@ -261,9 +269,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
             appendLog("netID service authorization failed: ${error.code}, ${error.process}")
         }
         serviceState = ServiceState.AuthorizationFailed
-        if ((this::bottomDialogFragment.isInitialized) && (bottomDialogFragment.isAdded)) {
-            bottomDialogFragment.dismiss()
-        }
+        bottomDialogFragment.dismiss()
         updateElementsForServiceState()
     }
 
@@ -319,8 +325,8 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
             NetIdErrorProcess.UserInfo -> ServiceState.UserInfoFailed
             else -> ServiceState.Uninitialized
         }
-        updateElementsForServiceState()
         bottomDialogFragment.dismiss()
+        updateElementsForServiceState()
     }
 
     override fun onPermissionUpdateFinishedWithError(statusCode: PermissionResponseStatus, error: NetIdError) {

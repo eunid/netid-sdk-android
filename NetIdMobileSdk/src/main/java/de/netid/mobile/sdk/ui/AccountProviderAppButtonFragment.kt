@@ -59,8 +59,8 @@ class AccountProviderAppButtonFragment(
 
         when (flow) {
             NetIdAuthFlow.Permission -> binding.buttonApp.text = String.format(getString(R.string.authorization_permission_continue_button)).uppercase()
-            NetIdAuthFlow.Login -> binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue_button)).uppercase()
-            NetIdAuthFlow.LoginPermission -> binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue_button)).uppercase()
+            NetIdAuthFlow.Login -> binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue), appIdentifier.name).uppercase()
+            NetIdAuthFlow.LoginPermission -> binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue), appIdentifier.name).uppercase()
         }
         if (continueText.isNotEmpty()) {
             binding.buttonApp.text = continueText
@@ -85,10 +85,10 @@ class AccountProviderAppButtonFragment(
         var netIdLogoResource = R.drawable.ic_netid_logo_small
         var buttonBackgroundResource = R.color.authorization_agree_button_color
         var buttonForegroundResource = R.color.authorization_agree_text_color
-        var buttonOutlineResource = R.color.authorization_close_button_color
+        var buttonOutlineResource = R.color.authorization_agree_outline_color
         var buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_width
 
-        when (NetIdService.getButtonStyle()) {
+        when (buttonStyle) {
             NetIdButtonStyle.GreenSolid -> {
                 netIdLogoResource = R.drawable.ic_netid_logo_button_white
                 buttonBackgroundResource = R.color.green_background_color
@@ -107,15 +107,15 @@ class AccountProviderAppButtonFragment(
                 netIdLogoResource = R.drawable.ic_netid_logo_small
                 buttonBackgroundResource = R.color.authorization_agree_button_color
                 buttonForegroundResource = R.color.authorization_agree_text_color
-                buttonOutlineResource = R.color.authorization_close_button_color
+                buttonOutlineResource = R.color.authorization_agree_outline_color
                 buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_width
             }
         }
 
-        binding.buttonApp.setTextColor(resources.getColor(buttonForegroundResource))
-        binding.buttonApp.setBackgroundColor(resources.getColor(buttonBackgroundResource))
+        binding.buttonApp.setTextColor(resources.getColor(buttonForegroundResource, null))
+        binding.buttonApp.setBackgroundColor(resources.getColor(buttonBackgroundResource, null))
         binding.buttonApp.setStrokeColorResource(buttonOutlineResource)
-        binding.buttonApp.icon = resources.getDrawable(netIdLogoResource)
+        binding.buttonApp.icon = resources.getDrawable(netIdLogoResource, null)
         binding.buttonApp.setStrokeWidthResource(buttonStrokeWidthResource)
     }
 

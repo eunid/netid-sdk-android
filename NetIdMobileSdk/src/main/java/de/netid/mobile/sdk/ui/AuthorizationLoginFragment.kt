@@ -20,11 +20,9 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -103,13 +101,12 @@ class AuthorizationLoginFragment(
             }
         }
 
-        binding.fragmentAuthorizationButtonAgreeAndContinue.setTextColor(resources.getColor(buttonForegroundResource))
-        binding.fragmentAuthorizationButtonAgreeAndContinue.setBackgroundColor(resources.getColor(buttonBackgroundResource))
+        binding.fragmentAuthorizationButtonAgreeAndContinue.setTextColor(resources.getColor(buttonForegroundResource, null))
+        binding.fragmentAuthorizationButtonAgreeAndContinue.setBackgroundColor(resources.getColor(buttonBackgroundResource, null))
         binding.fragmentAuthorizationButtonAgreeAndContinue.setStrokeColorResource(buttonOutlineResource)
-        binding.fragmentAuthorizationButtonAgreeAndContinue.icon = resources.getDrawable(netIdLogoResource)
+        binding.fragmentAuthorizationButtonAgreeAndContinue.icon = resources.getDrawable(netIdLogoResource, null)
 
-//        binding.fragmentAuthorizationButtonClose.setBackgroundColor(resources.getColor(buttonBackgroundResource))
-        binding.fragmentAuthorizationButtonClose.setOnClickListener {
+        binding.fragmentAuthorizationButtonCloseContinue.setOnClickListener {
             listener.onCloseClicked()
         }
     }
@@ -135,7 +132,7 @@ class AuthorizationLoginFragment(
             binding.fragmentAuthorizationButtonContainerLayout.addView(appButton, index)
         }
         if (continueText.isNotEmpty()) {
-            binding.fragmentAuthorizationButtonClose.text = continueText
+            binding.fragmentAuthorizationButtonCloseContinue.text = continueText
         }
     }
 
@@ -154,7 +151,7 @@ class AuthorizationLoginFragment(
             NetIdLayerStyle.Outline -> {
                 netIdLogoResource = appIdentifier.typeFaceIcon + "_outline"
                 buttonBackgroundResource = appIdentifier.backgroundColorOutline
-                buttonForegroundResource = resources.getColor(R.color.authorization_agree_text_color)
+                buttonForegroundResource = resources.getColor(R.color.authorization_agree_text_color, null)
                 strokeWidth = R.dimen.authorization_close_button_stroke_width
             }
             else -> {

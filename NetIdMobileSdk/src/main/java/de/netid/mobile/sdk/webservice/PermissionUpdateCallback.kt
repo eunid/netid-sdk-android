@@ -18,7 +18,7 @@ import de.netid.mobile.sdk.api.NetIdError
 import de.netid.mobile.sdk.model.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 
-interface PermissionUpdateCallback {
+internal interface PermissionUpdateCallback {
 
     fun onPermissionUpdated(subjectIdentifiers: SubjectIdentifiers)
 

@@ -111,6 +111,16 @@ As stated above, it is possible to customize certain aspects of the dialog prese
 private val loginLayerConfig = LoginLayerConfig("Headline text", "Login with app %s", "Continue text")
 ``` 
 
+And when using permission flow, the dialog can be customized as well:
+```kotlin
+private val permissionLayerConfig = PermissionLayerConfig(
+    "custom_logo_resource_name",
+    "Headline text", 
+    "Legal text", 
+    "Continue text")
+``` 
+Keep in mind that you can not customize the complete legal text in the dialog. The second part of it is predefined by netID.
+
 The SDK will figure out by itself, if Account Provider apps like [GMX](https://play.google.com/store/apps/details?id=de.gmx.mobile.android.mail) or [web.de](https://play.google.com/store/apps/details?id=de.web.mobile.android.mail) are installed. If so, the SDK will always prefer the app2app-flow instead of app2web when communicating with the netID authorization service. When at least one of those apps is found, the call to `getAuthorizationFragment` will return a slightly different layout, exposing the found apps:
 <table>
     <tr>
@@ -171,6 +181,44 @@ NetIdService.updatePermissions(this.applicationContext)
 ```
 Updates the permissions object. On success `onUpdatePermissions` is called on the delegate, returning the requested information. Otherwise `onUpdatePermissionsWithError` gets called, returning a description of the error.
 
+## Implementing the NetIdServiceListener
+
+To be able to react to callbacks regarding the aforementioned functions, your application must conform to the `NetIdServiceListener` interface. Depending on your type of application, you must not implemnt all callbacks in full detail (e.g. if you never intent to fetch user information, you could just implement a stub here), hence we only list the most important ones here.
+
+```kotlin
+/**
+ * Callback function that gets called when the SDK could not be initialized correctly.
+ * In this case, a ``NetIdError`` is returned which holds more information about the error.
+ * @param error Error description.
+ */
+fun onInitializationFinishedWithError(error: NetIdError?)
+
+/**
+ * Callback function that gets called when the authentication process finished successfully.
+ * In this case, an access token is returned.
+ * @param token Access token.
+ */
+fun onAuthenticationFinished(accessToken: String)
+
+/**
+ * Callback function when user information could not be retrieved.
+ * In this case, a ``NetIdError`` is returned which holds more information about the error.
+ * @param error Error description.
+ */
+fun onAuthenticationFinishedWithError(error: NetIdError)
+
+/**
+ * Callback function that gets called when a session ends.
+ */
+fun onSessionEnd()
+
+/**
+ * Callback function that gets called when the authentication process got canceled.
+ * In this case, a ``NetIdError`` is returned which holds more information about the error.
+ * @param error Error description.
+ */
+fun onAuthenticationCanceled(error: NetIdError)
+```
 
 ## Button workflow
 
@@ -260,4 +308,12 @@ NetIdService.getKeysForAccountProviderApps().forEach {
         add(R.id.activityMainLoginContainer, appButton)
     }
 }
+```
+
+## Add the library to your project
+
+`netID MobielSDK for Android` is available from Maven Central. To include it in your own project, add the following dependency (with VERSION being 1.0.1 at the time of this writing):
+
+```gradle
+implementation 'de.netid.mobile:netidmobilesdk:<VERSION>'
 ```

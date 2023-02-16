@@ -14,14 +14,12 @@
 
 package de.netid.mobile.sdk.appauth
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import de.netid.mobile.sdk.api.NetIdAuthFlow
 import net.openid.appauth.AuthState
-import java.util.concurrent.locks.ReentrantLock
 
-interface AppAuthManager {
+internal interface AppAuthManager {
 
     var listener: AppAuthManagerListener?
 
@@ -29,7 +27,7 @@ interface AppAuthManager {
      * Fetches the discovery document which includes the configuration for the authentication endpoints.
      * During this call, it is checked if there is an AuthState present from a former session.
      * If so, this AuthState is used, otherwise a new one is created based on the service configuration.
-     * @param host: server address
+     * @param host server address
      */
     fun fetchAuthorizationServiceConfiguration(host: String)
 
@@ -54,7 +52,7 @@ interface AppAuthManager {
 
     /**
      * Processes the authorization intent.
-     * @param intent the intent
+     * @param data the intent
      */
     fun processAuthorizationIntent(data: Intent)
 

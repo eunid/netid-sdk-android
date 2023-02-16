@@ -16,8 +16,6 @@ package de.netid.mobile.sdk.ui
 
 import android.app.Activity
 import android.content.Intent
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.Selection
@@ -27,19 +25,13 @@ import android.text.Spanned
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.api.NetIdLayerStyle
 import de.netid.mobile.sdk.api.NetIdService
@@ -116,7 +108,7 @@ class AuthorizationPermissionFragment(
         var netIdLogoResource = R.drawable.ic_netid_logo_small
         var buttonBackgroundResource = R.color.authorization_agree_button_color
         var buttonForegroundResource = R.color.authorization_agree_text_color
-        var buttonOutlineResource = R.color.authorization_close_button_color
+        var buttonOutlineResource = R.color.authorization_agree_outline_color
 
         when (NetIdService.getLayerStyle()) {
             NetIdLayerStyle.Outline -> {
@@ -129,14 +121,14 @@ class AuthorizationPermissionFragment(
                 netIdLogoResource = R.drawable.ic_netid_logo_small
                 buttonBackgroundResource = R.color.authorization_agree_button_color
                 buttonForegroundResource = R.color.authorization_agree_text_color
-                buttonOutlineResource = R.color.authorization_close_button_color
+                buttonOutlineResource = R.color.authorization_agree_outline_color
             }
         }
 
-        binding.fragmentAuthorizationButtonAgreeAndContinue.setTextColor(resources.getColor(buttonForegroundResource))
-        binding.fragmentAuthorizationButtonAgreeAndContinue.setBackgroundColor(resources.getColor(buttonBackgroundResource))
+        binding.fragmentAuthorizationButtonAgreeAndContinue.setTextColor(resources.getColor(buttonForegroundResource, null))
+        binding.fragmentAuthorizationButtonAgreeAndContinue.setBackgroundColor(resources.getColor(buttonBackgroundResource, null))
         binding.fragmentAuthorizationButtonAgreeAndContinue.setStrokeColorResource(buttonOutlineResource)
-        binding.fragmentAuthorizationButtonAgreeAndContinue.icon = resources.getDrawable(netIdLogoResource)
+        binding.fragmentAuthorizationButtonAgreeAndContinue.icon = resources.getDrawable(netIdLogoResource, null)
 
         binding.fragmentAuthorizationButtonAgreeAndContinue.text = getString(R.string.authorization_permission_agree_and_continue_with_net_id).uppercase()
         binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
