@@ -20,7 +20,7 @@ android {
         aarMetadata {
             minCompileSdk = 23
         }
-        versionName = "1.0.0"
+        versionName = "1.0.1"
     }
 
     buildFeatures {
@@ -55,6 +55,7 @@ publishing {
                 name = "netID SDK for Android"
                 description = "The netID MobileSDK facilitates the use of the netID federated login and privacy management services."
                 url = 'https://github.com/eunid/netid-sdk-android/'
+                packaging 'aar'
 
                 licenses {
                     license {
