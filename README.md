@@ -181,6 +181,44 @@ NetIdService.updatePermissions(this.applicationContext)
 ```
 Updates the permissions object. On success `onUpdatePermissions` is called on the delegate, returning the requested information. Otherwise `onUpdatePermissionsWithError` gets called, returning a description of the error.
 
+## Implementing the NetIdServiceListener
+
+To be able to react to callbacks regarding the aforementioned functions, your application must conform to the `NetIdServiceListener` interface. Depending on your type of application, you must not implemnt all callbacks in full detail (e.g. if you never intent to fetch user information, you could just implement a stub here), hence we only list the most important ones here.
+
+```kotlin
+/**
+ * Callback function that gets called when the SDK could not be initialized correctly.
+ * In this case, a ``NetIdError`` is returned which holds more information about the error.
+ * @param error Error description.
+ */
+fun onInitializationFinishedWithError(error: NetIdError?)
+
+/**
+ * Callback function that gets called when the authentication process finished successfully.
+ * In this case, an access token is returned.
+ * @param token Access token.
+ */
+fun onAuthenticationFinished(accessToken: String)
+
+/**
+ * Callback function when user information could not be retrieved.
+ * In this case, a ``NetIdError`` is returned which holds more information about the error.
+ * @param error Error description.
+ */
+fun onAuthenticationFinishedWithError(error: NetIdError)
+
+/**
+ * Callback function that gets called when a session ends.
+ */
+fun onSessionEnd()
+
+/**
+ * Callback function that gets called when the authentication process got canceled.
+ * In this case, a ``NetIdError`` is returned which holds more information about the error.
+ * @param error Error description.
+ */
+fun onAuthenticationCanceled(error: NetIdError)
+```
 
 ## Button workflow
 
@@ -270,4 +308,12 @@ NetIdService.getKeysForAccountProviderApps().forEach {
         add(R.id.activityMainLoginContainer, appButton)
     }
 }
+```
+
+## Add the library to your project
+
+`netID MobielSDK for Android` is available from Maven Central. To include it in your own project, add the following dependency (with VERSION being 1.0.1 at the time of this writing):
+
+```gradle
+implementation 'de.netid.mobile:netidmobilesdk:<VERSION>'
 ```
