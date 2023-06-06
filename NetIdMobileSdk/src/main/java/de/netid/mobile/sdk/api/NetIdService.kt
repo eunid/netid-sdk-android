@@ -138,7 +138,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                         )
                     NetIdAuthFlow.Permission ->
                         AuthorizationPermissionFragment(
-                            this, availableAppIdentifiers, it, (config.permissionLayerConfig?.logoId)?: "", (config.permissionLayerConfig?.headlineText)?: "", (config.permissionLayerConfig?.legalText)?: "", (config.permissionLayerConfig?.continueText)?: ""
+                            this, availableAppIdentifiers, it, (config.permissionLayerConfig?.logoName)?: "", (config.permissionLayerConfig?.headlineText)?: "", (config.permissionLayerConfig?.legalText)?: "", (config.permissionLayerConfig?.continueText)?: ""
                         )
                 }
             }
