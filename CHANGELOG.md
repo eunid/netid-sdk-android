@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Inital commit
+- Initial commit
 - Permission management webservices and API functions
 - AuthorizationView screen design alignment
 - API function to transmit a id token
@@ -59,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated documentation
 - Updated some tests
 - Be more explicit about custom logo resource
+- Improved error handling for loading of custom logo resource
 
 ### Fixed
 - Fixed UserInfo json parser error
@@ -66,9 +67,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a problem with finding the activities of a package
 - Fixed wrong scopes for hard/soft flow
 - Fixed a bug with the soft flow if only one app was installed
-- Fixed a bug with cathcing the redirect
+- Fixed a bug with catching the redirect
 - Fixed a bug with too many scopes
-- Fixed a bug with not setting the istandard claims
+- Fixed a bug with not setting the standard claims
 - Fixed a bug when some claims were missing
 - Only set claims in login and login+permission flows
 - Make get/update permission possible in permission flow
@@ -77,7 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a crash in the context of the bottom fragment
 - Fixed a bug when authorizing/deauthorizing and authorizing again
 - Fixed a bug where for every id app the same logo was displayed
-- Fixed an issue when the overlay was not closed after chaning day/night mode
+- Fixed an issue when the overlay was not closed after changing day/night mode
 - Fixed wrong color for button outline in dark mode
 
  

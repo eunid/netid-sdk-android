@@ -80,10 +80,15 @@ class AuthorizationPermissionFragment(
         configureStandardButtons()
         configurePermissionFlowDialog()
         if (logoName.isNotEmpty()) {
-            var logo = context?.resources?.getIdentifier(logoName, "drawable", context?.packageName)
-                ?.let { context?.getDrawable(it) }
-            if (logo != null) {
-                binding.fragmentAuthorizationLogoImageView.setImageDrawable(logo)
+            val logoId = context?.resources?.getIdentifier(logoName, "drawable", context?.packageName)
+            if (logoId != 0) {
+                val logo = logoId?.let { context?.getDrawable(it) }
+                if (logo != null) {
+                    binding.fragmentAuthorizationLogoImageView.setImageDrawable(logo)
+                }
+            } else {
+                // The custom logo was not found, at least log this out to the console.
+                System.err.println("Resource with name $logoName was not found in package ${context?.packageName}, using default icon.")
             }
         }
         if (headlineText.isNotEmpty()) {

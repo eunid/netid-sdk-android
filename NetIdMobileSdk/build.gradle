@@ -20,7 +20,7 @@ android {
         aarMetadata {
             minCompileSdk = 23
         }
-        versionName = "1.0.1"
+        versionName = "1.0.2"
     }
 
     buildFeatures {
