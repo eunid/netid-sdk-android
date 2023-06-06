@@ -15,13 +15,13 @@
 package de.netid.mobile.sdk.api
 
 /**
- * @property logoId References an icon resource by id to be set during permission flow (in the upper left corner of the dialog).
+ * @property logoName References an icon resource by its name to be set during permission flow (in the upper left corner of the dialog). The icon has to be part of the application's drawable assets.
  * @property headlineText Sets the text of the headline (beneath the logo).
  * @property legalText Sets the text of the first part of the legal information text. However, the second part is fixed and can not be set.
  * @property continueText Sets the text of the continue button at the bottom of the dialog.
  */
 data class PermissionLayerConfig(
-    val logoId: String? = "",
+    val logoName: String? = "",
     val headlineText: String? = "",
     val legalText: String? = "",
     val continueText: String? = ""

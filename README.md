@@ -119,6 +119,8 @@ private val permissionLayerConfig = PermissionLayerConfig(
     "Legal text", 
     "Continue text")
 ``` 
+With the first parameter, it is possible to set a custom logo resource (which will be displayed in the top left corner of the dialog). This resource is expected to be a drawable asset in the application package and is referenced by its name, not its id.
+
 Keep in mind that you can not customize the complete legal text in the dialog. The second part of it is predefined by netID.
 
 The SDK will figure out by itself, if Account Provider apps like [GMX](https://play.google.com/store/apps/details?id=de.gmx.mobile.android.mail) or [web.de](https://play.google.com/store/apps/details?id=de.web.mobile.android.mail) are installed. If so, the SDK will always prefer the app2app-flow instead of app2web when communicating with the netID authorization service. When at least one of those apps is found, the call to `getAuthorizationFragment` will return a slightly different layout, exposing the found apps:

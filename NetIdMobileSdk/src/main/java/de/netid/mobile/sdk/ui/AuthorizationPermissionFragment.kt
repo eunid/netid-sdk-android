@@ -44,7 +44,7 @@ class AuthorizationPermissionFragment(
     private val listener: AuthorizationFragmentListener,
     private val appIdentifiers: MutableList<AppIdentifier> = mutableListOf(),
     private val authorizationIntent: Intent,
-    private val logoId: String = "",
+    private val logoName: String = "",
     private val headlineText: String = "",
     private val legalText: String = "",
     private val continueText: String = ""
@@ -79,8 +79,8 @@ class AuthorizationPermissionFragment(
 
         configureStandardButtons()
         configurePermissionFlowDialog()
-        if (logoId.isNotEmpty()) {
-            var logo = context?.resources?.getIdentifier(logoId, "drawable", context?.packageName)
+        if (logoName.isNotEmpty()) {
+            var logo = context?.resources?.getIdentifier(logoName, "drawable", context?.packageName)
                 ?.let { context?.getDrawable(it) }
             if (logo != null) {
                 binding.fragmentAuthorizationLogoImageView.setImageDrawable(logo)
