@@ -62,6 +62,8 @@ internal interface AppAuthManager {
      */
     fun getAccessToken(): String?
 
+    fun setAccessToken(token: String?)
+
     /**
      * Returns the currently available permission token if there is one, null otherwise.
      * @return permissionToken

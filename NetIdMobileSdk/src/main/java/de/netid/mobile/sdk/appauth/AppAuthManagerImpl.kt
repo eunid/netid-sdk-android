@@ -36,7 +36,7 @@ internal class AppAuthManagerImpl(context: Context) : AppAuthManager {
     companion object {
         private const val scheme = "https://"
         private const val scopePermissionManagement = "permission_management"
-        private val browserDenyList =  BrowserDenyList(
+        private val browserDenyList = BrowserDenyList(
             VersionedBrowserMatcher.FIREFOX_BROWSER,
             VersionedBrowserMatcher.FIREFOX_CUSTOM_TAB
         )
@@ -50,11 +50,7 @@ internal class AppAuthManagerImpl(context: Context) : AppAuthManager {
     private var authorizationServiceConfiguration: AuthorizationServiceConfiguration? = null
     private var authService: AuthorizationService? = null
     private var authState: AuthState? = null
-    private var sharedPreferences: SharedPreferences
-
-    init {
-        sharedPreferences = context.getSharedPreferences(STORE_NAME, Context.MODE_PRIVATE)
-    }
+    private var sharedPreferences: SharedPreferences = context.getSharedPreferences(STORE_NAME, Context.MODE_PRIVATE)
 
     override fun getAccessToken(): String? {
         return getAuthState()?.accessToken
@@ -67,11 +63,16 @@ internal class AppAuthManagerImpl(context: Context) : AppAuthManager {
     }
 
     override fun getAuthState(): AuthState? {
-        if (authState != null)
+        if (authState != null) {
             return authState
+        }
 
         authState = readState()
         return authState
+    }
+
+    override fun setAccessToken(token: String?) {
+        getAuthState()?.lastTokenResponse?.accessToken = token
     }
 
     /**

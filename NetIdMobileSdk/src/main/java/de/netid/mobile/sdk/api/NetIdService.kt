@@ -388,6 +388,10 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
+    fun setAccessToken(token: String?) {
+        appAuthManager.setAccessToken(token)
+    }
+
     /**
      * Function to end a session.
      * The net ID service itself still remains initialized but all information about authorization/authentication is discarded.

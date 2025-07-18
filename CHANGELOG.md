@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added session persistence
 - Added possibility to add optional claims to login flow
 - Added button workflow, with own demo app
+- Possibility to set external access token
 
 ### Changed
 - Renamed NetID to netID

@@ -8,6 +8,7 @@
     <string name="net_id_service_load_user_info">UserInfo laden</string>
     <string name="net_id_service_load_permissions">Laden</string>
     <string name="net_id_service_load_update_permissions">Aktualisieren</string>
+    <string name="net_id_service_set_access_token">Access Token setzen</string>
     <string name="net_id_service_end_session">Session beenden</string>
     <string name="net_id_service_logs">Logs:\n\n</string>
     <string name="net_id_service_auth_permission">Permission</string>
