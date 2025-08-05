@@ -3,7 +3,7 @@
 ## About
 
 The `netID MobileSDK` facilitates the use of the [netID](https://netid.de) authorization and privacy management services.
-Alongside the SDK, this repository hosts two sample apps, demonstarting the usage of the SDK. The first one is more complete as it demonstrates complete workflows including fetching/setting of additional values and/or user information. The second one is less complex and only demonstrates the basic workflow, if you want to add the different buttons for interacting with the SDK in a more direct way. 
+Alongside the SDK, this repository hosts two sample apps, demonstrating the usage of the SDK. The first one is more complete as it demonstrates complete workflows including fetching/setting of additional values and/or user information. The second one is less complex and only demonstrates the basic workflow, if you want to add the different buttons for interacting with the SDK in a more direct way. 
 
 ## Initialize NetIDService
 
@@ -73,7 +73,7 @@ NetIdService.initialize(netIdConfig, this.applicationContext)
 After the NetIDService has been initialized, subsequent calls to request authorization can be made. 
 In the example app, you are presented with three choices as can be seen in this screenshot.
 
-<img src="images/netIdSdk_android_choose_authFlow.png" alt="netID SDK example app - chosse authFlow" style="width:200px;"/>
+<img src="images/netIdSdk_android_choose_authFlow.png" alt="netID SDK example app - choose authFlow" style="width:200px;"/>
 
 In your own app, you most likely will decide which flow to take without an user interaction. To initiate the authorization process, issue the following call to the NetIDService:
 ```kotlin
@@ -182,6 +182,11 @@ Fetches the permissions object. On success `onFetchPermissions` is called on the
 NetIdService.updatePermissions(this.applicationContext)
 ```
 Updates the permissions object. On success `onUpdatePermissions` is called on the delegate, returning the requested information. Otherwise `onUpdatePermissionsWithError` gets called, returning a description of the error.
+
+```kotlin
+NetIdService.setAccessToken(accessToken)
+```
+This is a testing function, where an external access token can be set. Usefull for testing the different flows. Usually, this function is not used and can be safely ignored.
 
 ## Implementing the NetIdServiceListener
 

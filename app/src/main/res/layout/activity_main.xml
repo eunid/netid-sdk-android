@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/main_activity_outer_padding"
+    android:fitsSystemWindows="true"
     tools:context="de.netid.mobile.sdk.example.MainActivity">
 
     <LinearLayout
@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="5dp"
+        android:padding="@dimen/main_activity_outer_padding"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -131,52 +131,60 @@
         </LinearLayout>
 
         <TextView
-                android:id="@+id/activityMainTitlePermissionTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/main_activity_permission_section_margin_horizontal"
-                android:text="@string/net_id_service_permission_title"
-                android:textSize="@dimen/net_id_service_title_permission_text_size"
-                android:textColor="@color/black"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/activityMainTitlePermissionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/main_activity_permission_section_margin_horizontal"
+            android:text="@string/net_id_service_permission_title"
+            android:textSize="@dimen/net_id_service_title_permission_text_size"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal"
-                  android:gravity="center">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
 
             <Button
-                    android:id="@+id/activityMainButtonPermissionRead"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="@dimen/main_activity_button_status_margin_horizontal"
-                    android:backgroundTint="@android:color/holo_orange_dark"
-                    android:text="@string/net_id_service_load_permissions"
-                    android:textColor="@drawable/netid_button"
-                    android:textAllCaps="false" />
+                android:id="@+id/activityMainButtonPermissionRead"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="@dimen/main_activity_button_status_margin_horizontal"
+                android:backgroundTint="@android:color/holo_orange_dark"
+                android:text="@string/net_id_service_load_permissions"
+                android:textColor="@drawable/netid_button"
+                android:textAllCaps="false" />
 
               <Button
-                      android:id="@+id/activityMainButtonPermissionWrite"
-                      android:layout_width="0dp"
-                      android:layout_height="wrap_content"
-                      android:layout_weight="1"
-                      android:backgroundTint="@android:color/holo_orange_dark"
-                      android:text="@string/net_id_service_load_update_permissions"
-                      android:textColor="@drawable/netid_button"
-                      android:textAllCaps="false" />
+                  android:id="@+id/activityMainButtonPermissionWrite"
+                  android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:backgroundTint="@android:color/holo_orange_dark"
+                  android:text="@string/net_id_service_load_update_permissions"
+                  android:textColor="@drawable/netid_button"
+                  android:textAllCaps="false" />
         </LinearLayout>
+
+        <Button
+            android:id="@+id/activityMainButtonSetAccessToken"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/holo_orange_dark"
+            android:text="@string/net_id_service_set_access_token"
+            android:textColor="@drawable/netid_button"
+            android:textAllCaps="false" />
 
     </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/main_activity_vertical_margin"
-        android:layout_marginBottom="@dimen/main_activity_vertical_margin"
+        android:padding="@dimen/main_activity_outer_padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/activityMainButtonContainerLayout"
@@ -200,6 +208,7 @@
         android:textColor="@drawable/netid_button"
         android:text="@string/net_id_service_end_session"
         android:textAllCaps="false"
+        android:layout_marginHorizontal="@dimen/main_activity_outer_padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/activityMainStyleSpinner" />
@@ -209,6 +218,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:entries="@array/layerStyles"
+        android:layout_marginHorizontal="@dimen/main_activity_outer_padding"
+        android:layout_marginBottom="@dimen/main_activity_outer_padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />

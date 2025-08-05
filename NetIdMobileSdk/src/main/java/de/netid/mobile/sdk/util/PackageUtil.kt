@@ -57,14 +57,14 @@ internal class PackageUtil {
                 val info = packageManager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
                 // Filter for specific activity
                 if (info.activities != null) {
-                    info.activities.forEach {
+                    info.activities?.forEach {
                         if (it.name.equals(activityName)) {
                             return@isPackageInstalled true
                         }
                     }
                 }
                 false
-            } catch (exception: PackageManager.NameNotFoundException) {
+            } catch (_: PackageManager.NameNotFoundException) {
                 false
             }
         }

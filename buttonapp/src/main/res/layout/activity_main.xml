@@ -5,8 +5,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingHorizontal="@dimen/main_activity_outer_padding"
     android:paddingVertical="5dp"
+    android:fitsSystemWindows="true"
     tools:context="de.netid.mobile.sdk.example.buttonapp.MainActivity">
 
     <LinearLayout
@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="@dimen/main_activity_vertical_margin"
+        android:paddingHorizontal="@dimen/main_activity_outer_padding"
         android:background="@drawable/ic_netid_logo_button"
         android:tileMode="repeat"
         app:layout_constraintEnd_toEndOf="parent"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -53,13 +53,14 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:paddingHorizontal="@dimen/main_activity_outer_padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/activityMainButtonContainerLayout"
@@ -79,6 +80,7 @@
         android:id="@+id/activityMainButtonEndSession"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/main_activity_outer_padding"
         android:backgroundTint="@android:color/holo_red_light"
         android:textColor="@drawable/netid_button"
         android:text="@string/net_id_service_end_session"
@@ -92,6 +94,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:entries="@array/buttonStyles"
+        android:layout_marginHorizontal="@dimen/main_activity_outer_padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />

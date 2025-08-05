@@ -42,6 +42,8 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
         private const val redirectUri = "https://eunid.github.io/redirectApp"
         private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
 
+        private const val INVALID_ACCESS_TOKEN = "<INSERT_EXPIRED_TOKEN_HERE>"
+
         // Using default text / icon
         private val permissionLayerConfig = null
         private val loginLayerConfig = null
@@ -64,6 +66,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
         setupAuthorizeButton()
         setupUserInfoButton()
         setupPermissionManagementButtons()
+        setupSetAccessTokenButton()
         setupEndSessionButton()
         updateElementsForServiceState()
 
@@ -178,6 +181,12 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
         }
     }
 
+    private fun setupSetAccessTokenButton() {
+        binding.activityMainButtonSetAccessToken.setOnClickListener {
+            NetIdService.setAccessToken(INVALID_ACCESS_TOKEN)
+        }
+    }
+
     private fun setupEndSessionButton() {
         binding.activityMainButtonEndSession.setOnClickListener {
             it.isEnabled = false
@@ -195,14 +204,12 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
     }
 
     private fun updateElementsForServiceState() {
-        val isUninitialized =
-            serviceState == ServiceState.Uninitialized || serviceState == ServiceState.InitializationFailed
-        val isNotAuthorized =
-            serviceState == ServiceState.InitializationSuccessful || serviceState == ServiceState.AuthorizationFailed
-        val isAuthorized =
-            serviceState == ServiceState.AuthorizationSuccessful || serviceState == ServiceState.UserInfoFailed
-                    || serviceState == ServiceState.UserInfoSuccessful || serviceState == ServiceState.PermissionWriteSuccessful || serviceState == ServiceState.PermissionWriteFailed
-                    || serviceState == ServiceState.PermissionReadFailed || serviceState == ServiceState.PermissionReadSuccessful
+        val isUninitialized = serviceState == ServiceState.Uninitialized || serviceState == ServiceState.InitializationFailed
+        val isNotAuthorized = serviceState == ServiceState.InitializationSuccessful || serviceState == ServiceState.AuthorizationFailed
+        val isAuthorized = serviceState == ServiceState.AuthorizationSuccessful || serviceState == ServiceState.UserInfoFailed ||
+            serviceState == ServiceState.UserInfoSuccessful || serviceState == ServiceState.PermissionWriteSuccessful ||
+            serviceState == ServiceState.PermissionWriteFailed || serviceState == ServiceState.PermissionReadFailed ||
+            serviceState == ServiceState.PermissionReadSuccessful
 
         binding.activityMainButtonInitialize.isEnabled = isUninitialized
         binding.activityMainButtonAuthorize.isEnabled = isNotAuthorized
@@ -210,6 +217,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
         binding.activityMainButtonEndSession.isEnabled = isAuthorized
         binding.activityMainButtonPermissionWrite.isEnabled = isAuthorized
         binding.activityMainButtonPermissionRead.isEnabled = isAuthorized
+        binding.activityMainButtonSetAccessToken.isEnabled = isAuthorized
         binding.activityMainCheckBoxShippingAddress.isEnabled = isUninitialized
         binding.activityMainCheckBoxBirthdate.isEnabled = isUninitialized
 

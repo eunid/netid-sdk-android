@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
@@ -9,18 +11,16 @@ plugins {
 
 android {
     namespace = 'de.netid.mobile.sdk'
-    compileSdk 32
+    compileSdk 35
 
     defaultConfig {
         minSdk 23
-        targetSdk 32
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
         manifestPlaceholders = [appAuthRedirectScheme: 'de.netid.mobile.sdk.netidmobilesdk']
         aarMetadata {
             minCompileSdk = 23
         }
-        versionName = "1.0.2"
     }
 
     buildFeatures {
@@ -34,11 +34,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_19
+        targetCompatibility JavaVersion.VERSION_19
     }
-        kotlinOptions {
-        jvmTarget = '1.8'
+
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_19
+        }
     }
 }
 
@@ -97,8 +100,8 @@ publishing {
             name = "sonatype"
             url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
             credentials {
-                username sonatype_user
-                password sonatype_pwd
+//                username sonatype_user
+//                password sonatype_pwd
             }
         }
     }
@@ -109,13 +112,13 @@ signing {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.8.0'
-    implementation 'androidx.appcompat:appcompat:1.4.2'
-    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'androidx.core:core-ktx:1.16.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'com.google.android.material:material:1.12.0'
     implementation 'net.openid:appauth:0.11.1'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0-RC'
-    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:5.1.0'
 }

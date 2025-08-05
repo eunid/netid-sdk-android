@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added session persistence
 - Added possibility to add optional claims to login flow
 - Added button workflow, with own demo app
+- Possibility to set external access token
 
 ### Changed
 - Renamed NetID to netID
@@ -46,7 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Small refactoring about claims handling
 - Changed icon for close button
 - Some cleanups
-- Make permission erros more transparent
+- Make permission errors more transparent
 - Force use of Chrome for app2web 
 - Be less strict when parsing JSON, ignore unknown claims
 - Hide text about apps when using app2web

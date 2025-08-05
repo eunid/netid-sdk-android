@@ -389,6 +389,15 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     }
 
     /**
+     * Sets an access token, overwriting the actual token in the SDK.
+     * This makes most sense after initializing the SDK and getting a token.
+     * @param accessToken access token to set, of type ``String``
+     */
+    fun setAccessToken(accessToken: String?) {
+        appAuthManager.setAccessToken(accessToken)
+    }
+
+    /**
      * Function to end a session.
      * The net ID service itself still remains initialized but all information about authorization/authentication is discarded.
      * To start a new session, call ``authorize(destinationScheme:currentViewController:authFlow)`` again.

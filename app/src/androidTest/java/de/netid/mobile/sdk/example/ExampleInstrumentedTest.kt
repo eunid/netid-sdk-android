@@ -138,11 +138,11 @@ class ExampleInstrumentedTest {
         }
 
         val email = device.findObject(selector.resourceId("email"))
-        email.text = this.login
+        email.setText(this.login)
         device.findObject(selector.resourceId("proceed")).click()
 
         val password = device.findObject(selector.resourceId("password"))
-        password.text = this.password
+        password.setText(this.password)
         device.findObject(selector.resourceId("login-submit")).click()
 
         device.findObject(selector.resourceId("approve")).click()
@@ -160,6 +160,53 @@ class ExampleInstrumentedTest {
         onView(withId(R.id.activityMainButtonPermissionRead)).perform(click())
         sleep(2000)
         assert(findInLog("netID service permission - fetch failed with error"))
+
+        // At the end, we end the session and test if the "Authorisieren" button is enabled again.
+        onView(withId(R.id.activityMainButtonEndSession)).check(matches(isEnabled()))
+        onView(withId(R.id.activityMainButtonEndSession)).perform(click())
+    }
+
+    @Test
+    // Do complete login flow cycle.
+    fun testSetAccessTokenOkay() {
+        initializeSdkIfNeeded()
+
+        onView(withId(R.id.activityMainButtonInitialize)).check(matches(isNotEnabled()))
+        onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isEnabled()))
+        onView(withId(R.id.activityMainButtonAuthorize)).perform(click())
+
+        onView(withId(android.R.id.button2)).perform(click());
+        onView(withId(de.netid.mobile.sdk.R.id.fragmentAuthorizationButtonAgreeAndContinue)).perform(click())
+
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val selector = UiSelector()
+        val link = device.findObject(selector.resourceId("edit"))
+        if (link.exists()) {
+            link.click()
+        }
+
+        val email = device.findObject(selector.resourceId("email"))
+        email.setText(this.login)
+        device.findObject(selector.resourceId("proceed")).click()
+
+        val password = device.findObject(selector.resourceId("password"))
+        password.setText(this.password)
+        device.findObject(selector.resourceId("login-submit")).click()
+
+        device.findObject(selector.resourceId("approve")).click()
+        sleep(2000)
+
+        onView(withId(R.id.activityMainButtonAuthorize)).check(matches(isNotEnabled()))
+        assert(findInLog("Access Token:"))
+
+        onView(withId(R.id.activityMainButtonSetAccessToken)).check(matches(isEnabled()))
+        onView(withId(R.id.activityMainButtonSetAccessToken)).perform(click())
+        sleep(2000)
+
+        onView(withId(R.id.activityMainButtonUserInfo)).check(matches(isEnabled()))
+        onView(withId(R.id.activityMainButtonUserInfo)).perform(click())
+        sleep(2000)
+        assert(findInLog("netID service user info - fetch failed: UnauthorizedClient, UserInfo"))
 
         // At the end, we end the session and test if the "Authorisieren" button is enabled again.
         onView(withId(R.id.activityMainButtonEndSession)).check(matches(isEnabled()))
@@ -186,11 +233,11 @@ class ExampleInstrumentedTest {
         }
 
         val email = device.findObject(selector.resourceId("email"))
-        email.text = this.login
+        email.setText(this.login)
         device.findObject(selector.resourceId("proceed")).click()
 
         val password = device.findObject(selector.resourceId("password"))
-        password.text = this.password
+        password.setText(this.password)
         device.findObject(selector.resourceId("login-submit")).click()
         sleep(2000)
 
