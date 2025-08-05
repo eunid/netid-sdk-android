@@ -62,7 +62,12 @@ internal interface AppAuthManager {
      */
     fun getAccessToken(): String?
 
-    fun setAccessToken(token: String?)
+    /**
+     * Sets an access token, overwriting the actual token in the SDK.
+     * This makes most sense after initializing the SDK and getting a token.
+     * @param accessToken access token to set, of type ``String``
+     */
+    fun setAccessToken(accessToken: String?)
 
     /**
      * Returns the currently available permission token if there is one, null otherwise.

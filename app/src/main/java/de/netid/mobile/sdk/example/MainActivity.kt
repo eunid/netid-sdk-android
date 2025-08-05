@@ -42,11 +42,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
         private const val redirectUri = "https://eunid.github.io/redirectApp"
         private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
 
-        private const val INVALID_ACCESS_TOKEN = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwia2lkIjoicGxzX2Flc19rZXktMSIsInppcCI6IkRFRiJ9" +
-            "..-fawL2Eo8FwU10fw.e5sv6xY5frmWPh8wUsrZD3HPfYgBtwDK3IXrmCeRiNyca8XIiWvPEMp_2mSBh7JjChExatir6lLttBbOZuekkVesT7BmGITq8g" +
-            "Q5AkNuoV88jKT0CRyFjvfY6CgabvkJ1CYF8Un0IMXCpyJSb9lt4MNc7sr9shsK1SyWV8vK9mRHk34LMCtnzbIEPbQfR6VYasAMqVXHMv7a3oVXHp8soby" +
-            "wpPBXCHtm03dUtpyfLVzwwSg4GnjaJ9Y4TCw1ocxGTc8DtJ6YaGknuixK1wy3ZiU7h6M-r18yBQf99rMUcR96lz42bhbTjfFnHLpszHeJv5bMrWGJEkob" +
-            "dDly13UnXEmzbP1iZjxRfUy-3Xi_.-S_i_CsstgFS2RvO7l0o9w"
+        private const val INVALID_ACCESS_TOKEN = "<INSERT_EXPIRED_TOKEN_HERE>"
 
         // Using default text / icon
         private val permissionLayerConfig = null

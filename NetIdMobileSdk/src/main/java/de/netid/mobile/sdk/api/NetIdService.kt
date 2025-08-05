@@ -388,8 +388,13 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
     }
 
-    fun setAccessToken(token: String?) {
-        appAuthManager.setAccessToken(token)
+    /**
+     * Sets an access token, overwriting the actual token in the SDK.
+     * This makes most sense after initializing the SDK and getting a token.
+     * @param accessToken access token to set, of type ``String``
+     */
+    fun setAccessToken(accessToken: String?) {
+        appAuthManager.setAccessToken(accessToken)
     }
 
     /**

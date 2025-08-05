@@ -31,6 +31,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.util.concurrent.locks.ReentrantLock
 
+
 internal class AppAuthManagerImpl(context: Context) : AppAuthManager {
 
     companion object {
@@ -71,8 +72,13 @@ internal class AppAuthManagerImpl(context: Context) : AppAuthManager {
         return authState
     }
 
-    override fun setAccessToken(token: String?) {
-        getAuthState()?.lastTokenResponse?.accessToken = token
+    override fun setAccessToken(accessToken: String?) {
+        val lastTokenResponse = getAuthState()?.lastTokenResponse
+        if (lastTokenResponse != null) {
+            val builder = TokenResponse.Builder(lastTokenResponse.request).setAccessToken(accessToken)
+            val modifiedTokenResponse = builder.build()
+            getAuthState()?.update(modifiedTokenResponse, null)
+        }
     }
 
     /**
