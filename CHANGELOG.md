@@ -61,6 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated some tests
 - Be more explicit about custom logo resource
 - Improved error handling for loading of custom logo resource
+- Switched to jdk 17
 
 ### Fixed
 - Fixed UserInfo json parser error
