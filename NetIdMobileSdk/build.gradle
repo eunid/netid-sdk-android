@@ -34,13 +34,13 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_19
-        targetCompatibility JavaVersion.VERSION_19
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlin {
         compilerOptions {
-            jvmTarget = JvmTarget.JVM_19
+            jvmTarget = JvmTarget.JVM_17
         }
     }
 }
@@ -98,10 +98,10 @@ publishing {
     repositories {
         maven {
             name = "sonatype"
-            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
             credentials {
-//                username sonatype_user
-//                password sonatype_pwd
+                username 'username'
+                password 'password'
             }
         }
     }
