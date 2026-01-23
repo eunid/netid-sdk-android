@@ -34,6 +34,7 @@ internal class UserInfoManager(private val listener: UserInfoManagerListener) {
                 override fun onUserInfoFetchFailed(error: NetIdError) {
                     listener.onUserInfoFetchFailed(error)
                 }
-            })
+            }
+        )
     }
 }

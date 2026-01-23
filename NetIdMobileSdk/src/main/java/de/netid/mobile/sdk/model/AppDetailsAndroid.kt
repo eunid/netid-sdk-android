@@ -18,5 +18,3 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AppDetailsAndroid(val applicationId: String, val verifiedAppLink: String, val activityFilter: String)
-
-

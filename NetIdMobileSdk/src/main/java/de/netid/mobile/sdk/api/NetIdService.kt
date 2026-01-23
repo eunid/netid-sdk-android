@@ -21,10 +21,20 @@ import androidx.fragment.app.Fragment
 import de.netid.mobile.sdk.appauth.AppAuthManager
 import de.netid.mobile.sdk.appauth.AppAuthManagerFactory
 import de.netid.mobile.sdk.appauth.AppAuthManagerListener
-import de.netid.mobile.sdk.model.*
+import de.netid.mobile.sdk.model.AppIdentifier
+import de.netid.mobile.sdk.model.NetIdPermissionUpdate
+import de.netid.mobile.sdk.model.PermissionReadResponse
+import de.netid.mobile.sdk.model.PermissionResponseStatus
+import de.netid.mobile.sdk.model.SubjectIdentifiers
+import de.netid.mobile.sdk.model.UserInfo
 import de.netid.mobile.sdk.permission.PermissionManager
 import de.netid.mobile.sdk.permission.PermissionManagerListener
-import de.netid.mobile.sdk.ui.*
+import de.netid.mobile.sdk.ui.AccountProviderAppButtonFragment
+import de.netid.mobile.sdk.ui.AuthorizationFragmentListener
+import de.netid.mobile.sdk.ui.AuthorizationLoginFragment
+import de.netid.mobile.sdk.ui.AuthorizationPermissionFragment
+import de.netid.mobile.sdk.ui.LoginContinueButtonFragment
+import de.netid.mobile.sdk.ui.PermissionContinueButtonFragment
 import de.netid.mobile.sdk.userinfo.UserInfoManager
 import de.netid.mobile.sdk.userinfo.UserInfoManagerListener
 import de.netid.mobile.sdk.util.JsonUtil
@@ -44,11 +54,9 @@ import de.netid.mobile.sdk.util.ReachabilityUtil
  *
  * ``NetIdService.initialize(netIdConfig, this)``
  */
-object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
-    UserInfoManagerListener, PermissionManagerListener {
-
-    private const val appIdentifierFilename = "netIdAppIdentifiers.json"
-    private const val broker = "broker.netid.de"
+object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener, UserInfoManagerListener, PermissionManagerListener {
+    private const val APP_IDENTIFIER_FILENAME = "netIdAppIdentifiers.json"
+    private const val BROKER = "broker.netid.de"
     private var layerStyle: NetIdLayerStyle = NetIdLayerStyle.Solid
     private var buttonStyle: NetIdButtonStyle = NetIdButtonStyle.WhiteSolid
 
@@ -61,8 +69,8 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     private val availableAppIdentifiers = mutableListOf<AppIdentifier>()
     private val netIdServiceListeners = mutableSetOf<NetIdServiceListener>()
 
-    private var permissionContinueButtonFragment:Fragment? = null
-    private var loginContinueButtonFragment:Fragment? = null
+    private var permissionContinueButtonFragment: Fragment? = null
+    private var loginContinueButtonFragment: Fragment? = null
     private var appButtonFragmentsForPermission = mutableMapOf<String, Fragment>()
     private var appButtonFragmentsForLogin = mutableMapOf<String, Fragment>()
     private var appButtonFragmentsForLoginPermission = mutableMapOf<String, Fragment>()
@@ -85,8 +93,8 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
 
     /**
      * Initializes the sdk and loads the authentication configuration document.
-     * @param  netIdConfig The client configuration of type ``NetIdConfig``
-     * @param  context Context to use.
+     * @param netIdConfig The client configuration of type ``NetIdConfig``
+     * @param context Context to use.
      */
     fun initialize(netIdConfig: NetIdConfig, context: Context) {
         if (handleConnection(context, NetIdErrorProcess.Configuration)) {
@@ -119,9 +127,8 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
         }
 
         netIdConfig?.let { config ->
-            //prompt is applied only in App2Web Flows
-            val effectivePrompt: String? =
-                if(availableAppIdentifiers.isEmpty()) config.promptWeb else null
+            // prompt is applied only in App2Web Flows
+            val effectivePrompt: String? = if (availableAppIdentifiers.isEmpty()) config.promptWeb else null
 
             return appAuthManager.getAuthorizationIntent(
                 config.clientId,
@@ -134,11 +141,23 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                 when (authFlow) {
                     NetIdAuthFlow.Login, NetIdAuthFlow.LoginPermission ->
                         AuthorizationLoginFragment(
-                            this, availableAppIdentifiers, it, (config.loginLayerConfig?.headlineText) ?: "", (config.loginLayerConfig?.loginText) ?:"", (config.loginLayerConfig?.continueText)?: ""
+                            this,
+                            availableAppIdentifiers,
+                            it,
+                            (config.loginLayerConfig?.headlineText) ?: "",
+                            (config.loginLayerConfig?.loginText) ?: "",
+                            (config.loginLayerConfig?.continueText) ?: ""
                         )
+
                     NetIdAuthFlow.Permission ->
                         AuthorizationPermissionFragment(
-                            this, availableAppIdentifiers, it, (config.permissionLayerConfig?.logoName)?: "", (config.permissionLayerConfig?.headlineText)?: "", (config.permissionLayerConfig?.legalText)?: "", (config.permissionLayerConfig?.continueText)?: ""
+                            this,
+                            availableAppIdentifiers,
+                            it,
+                            (config.permissionLayerConfig?.logoName) ?: "",
+                            (config.permissionLayerConfig?.headlineText) ?: "",
+                            (config.permissionLayerConfig?.legalText) ?: "",
+                            (config.permissionLayerConfig?.continueText) ?: ""
                         )
                 }
             }
@@ -212,7 +231,8 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     }
 
     /**
-     * Returns the keys of installed account provider apps. With these keys, you can request buttons for specific account provider apps identified by their key aka name.
+     * Returns the keys of installed account provider apps.
+     * With these keys, you can request buttons for specific account provider apps identified by their key aka name.
      * Use this function only if you intent to build your very own authorization dialog.
      * @return: Array of keys of installed account provider apps.
      */
@@ -274,10 +294,12 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     /**
      * Returns the button for a certain account provider app for a requested ``NetIdAuthFlow``
      * Use this function only if you intent to build your very own authorization dialog.
-     * @param key Key denoting one of the installed account provider apps. Use ``getKeysForAccountProviderApps`` first to get the keys/names of all installed account provider apps.
+     * @param key Key denoting one of the installed account provider apps.
+     * Use ``getKeysForAccountProviderApps`` first to get the keys/names of all installed account provider apps.
      * @param authFlow Can be any of .Permission, .Login or .LoginPermission.
      * @param continueText Alternative text to set on the button. If empty, the default will be used.
-     * @returns Button with text and label for the chosen id app. If index is out of bounds or no app is installed, ArrayIndexOutOfBoundsException is thrown.
+     * @return Button with text and label for the chosen id app.
+     * If index is out of bounds or no app is installed, ArrayIndexOutOfBoundsException is thrown.
      * @throws ArrayIndexOutOfBoundsException
      */
     fun accountProviderAppButtonFragment(key: String, flow: NetIdAuthFlow, continueText: String = ""): Fragment {
@@ -304,7 +326,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
      * Checks whether there is a network connection or not.
      * @param context Context to use.
      * @param process: In case of an error, denotes the process that the error is responsible for.
-     * @returns bool
+     * @return `true`, if there is a network connection; `false` otherwise
      */
     private fun handleConnection(context: Context, process: NetIdErrorProcess): Boolean {
         return if (ReachabilityUtil.hasConnection(context)) {
@@ -326,13 +348,15 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
             var error: NetIdError? = null
 
             appAuthManager.getAccessToken()?.let { token ->
-                appAuthManager.getAuthState()?.authorizationServiceConfiguration?.discoveryDoc?.userinfoEndpoint?.let{ endpoint ->
+                appAuthManager.getAuthState()?.authorizationServiceConfiguration?.discoveryDoc?.userinfoEndpoint?.let { endpoint ->
                     userInfoManager.fetchUserInfo(
                         endpoint,
-                        token)
-                } ?:{
+                        token
+                    )
+                } ?: {
                     error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.InvalidDiscoveryDocument)
-                }            } ?: run {
+                }
+            } ?: run {
                 error = NetIdError(NetIdErrorProcess.UserInfo, NetIdErrorCode.UnauthorizedClient)
             }
 
@@ -384,7 +408,6 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
                     item.onPermissionUpdateFinishedWithError(PermissionResponseStatus.UNKNOWN, it)
                 }
             }
-
         }
     }
 
@@ -413,7 +436,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
     private fun setupAuthManagerAndFetchConfiguration(context: Context) {
         appAuthManager = AppAuthManagerFactory.createAppAuthManager(context)
         appAuthManager.listener = this
-        appAuthManager.fetchAuthorizationServiceConfiguration(broker)
+        appAuthManager.fetchAuthorizationServiceConfiguration(BROKER)
     }
 
     private fun setupUserInfoManager() {
@@ -426,11 +449,10 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener,
 
     private fun checkAvailableNetIdApplications(context: Context) {
         availableAppIdentifiers.clear()
-        val appIdentifiers = JsonUtil.loadAppIdentifiers(appIdentifierFilename, context)
+        val appIdentifiers = JsonUtil.loadAppIdentifiers(APP_IDENTIFIER_FILENAME, context)
         val installedAppIdentifiers = PackageUtil.getInstalledPackages(appIdentifiers, context.packageManager)
         availableAppIdentifiers.addAll(installedAppIdentifiers)
     }
-
 
 // AppAuthManagerListener functions
 

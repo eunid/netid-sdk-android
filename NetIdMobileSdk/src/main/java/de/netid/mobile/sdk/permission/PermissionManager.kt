@@ -27,33 +27,34 @@ internal class PermissionManager(private val listener: PermissionManagerListener
 
     fun fetchPermissions(accessToken: String, collapseSyncId: Boolean) {
         WebserviceApi.performPermissionReadRequest(
-                accessToken,
-                collapseSyncId,
-                object : PermissionReadCallback {
-                    override fun onPermissionsFetched(permissionResponse: PermissionReadResponse) {
-                        listener.onPermissionsFetched(permissionResponse)
-                    }
+            accessToken,
+            collapseSyncId,
+            object : PermissionReadCallback {
+                override fun onPermissionsFetched(permissionResponse: PermissionReadResponse) {
+                    listener.onPermissionsFetched(permissionResponse)
+                }
 
-                    override fun onPermissionsFetchFailed(statusCode: PermissionResponseStatus, error: NetIdError) {
-                        listener.onPermissionsFetchFailed(statusCode, error)
-                    }
-                })
+                override fun onPermissionsFetchFailed(statusCode: PermissionResponseStatus, error: NetIdError) {
+                    listener.onPermissionsFetchFailed(statusCode, error)
+                }
+            }
+        )
     }
-
 
     fun updatePermission(accessToken: String, permission: NetIdPermissionUpdate, collapseSyncId: Boolean) {
         WebserviceApi.performPermissionUpdateRequest(
-                accessToken,
-                permission,
-                collapseSyncId,
-                object : PermissionUpdateCallback {
-                    override fun onPermissionUpdated(subjectIdentifiers: SubjectIdentifiers) {
-                        listener.onPermissionUpdated(subjectIdentifiers)
-                    }
+            accessToken,
+            permission,
+            collapseSyncId,
+            object : PermissionUpdateCallback {
+                override fun onPermissionUpdated(subjectIdentifiers: SubjectIdentifiers) {
+                    listener.onPermissionUpdated(subjectIdentifiers)
+                }
 
-                    override fun onPermissionUpdateFailed(responseStatusCode: PermissionResponseStatus, error: NetIdError) {
-                        listener.onPermissionUpdateFailed(responseStatusCode, error)
-                    }
-                })
+                override fun onPermissionUpdateFailed(responseStatusCode: PermissionResponseStatus, error: NetIdError) {
+                    listener.onPermissionUpdateFailed(responseStatusCode, error)
+                }
+            }
+        )
     }
 }

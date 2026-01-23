@@ -16,16 +16,15 @@ package de.netid.mobile.sdk.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-class PermissionUpdateResponse (
+class PermissionUpdateResponse(
     @SerialName("subject_identifiers")
     val subjectIdentifiers: SubjectIdentifiers
-)  {
-   override fun toString(): String {
+) {
+    override fun toString(): String {
         val format = Json { encodeDefaults = false }
         return format.encodeToString(this)
-   }
+    }
 }

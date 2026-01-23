@@ -14,9 +14,11 @@
 
 package de.netid.mobile.sdk.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.Selection
 import android.text.Spannable
@@ -31,6 +33,9 @@ import android.view.ViewGroup
 import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.api.NetIdLayerStyle
@@ -74,19 +79,18 @@ class AuthorizationPermissionFragment(
         return binding.root
     }
 
+    @SuppressLint("DiscouragedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         configureStandardButtons()
         configurePermissionFlowDialog()
         if (logoName.isNotEmpty()) {
-            val logoId = context?.resources?.getIdentifier(logoName, "drawable", context?.packageName)
-            if (logoId != 0) {
-                val logo = logoId?.let { context?.getDrawable(it) }
-                if (logo != null) {
+            context?.resources?.getIdentifier(logoName, "drawable", context?.packageName)?.let { logoId ->
+                AppCompatResources.getDrawable(requireContext(), logoId)?.let { logo ->
                     binding.fragmentAuthorizationLogoImageView.setImageDrawable(logo)
                 }
-            } else {
+            } ?: run {
                 // The custom logo was not found, at least log this out to the console.
                 System.err.println("Resource with name $logoName was not found in package ${context?.packageName}, using default icon.")
             }
@@ -110,10 +114,10 @@ class AuthorizationPermissionFragment(
      * The button to continue is configured so that it can either use app2web- or (if id apps are installed) app2app-flow.
      */
     private fun configureStandardButtons() {
-        var netIdLogoResource = R.drawable.ic_netid_logo_small
-        var buttonBackgroundResource = R.color.authorization_agree_button_color
-        var buttonForegroundResource = R.color.authorization_agree_text_color
-        var buttonOutlineResource = R.color.authorization_agree_outline_color
+        val netIdLogoResource: Int
+        val buttonBackgroundResource: Int
+        val buttonForegroundResource: Int
+        val buttonOutlineResource: Int
 
         when (NetIdService.getLayerStyle()) {
             NetIdLayerStyle.Outline -> {
@@ -122,6 +126,7 @@ class AuthorizationPermissionFragment(
                 buttonForegroundResource = R.color.outline_text_color
                 buttonOutlineResource = R.color.outline_outline_color
             }
+
             else -> {
                 netIdLogoResource = R.drawable.ic_netid_logo_small
                 buttonBackgroundResource = R.color.authorization_agree_button_color
@@ -133,17 +138,17 @@ class AuthorizationPermissionFragment(
         binding.fragmentAuthorizationButtonAgreeAndContinue.setTextColor(resources.getColor(buttonForegroundResource, null))
         binding.fragmentAuthorizationButtonAgreeAndContinue.setBackgroundColor(resources.getColor(buttonBackgroundResource, null))
         binding.fragmentAuthorizationButtonAgreeAndContinue.setStrokeColorResource(buttonOutlineResource)
-        binding.fragmentAuthorizationButtonAgreeAndContinue.icon = resources.getDrawable(netIdLogoResource, null)
+        binding.fragmentAuthorizationButtonAgreeAndContinue.icon = ResourcesCompat.getDrawable(resources, netIdLogoResource, null)
 
-        binding.fragmentAuthorizationButtonAgreeAndContinue.text = getString(R.string.authorization_permission_agree_and_continue_with_net_id).uppercase()
+        binding.fragmentAuthorizationButtonAgreeAndContinue.text = getString(
+            R.string.authorization_permission_agree_and_continue_with_net_id
+        ).uppercase()
         binding.fragmentAuthorizationButtonAgreeAndContinue.setOnClickListener {
             var adapter = binding.fragmentAuthorizationAppCellContainer.adapter as? AuthorizationAppListAdapter
             // If we only have one app or the user did not make changes to the default, use the standard one.
             if (adapter == null) adapter = context?.let { AuthorizationAppListAdapter(it, appIdentifiers) }
-            if ((adapter != null) && (adapter.selectedPosition != -1) && (appIdentifiers.size != 0)) {
-                adapter.getItem(adapter.selectedPosition).let { app ->
-                    openApp(app)
-                }
+            if ((adapter != null) && (adapter.selectedPosition != -1) && (appIdentifiers.isNotEmpty())) {
+                openApp(adapter.getItem(adapter.selectedPosition))
             } else {
                 resultLauncher.launch(authorizationIntent)
             }
@@ -164,29 +169,54 @@ class AuthorizationPermissionFragment(
         val chooseString = getString(R.string.authorization_permission_choose_account_provider)
         when (appIdentifiers.size) {
             0 -> binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
-                getString(R.string.authorization_permission_legal_info) + getString(R.string.authorization_permission_legal_info_fixed, netIdString, "")
+                getString(R.string.authorization_permission_legal_info) + getString(
+                    R.string.authorization_permission_legal_info_fixed,
+                    netIdString,
+                    ""
+                )
             } else {
                 String.format(legalText, netIdString) + getString(R.string.authorization_permission_legal_info_fixed, netIdString, "")
             }
+
             1 -> binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
-                getString(R.string.authorization_permission_legal_info) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, "")
+                getString(R.string.authorization_permission_legal_info) + getString(
+                    R.string.authorization_permission_legal_info_fixed,
+                    appIdentifiers[0].name,
+                    ""
+                )
             } else {
-                String.format(legalText, appIdentifiers[0].name) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, "")
+                String.format(legalText, appIdentifiers[0].name) + getString(
+                    R.string.authorization_permission_legal_info_fixed,
+                    appIdentifiers[0].name,
+                    ""
+                )
             }
+
             else -> {
                 binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
-                    getString(R.string.authorization_permission_legal_info,) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, chooseString)
+                    getString(R.string.authorization_permission_legal_info) + getString(
+                        R.string.authorization_permission_legal_info_fixed,
+                        appIdentifiers[0].name,
+                        chooseString
+                    )
                 } else {
-                    String.format(legalText, appIdentifiers[0].name) + getString(R.string.authorization_permission_legal_info_fixed, appIdentifiers[0].name, chooseString)
+                    String.format(legalText, appIdentifiers[0].name) + getString(
+                        R.string.authorization_permission_legal_info_fixed,
+                        appIdentifiers[0].name,
+                        chooseString
+                    )
                 }
                 binding.fragmentAuthorizationLegalInfoTextView.makeLinks(
-                    Pair(chooseString, View.OnClickListener {
-                        val listView: ListView = binding.fragmentAuthorizationAppCellContainer
-                        val listAdapter =
-                            context?.let { AuthorizationAppListAdapter(it, appIdentifiers) }
-                        listAdapter?.listener = this
-                        listView.adapter = listAdapter
-                    }),
+                    Pair(
+                        chooseString,
+                        View.OnClickListener {
+                            val listView: ListView = binding.fragmentAuthorizationAppCellContainer
+                            val listAdapter =
+                                context?.let { AuthorizationAppListAdapter(it, appIdentifiers) }
+                            listAdapter?.listener = this
+                            listView.adapter = listAdapter
+                        }
+                    ),
                 )
             }
         }
@@ -215,7 +245,9 @@ class AuthorizationPermissionFragment(
             // Otherwise, we leave the text as it is.
             if (startIndexOfLink != -1) {
                 spannableString.setSpan(
-                    clickableSpan, startIndexOfLink, startIndexOfLink + link.first.length,
+                    clickableSpan,
+                    startIndexOfLink,
+                    startIndexOfLink + link.first.length,
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
             }
@@ -231,11 +263,16 @@ class AuthorizationPermissionFragment(
      */
     private fun openApp(appIdentifier: AppIdentifier) {
         authorizationIntent.extras?.apply {
-            val authIntent = getParcelable<Intent>("authIntent") ?: return@apply
+            val authIntent: Intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getParcelable("authIntent", Intent::class.java) ?: return@apply
+            } else {
+                @Suppress("DEPRECATION")
+                getParcelable("authIntent") ?: return@apply
+            }
             val authUri = authIntent.data as Uri
             val uri = authUri.toString().replaceBefore("?", appIdentifier.android.verifiedAppLink)
             authIntent.setPackage(appIdentifier.android.applicationId)
-            authIntent.data = Uri.parse(uri)
+            authIntent.data = uri.toUri()
             putParcelable("authIntent", authIntent)
         }
         resultLauncher.launch(authorizationIntent)
@@ -244,7 +281,11 @@ class AuthorizationPermissionFragment(
     override fun onAppSelected(name: String) {
         val chooseString = getString(R.string.authorization_permission_choose_account_provider)
         binding.fragmentAuthorizationLegalInfoTextView.text = if (legalText.isEmpty()) {
-            getString(R.string.authorization_permission_legal_info) + getString(R.string.authorization_permission_legal_info_fixed, name, chooseString)
+            getString(R.string.authorization_permission_legal_info) + getString(
+                R.string.authorization_permission_legal_info_fixed,
+                name,
+                chooseString
+            )
         } else {
             String.format(legalText, name) + getString(R.string.authorization_permission_legal_info_fixed, name, chooseString)
         }

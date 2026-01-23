@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 package de.netid.mobile.sdk.model
 
-enum class NetIdPrivacySettingType(val code: String)  {
+enum class NetIdPrivacySettingType(val code: String) {
     IDCONSENT("IDCONSENT"),
     IAB_TC_STRING("IAB_TC_STRING"),
     OTHER("OTHER")

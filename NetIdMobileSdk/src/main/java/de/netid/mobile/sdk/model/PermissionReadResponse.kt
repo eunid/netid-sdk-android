@@ -16,7 +16,6 @@ package de.netid.mobile.sdk.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
@@ -25,7 +24,7 @@ data class PermissionReadResponse(
     @SerialName("status_code")
     val statusCode: PermissionResponseStatus = PermissionResponseStatus.UNKNOWN,
     @SerialName("subject_identifiers")
-    val subjectIdentifiers: SubjectIdentifiers? =null,
+    val subjectIdentifiers: SubjectIdentifiers? = null,
     @SerialName("netid_privacy_settings")
     val netIdPrivacySettings: List<NetIdPrivacySetting>? = null
 ) {

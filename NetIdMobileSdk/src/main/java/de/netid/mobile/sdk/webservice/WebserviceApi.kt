@@ -21,8 +21,12 @@ import de.netid.mobile.sdk.api.NetIdError
 import de.netid.mobile.sdk.api.NetIdErrorCode
 import de.netid.mobile.sdk.api.NetIdErrorProcess
 import de.netid.mobile.sdk.constants.WebserviceConstants
-import de.netid.mobile.sdk.model.*
-import kotlinx.serialization.decodeFromString
+import de.netid.mobile.sdk.model.NetIdPermissionUpdate
+import de.netid.mobile.sdk.model.PermissionReadResponse
+import de.netid.mobile.sdk.model.PermissionResponseStatus
+import de.netid.mobile.sdk.model.PermissionUpdateErrorResponse
+import de.netid.mobile.sdk.model.PermissionUpdateResponse
+import de.netid.mobile.sdk.model.UserInfo
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import okhttp3.Call
@@ -79,7 +83,7 @@ internal object WebserviceApi {
                 response.use {
                     if (response.isSuccessful) {
                         // Unknown JSON claims are ignored
-                        val userInfo = Json{ ignoreUnknownKeys = true }.decodeFromString<UserInfo>(response.body?.string() ?: "")
+                        val userInfo = Json { ignoreUnknownKeys = true }.decodeFromString<UserInfo>(response.body.string())
                         Handler(Looper.getMainLooper()).post {
                             userInfoCallback.onUserInfoFetched(userInfo)
                         }
@@ -155,8 +159,11 @@ internal object WebserviceApi {
             override fun onResponse(call: Call, response: Response) {
                 var permissionResponse: PermissionReadResponse
                 // Unknown JSON claims are ignored, unknown ENUM values mapped to default
-                val format = Json { ignoreUnknownKeys = true; coerceInputValues = true }
-                val responseBody: String = response.body?.string() ?: ""
+                val format = Json {
+                    ignoreUnknownKeys = true
+                    coerceInputValues = true
+                }
+                val responseBody: String = response.body.string()
 
                 response.use {
                     if (response.isSuccessful) {
@@ -236,7 +243,7 @@ internal object WebserviceApi {
             WebserviceConstants.CONTENT_TYPE_HEADER_KEY,
             WebserviceConstants.CONTENT_TYPE_PERMISSION_WRITE
         )
-        .build()
+            .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
@@ -253,8 +260,11 @@ internal object WebserviceApi {
                 var permissionUpdateErrorResponse: PermissionUpdateErrorResponse
                 var permissionUpdateResponse: PermissionUpdateResponse
                 // Unknown JSON claims are ignored, unknown ENUM values mapped to default
-                val format = Json { ignoreUnknownKeys = true; coerceInputValues = true }
-                val responseBody = response.body?.string() ?: ""
+                val format = Json {
+                    ignoreUnknownKeys = true
+                    coerceInputValues = true
+                }
+                val responseBody = response.body.string()
 
                 response.use {
                     if (response.isSuccessful) {
@@ -268,7 +278,7 @@ internal object WebserviceApi {
 
                         // determine proper NetIDErrorCode
                         val errorCode: NetIdErrorCode =
-                            if (permissionUpdateErrorResponse.statusCode == PermissionResponseStatus.TPID_EXISTENCE_ERROR){
+                            if (permissionUpdateErrorResponse.statusCode == PermissionResponseStatus.TPID_EXISTENCE_ERROR) {
                                 NetIdErrorCode.Other
                             } else {
                                 NetIdErrorCode.InvalidRequest
