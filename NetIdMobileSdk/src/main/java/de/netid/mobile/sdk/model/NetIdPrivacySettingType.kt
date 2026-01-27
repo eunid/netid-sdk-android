@@ -14,9 +14,8 @@
 
 package de.netid.mobile.sdk.model
 
-enum class NetIdPrivacySettingType(val code: String) {
-    IDCONSENT("IDCONSENT"),
-    // TODO: Check if this setting type is still correct -> in version 1.6 the key is 'iab_tcstring'
-    IAB_TC_STRING("IAB_TC_STRING"),
-    OTHER("OTHER")
+enum class NetIdPrivacySettingType {
+    IdConsent,
+    IabTcString,
+    Other
 }

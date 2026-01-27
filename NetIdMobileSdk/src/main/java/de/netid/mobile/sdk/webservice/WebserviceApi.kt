@@ -22,7 +22,7 @@ import de.netid.mobile.sdk.api.NetIdErrorCode
 import de.netid.mobile.sdk.api.NetIdErrorProcess
 import de.netid.mobile.sdk.constants.WebserviceConstants
 import de.netid.mobile.sdk.model.NetIdPermissionUpdate
-import de.netid.mobile.sdk.model.permission.response.PermissionReadResponse
+import de.netid.mobile.sdk.model.permission.response.read.PermissionReadResponse
 import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
 import de.netid.mobile.sdk.model.permission.response.PermissionUpdateErrorResponse
 import de.netid.mobile.sdk.model.permission.response.PermissionUpdateResponse
@@ -163,25 +163,15 @@ internal object WebserviceApi {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                // TODO: We need to differentiate response models since API 1.6 response has a different structure
-                var permissionResponse: PermissionReadResponse
-                // Unknown JSON claims are ignored, unknown ENUM values mapped to default
-                val format = Json {
-                    ignoreUnknownKeys = true
-                    coerceInputValues = true
-                }
                 val responseBody: String = response.body.string()
+                val permissionResponse = configuration.decodePermissionResponse(responseBody)
 
                 response.use {
                     if (response.isSuccessful) {
-                        permissionResponse = format.decodeFromString(responseBody)
                         Handler(Looper.getMainLooper()).post {
                             permissionReadCallback.onPermissionsFetched(permissionResponse)
                         }
                     } else {
-                        // parse response for status_code for error details
-                        permissionResponse = format.decodeFromString(responseBody)
-
                         // determine proper NetIDErrorCode
                         val errorCode: NetIdErrorCode =
                             if (permissionResponse.statusCode == PermissionResponseStatus.TPID_EXISTENCE_ERROR) {

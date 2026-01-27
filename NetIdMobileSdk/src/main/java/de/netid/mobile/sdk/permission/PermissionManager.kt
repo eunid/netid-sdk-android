@@ -19,7 +19,7 @@ import de.netid.mobile.sdk.api.NetIdIdentifierFetchOption
 import de.netid.mobile.sdk.model.NetIdPermissionUpdate
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.permission.request.PermissionReadConfig
-import de.netid.mobile.sdk.model.permission.response.PermissionReadResponse
+import de.netid.mobile.sdk.model.permission.response.read.PermissionReadResponse
 import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
 import de.netid.mobile.sdk.webservice.PermissionReadCallback
 import de.netid.mobile.sdk.webservice.PermissionUpdateCallback

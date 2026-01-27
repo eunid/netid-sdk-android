@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.sdk.model
+package de.netid.mobile.sdk.model.permission.response.read
 
-data class NetIdPrivacySetting(
-    val type: NetIdPrivacySettingType = NetIdPrivacySettingType.Other,
-    val status: NetIdPermissionStatus? = null,
-    val value: String? = null,
-    val changedAt: String
+import de.netid.mobile.sdk.model.NetIdPrivacySetting
+import de.netid.mobile.sdk.model.SubjectIdentifiers
+import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
+
+data class PermissionReadResponse(
+    val statusCode: PermissionResponseStatus = PermissionResponseStatus.UNKNOWN,
+    val subjectIdentifiers: SubjectIdentifiers? = null,
+    val netIdPrivacySettings: List<NetIdPrivacySetting>? = null
 )

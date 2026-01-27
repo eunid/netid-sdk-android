@@ -1,4 +1,4 @@
-// Copyright 2022 European netID Foundation (https://enid.foundation)
+// Copyright 2026 European netID Foundation (https://enid.foundation)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.sdk.model
+package de.netid.mobile.sdk.model.permission.response.read.v1
 
-data class NetIdPrivacySetting(
-    val type: NetIdPrivacySettingType = NetIdPrivacySettingType.Other,
-    val status: NetIdPermissionStatus? = null,
-    val value: String? = null,
-    val changedAt: String
-)
+// Enum values are used for response parsing
+@Suppress("unused")
+enum class NetIdPrivacySettingTypeParseModelV1 {
+    IDCONSENT,
+    IAB_TC_STRING,
+    OTHER
+}
