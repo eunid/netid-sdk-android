@@ -38,7 +38,7 @@ internal interface AppAuthManager {
      * @param claims claims that should be set (for login flows), ignored for [NetIdAuthFlow.Permission]
      * @param prompt prompt value to be set for Web based flows, null otherwise
      * @param flow kind of flow, can be any of [NetIdAuthFlow.Permission], [NetIdAuthFlow.Login], or [NetIdAuthFlow.LoginPermission]
-     * @param activity
+     * @param context
      * @return intent
      */
     fun getAuthorizationIntent(

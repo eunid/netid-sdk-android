@@ -18,8 +18,10 @@ import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -38,6 +40,7 @@ import de.netid.mobile.sdk.model.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.UserInfo
 import org.json.JSONObject
+import kotlin.math.max
 
 class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnItemSelectedListener {
 
@@ -55,6 +58,11 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
         private const val CLAIMS = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
 
         private const val INVALID_ACCESS_TOKEN = "<INSERT_EXPIRED_TOKEN_HERE>"
+
+        private const val BACKEND_API_VERSION_1_5 = "1.5"
+        private const val BACKEND_API_VERSION_1_6 = "1.6"
+
+        private val backendApiVersionList = arrayListOf(BACKEND_API_VERSION_1_5, BACKEND_API_VERSION_1_6)
 
         // Using default text / icon
         private val permissionLayerConfig = null
@@ -76,6 +84,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
 
         setupInitializeButton()
         setupAuthorizeButton()
+        setupBackendVersionSpinner()
         setupUserInfoButton()
         setupPermissionManagementButtons()
         setupSetAccessTokenButton()
@@ -179,6 +188,42 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
                 updateElementsForServiceState()
             }
             builder.show()
+        }
+    }
+
+    private fun setupBackendVersionSpinner() {
+        val backendVersionDataAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, backendApiVersionList)
+        backendVersionDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        binding.activityMainSpinnerBackendVersion.adapter = backendVersionDataAdapter
+
+        val preselectedItem = SessionPreferences.loadBackendVersion(this, BACKEND_API_VERSION_1_5)
+        Log.d(javaClass.simpleName, "Preselected backend version: $preselectedItem")
+        val preselectedIndex = max(backendApiVersionList.indexOf(preselectedItem), 0)
+        Log.d(javaClass.simpleName, "Preselected backend version index: $preselectedIndex")
+        binding.activityMainSpinnerBackendVersion.setSelection(preselectedIndex)
+
+        binding.activityMainSpinnerBackendVersion.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                Log.i(javaClass.simpleName, "Backend version $position was selected")
+                if (position < backendApiVersionList.size) {
+                    SessionPreferences.saveBackendVersion(this@MainActivity, backendApiVersionList[position])
+                } else {
+                    Log.e(
+                        javaClass.simpleName,
+                        "Selected backend version position is $position while backend version list size is ${backendApiVersionList.size}"
+                    )
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                Log.w(javaClass.simpleName, "No backend version selected")
+            }
         }
     }
 

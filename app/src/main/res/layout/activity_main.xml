@@ -55,11 +55,18 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="@dimen/main_activity_button_status_margin_horizontal"
+                android:layout_marginEnd="8dp"
                 android:backgroundTint="@android:color/holo_blue_dark"
                 android:text="@string/net_id_service_authorize"
                 android:textColor="@drawable/netid_button"
                 android:textAllCaps="false" />
+
+            <Spinner
+                android:id="@+id/activityMainSpinnerBackendVersion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/main_activity_button_status_margin_horizontal"
+                android:spinnerMode="dropdown" />
 
             <View
                 android:id="@+id/activityMainStatusViewAuthorize"
