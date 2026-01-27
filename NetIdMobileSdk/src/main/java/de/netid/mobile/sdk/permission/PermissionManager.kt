@@ -19,6 +19,7 @@ import de.netid.mobile.sdk.api.NetIdIdentifierFetchOption
 import de.netid.mobile.sdk.model.NetIdPermissionUpdate
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.permission.request.PermissionReadConfig
+import de.netid.mobile.sdk.model.permission.request.PermissionWriteConfig
 import de.netid.mobile.sdk.model.permission.response.read.PermissionReadResponse
 import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
 import de.netid.mobile.sdk.webservice.PermissionReadCallback
@@ -52,11 +53,26 @@ internal class PermissionManager(private val listener: PermissionManagerListener
         )
     }
 
-    fun updatePermission(accessToken: String, permission: NetIdPermissionUpdate, collapseSyncId: Boolean) {
+    fun updatePermission(
+        accessToken: String,
+        permission: NetIdPermissionUpdate,
+        collapseSyncId: Boolean,
+        fetchOptions: Set<NetIdIdentifierFetchOption>
+    ) {
+        val configuration = if (fetchOptions.isEmpty()) {
+            if (collapseSyncId) {
+                PermissionWriteConfig.defaultCollapseSyncConfiguration()
+            } else {
+                PermissionWriteConfig.defaultConfiguration()
+            }
+        } else {
+            PermissionWriteConfig.tokenBasedConfiguration(fetchOptions)
+        }
+
         WebserviceApi.performPermissionUpdateRequest(
             accessToken,
             permission,
-            collapseSyncId,
+            configuration,
             object : PermissionUpdateCallback {
                 override fun onPermissionUpdated(subjectIdentifiers: SubjectIdentifiers) {
                     listener.onPermissionUpdated(subjectIdentifiers)

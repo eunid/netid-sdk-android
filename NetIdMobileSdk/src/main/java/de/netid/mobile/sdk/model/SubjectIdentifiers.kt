@@ -21,7 +21,7 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class SubjectIdentifiers(
     @SerialName("tpid")
-    val tpId: String?,
+    val tpId: String? = null,
     @SerialName("sync_id")
     val syncId: String? = null,
     @SerialName("etpid")

@@ -23,10 +23,10 @@ import de.netid.mobile.sdk.appauth.AppAuthManagerFactory
 import de.netid.mobile.sdk.appauth.AppAuthManagerListener
 import de.netid.mobile.sdk.model.AppIdentifier
 import de.netid.mobile.sdk.model.NetIdPermissionUpdate
-import de.netid.mobile.sdk.model.permission.response.read.PermissionReadResponse
-import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.UserInfo
+import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
+import de.netid.mobile.sdk.model.permission.response.read.PermissionReadResponse
 import de.netid.mobile.sdk.permission.PermissionManager
 import de.netid.mobile.sdk.permission.PermissionManagerListener
 import de.netid.mobile.sdk.ui.AccountProviderAppButtonFragment
@@ -400,12 +400,19 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener, Use
      * @param context Context to use.
      * @param permission Permissions to set, of type ``NetIdPermissionUpdate``.
      * @param collapseSyncId Boolean value to indicate if syncId is used or not.
+     * @param fetchOptions: a set of [NetIdIdentifierFetchOption] elements. Determines which identifiers are fetched. The default is no
+     * options.
      */
-    fun updatePermission(context: Context, permission: NetIdPermissionUpdate, collapseSyncId: Boolean = true) {
+    fun updatePermission(
+        context: Context,
+        permission: NetIdPermissionUpdate,
+        collapseSyncId: Boolean = true,
+        fetchOptions: Set<NetIdIdentifierFetchOption> = setOf()
+    ) {
         if (handleConnection(context, NetIdErrorProcess.PermissionWrite)) {
             var error: NetIdError? = null
             appAuthManager.getPermissionToken()?.let { token ->
-                permissionManager.updatePermission(token, permission, collapseSyncId)
+                permissionManager.updatePermission(token, permission, collapseSyncId, fetchOptions)
             } ?: run {
                 error = NetIdError(NetIdErrorProcess.PermissionWrite, NetIdErrorCode.UnauthorizedClient)
             }

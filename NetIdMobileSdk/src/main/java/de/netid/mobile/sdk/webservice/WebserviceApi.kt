@@ -22,12 +22,13 @@ import de.netid.mobile.sdk.api.NetIdErrorCode
 import de.netid.mobile.sdk.api.NetIdErrorProcess
 import de.netid.mobile.sdk.constants.WebserviceConstants
 import de.netid.mobile.sdk.model.NetIdPermissionUpdate
-import de.netid.mobile.sdk.model.permission.response.read.PermissionReadResponse
+import de.netid.mobile.sdk.model.UserInfo
+import de.netid.mobile.sdk.model.permission.request.PermissionReadConfig
+import de.netid.mobile.sdk.model.permission.request.PermissionWriteConfig
 import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
 import de.netid.mobile.sdk.model.permission.response.PermissionUpdateErrorResponse
 import de.netid.mobile.sdk.model.permission.response.PermissionUpdateResponse
-import de.netid.mobile.sdk.model.UserInfo
-import de.netid.mobile.sdk.model.permission.request.PermissionReadConfig
+import de.netid.mobile.sdk.model.permission.response.read.PermissionReadResponse
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import okhttp3.Call
@@ -202,13 +203,13 @@ internal object WebserviceApi {
      *
      * @param accessToken a currently valid ID token to read permissions
      * @param permissionUpdate a [NetIdPermissionUpdate] instance, defining the permission to update
-     * @param collapseSyncId If `true`, the response will not contain the sync id
+     * @param configuration A configuration to define request properties
      * @param permissionUpdateCallback a [PermissionUpdateCallback] instance receiving callbacks when the request is complete
      */
     fun performPermissionUpdateRequest(
         accessToken: String,
         permissionUpdate: NetIdPermissionUpdate,
-        collapseSyncId: Boolean,
+        configuration: PermissionWriteConfig,
         permissionUpdateCallback: PermissionUpdateCallback
     ) {
         val jsonElement = Json.encodeToJsonElement(permissionUpdate)
@@ -216,32 +217,29 @@ internal object WebserviceApi {
         val byteArray = jsonElement.toString().toByteArray()
         val body = byteArray.toRequestBody(mediaType)
 
-        // TODO: Use HttpUrl since path constants do not contain slashes anymore
+        val urlBuilder = HttpUrl.Builder()
+            .scheme(WebserviceConstants.HTTPS_PROTOCOL)
+            .host(WebserviceConstants.PERMISSION_WRITE_HOST)
+            .addPathSegment(WebserviceConstants.PERMISSION_WRITE_PATH)
+
+        configuration.queryParameter?.let { queryParameter ->
+            urlBuilder.addQueryParameter(queryParameter.key, queryParameter.value)
+        }
+
+        val httpUrl = urlBuilder.build()
+
         val requestBuilder = Request.Builder()
-            .url(WebserviceConstants.HTTPS_PROTOCOL + WebserviceConstants.PERMISSION_WRITE_HOST + WebserviceConstants.PERMISSION_WRITE_PATH)
+            .url(httpUrl)
             .method(WebserviceConstants.POST_METHOD, body)
             .header(
                 WebserviceConstants.AUTHORIZATION_HEADER,
                 WebserviceConstants.AUTHORIZATION_BEARER_PREFIX + accessToken
             )
+            .header(WebserviceConstants.ACCEPT_HEADER_KEY, configuration.acceptHeader)
+            .header(WebserviceConstants.CONTENT_TYPE_HEADER_KEY, WebserviceConstants.CONTENT_TYPE_PERMISSION_WRITE)
 
-        if (collapseSyncId) {
-            requestBuilder.header(
-                WebserviceConstants.ACCEPT_HEADER_KEY,
-                WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE
-            )
-        } else {
-            requestBuilder.header(
-                WebserviceConstants.ACCEPT_HEADER_KEY,
-                WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE_AUDIT
-            )
-        }
+        val request = requestBuilder.build()
 
-        val request = requestBuilder.header(
-            WebserviceConstants.CONTENT_TYPE_HEADER_KEY,
-            WebserviceConstants.CONTENT_TYPE_PERMISSION_WRITE
-        )
-            .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
