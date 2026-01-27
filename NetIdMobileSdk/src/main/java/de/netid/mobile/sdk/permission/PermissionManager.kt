@@ -15,20 +15,31 @@
 package de.netid.mobile.sdk.permission
 
 import de.netid.mobile.sdk.api.NetIdError
+import de.netid.mobile.sdk.api.NetIdIdentifierFetchOption
 import de.netid.mobile.sdk.model.NetIdPermissionUpdate
-import de.netid.mobile.sdk.model.PermissionReadResponse
-import de.netid.mobile.sdk.model.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
+import de.netid.mobile.sdk.model.permission.request.PermissionReadConfig
+import de.netid.mobile.sdk.model.permission.response.PermissionReadResponse
+import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
 import de.netid.mobile.sdk.webservice.PermissionReadCallback
 import de.netid.mobile.sdk.webservice.PermissionUpdateCallback
 import de.netid.mobile.sdk.webservice.WebserviceApi
 
 internal class PermissionManager(private val listener: PermissionManagerListener) {
+    fun fetchPermissions(accessToken: String, collapseSyncId: Boolean, fetchOptions: Set<NetIdIdentifierFetchOption>) {
+        val configuration = if (fetchOptions.isEmpty()) {
+            if (collapseSyncId) {
+                PermissionReadConfig.defaultCollapseSyncConfiguration()
+            } else {
+                PermissionReadConfig.defaultConfiguration()
+            }
+        } else {
+            PermissionReadConfig.tokenBasedConfiguration(fetchOptions)
+        }
 
-    fun fetchPermissions(accessToken: String, collapseSyncId: Boolean) {
         WebserviceApi.performPermissionReadRequest(
             accessToken,
-            collapseSyncId,
+            configuration,
             object : PermissionReadCallback {
                 override fun onPermissionsFetched(permissionResponse: PermissionReadResponse) {
                     listener.onPermissionsFetched(permissionResponse)

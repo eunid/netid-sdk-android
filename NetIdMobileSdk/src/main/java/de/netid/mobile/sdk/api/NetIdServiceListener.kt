@@ -14,8 +14,8 @@
 
 package de.netid.mobile.sdk.api
 
-import de.netid.mobile.sdk.model.PermissionReadResponse
-import de.netid.mobile.sdk.model.PermissionResponseStatus
+import de.netid.mobile.sdk.model.permission.response.PermissionReadResponse
+import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.UserInfo
 

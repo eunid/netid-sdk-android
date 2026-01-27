@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.sdk.model
+package de.netid.mobile.sdk.model.permission.response
 
+import de.netid.mobile.sdk.model.NetIdPrivacySetting
+import de.netid.mobile.sdk.model.SubjectIdentifiers
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

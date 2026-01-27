@@ -1,4 +1,4 @@
-// Copyright 2022 European netID Foundation (https://enid.foundation)
+// Copyright 2026 European netID Foundation (https://enid.foundation)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.sdk.webservice
+package de.netid.mobile.sdk.api
 
-import de.netid.mobile.sdk.api.NetIdError
-import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
-import de.netid.mobile.sdk.model.SubjectIdentifiers
-
-internal interface PermissionUpdateCallback {
-
-    fun onPermissionUpdated(subjectIdentifiers: SubjectIdentifiers)
-
-    fun onPermissionUpdateFailed(responseStatusCode: PermissionResponseStatus, error: NetIdError)
+enum class NetIdIdentifierFetchOption(val queryString: String) {
+    TagProtocolIdentifier("TPID"),
+    SynchronizationIdentifier("SYNC_ID"),
+    EncryptedTagProtocolIdentifier("ETPID")
 }

@@ -23,8 +23,8 @@ import de.netid.mobile.sdk.appauth.AppAuthManagerFactory
 import de.netid.mobile.sdk.appauth.AppAuthManagerListener
 import de.netid.mobile.sdk.model.AppIdentifier
 import de.netid.mobile.sdk.model.NetIdPermissionUpdate
-import de.netid.mobile.sdk.model.PermissionReadResponse
-import de.netid.mobile.sdk.model.PermissionResponseStatus
+import de.netid.mobile.sdk.model.permission.response.PermissionReadResponse
+import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.UserInfo
 import de.netid.mobile.sdk.permission.PermissionManager
@@ -281,7 +281,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener, Use
      * Returns the continue button (as a fragment) in case of a login flow dialog.
      * Use this function only if you intent to build your very own authorization dialog.
      * @param continueText Alternative text to set on the button. If empty, the default will be used.
-     * @param authFlow Must either be .Login or .LoginPermission. If is set to .Permission, an error will be thrown.
+     * @param flow Must either be .Login or .LoginPermission. If is set to .Permission, an error will be thrown.
      * @return Fragment for authorization.
      */
     fun loginContinueButtonFragment(continueText: String = "", flow: NetIdAuthFlow): Fragment {
@@ -296,7 +296,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener, Use
      * Use this function only if you intent to build your very own authorization dialog.
      * @param key Key denoting one of the installed account provider apps.
      * Use ``getKeysForAccountProviderApps`` first to get the keys/names of all installed account provider apps.
-     * @param authFlow Can be any of .Permission, .Login or .LoginPermission.
+     * @param flow Can be any of .Permission, .Login or .LoginPermission.
      * @param continueText Alternative text to set on the button. If empty, the default will be used.
      * @return Button with text and label for the chosen id app.
      * If index is out of bounds or no app is installed, ArrayIndexOutOfBoundsException is thrown.
@@ -371,13 +371,19 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener, Use
     /**
      * Fetch permissions.
      * @param context Context to use.
-     * @param collapseSyncId: Boolean value to indicate whether syncId is used or not.
+     * @param collapseSyncId: Boolean value to indicate whether syncId is used or not. This value is omitted if fetch options are used.
+     * @param fetchOptions: a set of [NetIdIdentifierFetchOption] elements. Determines which identifiers are fetched. The default is no
+     * options.
      */
-    fun fetchPermissions(context: Context, collapseSyncId: Boolean = true) {
+    fun fetchPermissions(
+        context: Context,
+        collapseSyncId: Boolean = true,
+        fetchOptions: Set<NetIdIdentifierFetchOption> = setOf()
+    ) {
         if (handleConnection(context, NetIdErrorProcess.PermissionRead)) {
             var error: NetIdError? = null
             appAuthManager.getPermissionToken()?.let { token ->
-                permissionManager.fetchPermissions(token, collapseSyncId)
+                permissionManager.fetchPermissions(token, collapseSyncId, fetchOptions)
             } ?: run {
                 error = NetIdError(NetIdErrorProcess.PermissionRead, NetIdErrorCode.UnauthorizedClient)
             }

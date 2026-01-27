@@ -29,16 +29,17 @@ import de.netid.mobile.sdk.api.NetIdAuthFlow
 import de.netid.mobile.sdk.api.NetIdConfig
 import de.netid.mobile.sdk.api.NetIdError
 import de.netid.mobile.sdk.api.NetIdErrorProcess
+import de.netid.mobile.sdk.api.NetIdIdentifierFetchOption
 import de.netid.mobile.sdk.api.NetIdLayerStyle
 import de.netid.mobile.sdk.api.NetIdService
 import de.netid.mobile.sdk.api.NetIdServiceListener
 import de.netid.mobile.sdk.example.databinding.ActivityMainBinding
 import de.netid.mobile.sdk.model.NetIdPermissionStatus
 import de.netid.mobile.sdk.model.NetIdPermissionUpdate
-import de.netid.mobile.sdk.model.PermissionReadResponse
-import de.netid.mobile.sdk.model.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.UserInfo
+import de.netid.mobile.sdk.model.permission.response.PermissionReadResponse
+import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
 import org.json.JSONObject
 import kotlin.math.max
 
@@ -59,10 +60,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
 
         private const val INVALID_ACCESS_TOKEN = "<INSERT_EXPIRED_TOKEN_HERE>"
 
-        private const val BACKEND_API_VERSION_1_5 = "1.5"
-        private const val BACKEND_API_VERSION_1_6 = "1.6"
-
-        private val backendApiVersionList = arrayListOf(BACKEND_API_VERSION_1_5, BACKEND_API_VERSION_1_6)
+        private val backendApiVersionList = arrayListOf(ApiVersion.API_VERSION_1_5.versionString, ApiVersion.API_VERSION_1_6.versionString)
 
         // Using default text / icon
         private val permissionLayerConfig = null
@@ -197,9 +195,10 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
 
         binding.activityMainSpinnerBackendVersion.adapter = backendVersionDataAdapter
 
-        val preselectedItem = SessionPreferences.loadBackendVersion(this, BACKEND_API_VERSION_1_5)
+        val preselectedItem = SessionPreferences.loadBackendVersion(this, ApiVersion.API_VERSION_1_5.toString())
         Log.d(javaClass.simpleName, "Preselected backend version: $preselectedItem")
-        val preselectedIndex = max(backendApiVersionList.indexOf(preselectedItem), 0)
+        val preselectedApiVersion = ApiVersion.valueOf(preselectedItem)
+        val preselectedIndex = max(backendApiVersionList.indexOf(preselectedApiVersion.versionString), 0)
         Log.d(javaClass.simpleName, "Preselected backend version index: $preselectedIndex")
         binding.activityMainSpinnerBackendVersion.setSelection(preselectedIndex)
 
@@ -212,7 +211,8 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
             ) {
                 Log.i(javaClass.simpleName, "Backend version $position was selected")
                 if (position < backendApiVersionList.size) {
-                    SessionPreferences.saveBackendVersion(this@MainActivity, backendApiVersionList[position])
+                    val apiVersion = ApiVersion.forVersionString(backendApiVersionList[position])
+                    SessionPreferences.saveBackendVersion(this@MainActivity, apiVersion.toString())
                 } else {
                     Log.e(
                         javaClass.simpleName,
@@ -237,7 +237,22 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
     private fun setupPermissionManagementButtons() {
         binding.activityMainButtonPermissionRead.setOnClickListener {
             it.isEnabled = false
-            NetIdService.fetchPermissions(this.applicationContext)
+
+            val version = SessionPreferences.loadBackendVersion(this, ApiVersion.API_VERSION_1_5.toString())
+            val apiVersion = ApiVersion.valueOf(version)
+            if (apiVersion == ApiVersion.API_VERSION_1_6) {
+                // TODO: Do we need to add a UI possibility to define the fetch options?
+                NetIdService.fetchPermissions(
+                    this.applicationContext,
+                    fetchOptions = setOf(
+                        NetIdIdentifierFetchOption.TagProtocolIdentifier,
+                        NetIdIdentifierFetchOption.SynchronizationIdentifier,
+                        NetIdIdentifierFetchOption.EncryptedTagProtocolIdentifier
+                    )
+                )
+            } else {
+                NetIdService.fetchPermissions(this.applicationContext)
+            }
         }
 
         binding.activityMainButtonPermissionWrite.setOnClickListener {

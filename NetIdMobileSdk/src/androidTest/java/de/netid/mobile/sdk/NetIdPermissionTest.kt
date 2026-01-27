@@ -14,16 +14,14 @@
 
 package de.netid.mobile.sdk
 
-import android.R
 import android.os.Handler
 import android.util.Log
-import android.view.ContextThemeWrapper
-import android.view.LayoutInflater
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.api.*
 import de.netid.mobile.sdk.appauth.AppAuthManagerListener
 import de.netid.mobile.sdk.model.*
+import de.netid.mobile.sdk.model.permission.response.PermissionReadResponse
+import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
