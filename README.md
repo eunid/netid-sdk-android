@@ -65,7 +65,7 @@ NetIdService.addListener(this)
 
 Finally, initialize the NetIdService itself with the aforementioned configuration.
 ```kotlin
-NetIdService.initialize(netIdConfig, this.applicationContext)
+NetIdService.initialize(netIdConfig, applicationContext)
 ```
 
 ## Authorization
@@ -169,19 +169,44 @@ NetIdService.endSession()
 Use this call to end a session. On the listener `onEndSession` is called signaling success of the operation. All objects regarding authorization (e.g. tokens) will get discarded. However, the service itself will still be available. A new call to `getAuthorizationFragment` will trigger a new authorization process.
 
 ```kotlin
-NetIdService.fetchUserInfo(this.applicationContext)
+NetIdService.fetchUserInfo(applicationContext)
 ```
 Fetches the user information object. On success `onFetchUserInfo` is called on the delegate, returning the requested information. Otherwise `onFetchUserInfoWithError` gets called, returning a description of the error.
 
 ```kotlin
-NetIdService.fetchPermissions(this.applicationContext)
+NetIdService.fetchPermissions(applicationContext)
 ```
-Fetches the permissions object. On success `onFetchPermissions` is called on the delegate, returning the requested information. Otherwise `onFetchPermissionsWithError` gets called, returning a description of the error.
+Fetches the permissions object. The `TPID` identifier is requested as default. On success `onFetchPermissions` is called on the delegate, returning the requested information. Otherwise `onFetchPermissionsWithError` gets called, returning a description of the error.
 
 ```kotlin
-NetIdService.updatePermissions(this.applicationContext)
+NetIdService.fetchPermissions(
+    applicationContext,
+    fetchOptions = setOf(
+        NetIdIdentifierFetchOption.TagProtocolIdentifier,
+        NetIdIdentifierFetchOption.SynchronizationIdentifier,
+        NetIdIdentifierFetchOption.EncryptedTagProtocolIdentifier
+    )
+)
 ```
-Updates the permissions object. On success `onUpdatePermissions` is called on the delegate, returning the requested information. Otherwise `onUpdatePermissionsWithError` gets called, returning a description of the error.
+Fetches the permission object and requests all identifiers contained by the `fetchOptions` set.
+
+```kotlin
+NetIdService.updatePermissions(applicationContext, permission)
+```
+Updates the permissions object with a given `NetIdPermissionUpdate` instance. The `TPID` identifier is requested as default. On success `onUpdatePermissions` is called on the delegate, returning the requested information. Otherwise `onUpdatePermissionsWithError` gets called, returning a description of the error.
+
+```
+NetIdService.updatePermission(
+    applicationContext,
+    permission,
+    fetchOptions = setOf(
+        NetIdIdentifierFetchOption.TagProtocolIdentifier,
+        NetIdIdentifierFetchOption.SynchronizationIdentifier,
+        NetIdIdentifierFetchOption.EncryptedTagProtocolIdentifier
+    )
+)
+```
+Updates the permissions object with a given `NetIdPermissionUpdate` instance and requests all identifiers contained by the `fetchOptions` set. 
 
 ```kotlin
 NetIdService.setAccessToken(accessToken)

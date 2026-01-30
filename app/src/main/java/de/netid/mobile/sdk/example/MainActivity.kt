@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
         binding.activityMainButtonInitialize.setOnClickListener {
             it.isEnabled = false
             setupNetIdConfig()
-            NetIdService.initialize(netIdConfig, this.applicationContext)
+            NetIdService.initialize(netIdConfig, applicationContext)
         }
     }
 
@@ -234,7 +234,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
     private fun setupUserInfoButton() {
         binding.activityMainButtonUserInfo.setOnClickListener {
             it.isEnabled = false
-            NetIdService.fetchUserInfo(this.applicationContext)
+            NetIdService.fetchUserInfo(applicationContext)
         }
     }
 
@@ -246,7 +246,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
             val apiVersion = PermissionIdentifierOption.valueOf(version)
             if (apiVersion == PermissionIdentifierOption.AllIdentifiers) {
                 NetIdService.fetchPermissions(
-                    this.applicationContext,
+                    applicationContext,
                     fetchOptions = setOf(
                         NetIdIdentifierFetchOption.TagProtocolIdentifier,
                         NetIdIdentifierFetchOption.SynchronizationIdentifier,
@@ -254,7 +254,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
                     )
                 )
             } else {
-                NetIdService.fetchPermissions(this.applicationContext)
+                NetIdService.fetchPermissions(applicationContext)
             }
         }
 
@@ -271,7 +271,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
             val apiVersion = PermissionIdentifierOption.valueOf(version)
             if (apiVersion == PermissionIdentifierOption.AllIdentifiers) {
                 NetIdService.updatePermission(
-                    this.applicationContext,
+                    applicationContext,
                     permission,
                     fetchOptions = setOf(
                         NetIdIdentifierFetchOption.TagProtocolIdentifier,
@@ -280,7 +280,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
                     )
                 )
             } else {
-                NetIdService.updatePermission(this.applicationContext, permission)
+                NetIdService.updatePermission(applicationContext, permission)
             }
         }
     }
