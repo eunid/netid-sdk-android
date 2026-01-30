@@ -375,6 +375,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener, Use
      * @param fetchOptions: a set of [NetIdIdentifierFetchOption] elements. Determines which identifiers are fetched. The default is no
      * options.
      */
+    @JvmOverloads
     fun fetchPermissions(
         context: Context,
         collapseSyncId: Boolean = true,
@@ -403,6 +404,7 @@ object NetIdService : AppAuthManagerListener, AuthorizationFragmentListener, Use
      * @param fetchOptions: a set of [NetIdIdentifierFetchOption] elements. Determines which identifiers are fetched. The default is no
      * options.
      */
+    @JvmOverloads
     fun updatePermission(
         context: Context,
         permission: NetIdPermissionUpdate,
