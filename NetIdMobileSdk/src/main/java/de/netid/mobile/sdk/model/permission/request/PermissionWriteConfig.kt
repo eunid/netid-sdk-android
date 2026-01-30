@@ -22,12 +22,12 @@ data class PermissionWriteConfig(
     val acceptHeader: String
 ) {
     companion object {
-        fun defaultConfiguration(): PermissionWriteConfig = PermissionWriteConfig(
-            acceptHeader = WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE_AUDIT
+        fun defaultConfiguration(): PermissionWriteConfig = tokenBasedConfiguration(
+            setOf(NetIdIdentifierFetchOption.TagProtocolIdentifier, NetIdIdentifierFetchOption.SynchronizationIdentifier)
         )
 
-        fun defaultCollapseSyncConfiguration(): PermissionWriteConfig = PermissionWriteConfig(
-            acceptHeader = WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE
+        fun defaultCollapseSyncConfiguration(): PermissionWriteConfig = tokenBasedConfiguration(
+            setOf(NetIdIdentifierFetchOption.TagProtocolIdentifier)
         )
 
         fun tokenBasedConfiguration(identifierFetchOptions: Set<NetIdIdentifierFetchOption>): PermissionWriteConfig {
@@ -40,7 +40,7 @@ data class PermissionWriteConfig(
                     key = WebserviceConstants.PERMISSION_WRITE_QUERY_PARAM_IDENTIFIER_KEY,
                     value = permissionQueryParameterValue
                 ),
-                acceptHeader = WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE_V2
+                acceptHeader = WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE
             )
         }
     }

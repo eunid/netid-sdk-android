@@ -12,26 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.sdk.model.permission.response.read.v1
+package de.netid.mobile.sdk.model.permission.response.read.parse
 
 import de.netid.mobile.sdk.model.NetIdPermissionStatus
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 
 @Serializable
-data class NetIdPrivacySettingParseModelV1(
-    // type of entry - default to other if unexpected value is received
-    val type: NetIdPrivacySettingTypeParseModelV1 = NetIdPrivacySettingTypeParseModelV1.OTHER,
-    // optional only present for netID Permissions
-    val status: NetIdPermissionStatus? = null,
-    // optional
-    val value: String? = null,
+data class NetIdPrivacySettingsIdConsent(
+    val status: NetIdPermissionStatus,
     @SerialName("changed_at")
     val changedAt: String
-) {
-    override fun toString(): String {
-        val format = Json { encodeDefaults = false }
-        return format.encodeToString(this)
-    }
-}
+)

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.sdk.model.permission.response.read.v1
+package de.netid.mobile.sdk.model.permission.response.read.parse
 
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
@@ -21,14 +21,14 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class PermissionReadResponseParseModelV1(
+data class PermissionReadResponseParseModel(
     // Default to unknown if status received is not mapped in PermissionResponseFailureStatus
     @SerialName("status_code")
     val statusCode: PermissionResponseStatus = PermissionResponseStatus.UNKNOWN,
     @SerialName("subject_identifiers")
     val subjectIdentifiers: SubjectIdentifiers? = null,
     @SerialName("netid_privacy_settings")
-    val netIdPrivacySettings: List<NetIdPrivacySettingParseModelV1>? = null
+    val netIdPrivacySettings: NetIdPrivacySettingParseModel? = null
 ) {
     override fun toString(): String {
         val format = Json { encodeDefaults = false }

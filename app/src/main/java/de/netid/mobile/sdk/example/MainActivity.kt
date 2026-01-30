@@ -38,8 +38,8 @@ import de.netid.mobile.sdk.model.NetIdPermissionStatus
 import de.netid.mobile.sdk.model.NetIdPermissionUpdate
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.UserInfo
-import de.netid.mobile.sdk.model.permission.response.read.PermissionReadResponse
 import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
+import de.netid.mobile.sdk.model.permission.response.read.PermissionReadResponse
 import org.json.JSONObject
 import kotlin.math.max
 
@@ -60,7 +60,10 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
 
         private const val INVALID_ACCESS_TOKEN = "<INSERT_EXPIRED_TOKEN_HERE>"
 
-        private val backendApiVersionList = arrayListOf(ApiVersion.API_VERSION_1_5.versionString, ApiVersion.API_VERSION_1_6.versionString)
+        private val permissionIdentifierOptionList = arrayListOf(
+            PermissionIdentifierOption.Default.optionString,
+            PermissionIdentifierOption.AllIdentifiers.optionString
+        )
 
         // Using default text / icon
         private val permissionLayerConfig = null
@@ -82,7 +85,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
 
         setupInitializeButton()
         setupAuthorizeButton()
-        setupBackendVersionSpinner()
+        setupIdentifierOptionSpinner()
         setupUserInfoButton()
         setupPermissionManagementButtons()
         setupSetAccessTokenButton()
@@ -189,16 +192,16 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
         }
     }
 
-    private fun setupBackendVersionSpinner() {
-        val backendVersionDataAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, backendApiVersionList)
+    private fun setupIdentifierOptionSpinner() {
+        val backendVersionDataAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, permissionIdentifierOptionList)
         backendVersionDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         binding.activityMainSpinnerBackendVersion.adapter = backendVersionDataAdapter
 
-        val preselectedItem = SessionPreferences.loadBackendVersion(this, ApiVersion.API_VERSION_1_5.toString())
+        val preselectedItem = SessionPreferences.loadBackendVersion(this, PermissionIdentifierOption.Default.toString())
         Log.d(javaClass.simpleName, "Preselected backend version: $preselectedItem")
-        val preselectedApiVersion = ApiVersion.valueOf(preselectedItem)
-        val preselectedIndex = max(backendApiVersionList.indexOf(preselectedApiVersion.versionString), 0)
+        val preselectedIdentifierOption = PermissionIdentifierOption.valueOf(preselectedItem)
+        val preselectedIndex = max(permissionIdentifierOptionList.indexOf(preselectedIdentifierOption.optionString), 0)
         Log.d(javaClass.simpleName, "Preselected backend version index: $preselectedIndex")
         binding.activityMainSpinnerBackendVersion.setSelection(preselectedIndex)
 
@@ -210,13 +213,14 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
                 id: Long
             ) {
                 Log.i(javaClass.simpleName, "Backend version $position was selected")
-                if (position < backendApiVersionList.size) {
-                    val apiVersion = ApiVersion.forVersionString(backendApiVersionList[position])
+                if (position < permissionIdentifierOptionList.size) {
+                    val apiVersion = PermissionIdentifierOption.forOptionString(permissionIdentifierOptionList[position])
                     SessionPreferences.saveBackendVersion(this@MainActivity, apiVersion.toString())
                 } else {
                     Log.e(
                         javaClass.simpleName,
-                        "Selected backend version position is $position while backend version list size is ${backendApiVersionList.size}"
+                        "Selected backend version position is $position while backend version list size is " +
+                            "${permissionIdentifierOptionList.size}"
                     )
                 }
             }
@@ -238,10 +242,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
         binding.activityMainButtonPermissionRead.setOnClickListener {
             it.isEnabled = false
 
-            val version = SessionPreferences.loadBackendVersion(this, ApiVersion.API_VERSION_1_5.toString())
-            val apiVersion = ApiVersion.valueOf(version)
-            if (apiVersion == ApiVersion.API_VERSION_1_6) {
-                // TODO: Do we need to add a UI possibility to define the fetch options?
+            val version = SessionPreferences.loadBackendVersion(this, PermissionIdentifierOption.Default.toString())
+            val apiVersion = PermissionIdentifierOption.valueOf(version)
+            if (apiVersion == PermissionIdentifierOption.AllIdentifiers) {
                 NetIdService.fetchPermissions(
                     this.applicationContext,
                     fetchOptions = setOf(
@@ -264,10 +267,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
                 "CPdfZIAPdfZIACnABCDECbCkAP_AAAAAAAYgIzJd9D7dbXFDefx_SPt0OYwW0NBXCuQCChSAA2AFVAOQcLQA02EaMATAhiACEQIAolIBAAEEHAFEAECQQIAEAAHsAgSEhAAKIAJEEBEQAAIQAAoKAAAAAAAIgAABoASAmBiQS5bmRUCAOIAQRgBIgggBCIADAgMBBEAIABgIAIIIgSgAAQAAAKIAAAAAARAAAASGgFABcAEMAPwAgoBaQEiAJ2AUiAxgBnwqASAEMAJgAXABHAEcALSAkEBeYDPh0EIABYAFQAMgAcgA-AEAALgAZAA0AB4AD6AIYAigBMACfAFwAXQAxABmADeAHMAPwAhgBLACYAE0AKMAUoAsQBbgDDAGiAPaAfgB-gEDAIoARaAjgCOgEpALEAWmAuYC6gF5AMUAbQA3ABxADnAHUAPQAi8BIICRAE7AKHAXmAwYBjADJAGVAMsAZmAz4BrADiwHjgPrAg0BDkhAbAAWABkAFwAQwAmABcADEAGYAN4AjgBSgCxAIoARwAlIBaQC5gGKANoAc4A6gB6AEggJEAScAz4B45KBAAAgABYAGQAOAAfAB4AEQAJgAXAAxABmADaAIYARwAowBSgC3AH4ARwAk4BaQC6gGKANwAdQBF4CRAF5gMsAZ8A1gCGoSBeAAgABYAFQAMgAcgA8AEAAMgAaAA8gCGAIoATAAngBvADmAH4AQgAhgBHACWAE0AKUAW4AwwB7QD8AP0AgYBFICNAI4ASkAuYBigDaAG4AOIAegBIgCdgFDgKRAXmAwYBkgDPoGsAayA4IB44EOREAYAQwA_AEiAJ2AUiAz4ZAHACGAEwARwBHAEnALzAZ8UgXAALAAqABkADkAHwAgABkADQAHkAQwBFACYAE8AKQAYgAzABzAD8AIYAUYApQBYgC3AGjAPwA_QCLQEcAR0AlIBcwC8gGKANoAbgA9ACLwEiAJOATsAocBeYDGAGSAMsAZ9A1gDWQHBAPHAhm.f_gAAAAAAsgA"
             )
 
-            val version = SessionPreferences.loadBackendVersion(this, ApiVersion.API_VERSION_1_5.toString())
-            val apiVersion = ApiVersion.valueOf(version)
-            if (apiVersion == ApiVersion.API_VERSION_1_6) {
-                // TODO: Do we need to add a UI possibility to define the fetch options?
+            val version = SessionPreferences.loadBackendVersion(this, PermissionIdentifierOption.Default.toString())
+            val apiVersion = PermissionIdentifierOption.valueOf(version)
+            if (apiVersion == PermissionIdentifierOption.AllIdentifiers) {
                 NetIdService.updatePermission(
                     this.applicationContext,
                     permission,

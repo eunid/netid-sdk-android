@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.sdk.model.permission.response.read.v2
+package de.netid.mobile.sdk.model.permission.response.read.parse
 
-import de.netid.mobile.sdk.model.NetIdPermissionStatus
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class NetIdPrivacySettingsIdConsentV2(
-    val status: NetIdPermissionStatus,
+data class NetIdPrivacySettingsIabTcString(
+    val value: String,
     @SerialName("changed_at")
     val changedAt: String
 )

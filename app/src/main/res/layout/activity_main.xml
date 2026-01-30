@@ -146,14 +146,6 @@
                 android:textSize="@dimen/net_id_service_title_permission_text_size"
                 android:textColor="@color/black" />
 
-            <TextView
-                android:id="@+id/activityMainTitleApiVersionTextView"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:text="@string/net_id_service_permission_api_version"
-                android:textColor="@color/black"
-                android:textStyle="italic" />
-
             <Spinner
                 android:id="@+id/activityMainSpinnerBackendVersion"
                 android:layout_width="wrap_content"

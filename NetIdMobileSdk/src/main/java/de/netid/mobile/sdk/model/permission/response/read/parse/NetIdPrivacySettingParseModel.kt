@@ -12,12 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.sdk.model.permission.response.read.v1
+package de.netid.mobile.sdk.model.permission.response.read.parse
 
-// Enum values are used for response parsing
-@Suppress("unused")
-enum class NetIdPrivacySettingTypeParseModelV1 {
-    IDCONSENT,
-    IAB_TC_STRING,
-    OTHER
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
+@Serializable
+data class NetIdPrivacySettingParseModel(
+    @SerialName("idconsent")
+    val idConsent: NetIdPrivacySettingsIdConsent? = null,
+    @SerialName("iab_tcstring")
+    val iabTcString: NetIdPrivacySettingsIabTcString? = null
+) {
+    override fun toString(): String {
+        val format = Json { encodeDefaults = false }
+        return format.encodeToString(this)
+    }
 }
