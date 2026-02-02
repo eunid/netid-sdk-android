@@ -1,4 +1,4 @@
-// Copyright 2022 European netID Foundation (https://enid.foundation)
+// Copyright 2026 European netID Foundation (https://enid.foundation)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,20 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.sdk.model
+package de.netid.mobile.sdk.model.permission.response.read.parse
 
+import de.netid.mobile.sdk.model.NetIdPermissionStatus
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 @Serializable
-data class PermissionUpdateErrorResponse(
-    @SerialName("status_code")
-    val statusCode: PermissionResponseStatus = PermissionResponseStatus.UNKNOWN,
-) {
-    override fun toString(): String {
-        val format = Json { encodeDefaults = false }
-        return format.encodeToString(this)
-    }
-}
+data class NetIdPrivacySettingsIdConsent(
+    val status: NetIdPermissionStatus,
+    @SerialName("changed_at")
+    val changedAt: String
+)

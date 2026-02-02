@@ -12,9 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.sdk.model
+package de.netid.mobile.sdk.model.permission.response
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 @Serializable
-data class AppDetailsAndroid(val applicationId: String, val verifiedAppLink: String, val activityFilter: String)
+data class PermissionUpdateErrorResponse(
+    @SerialName("status_code")
+    val statusCode: PermissionResponseStatus = PermissionResponseStatus.UNKNOWN,
+) {
+    override fun toString(): String {
+        val format = Json { encodeDefaults = false }
+        return format.encodeToString(this)
+    }
+}

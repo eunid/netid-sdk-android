@@ -21,18 +21,26 @@ import de.netid.mobile.sdk.api.NetIdError
 import de.netid.mobile.sdk.api.NetIdErrorCode
 import de.netid.mobile.sdk.api.NetIdErrorProcess
 import de.netid.mobile.sdk.constants.WebserviceConstants
-import de.netid.mobile.sdk.model.*
-import kotlinx.serialization.decodeFromString
+import de.netid.mobile.sdk.model.NetIdPermissionUpdate
+import de.netid.mobile.sdk.model.UserInfo
+import de.netid.mobile.sdk.model.permission.request.PermissionReadConfig
+import de.netid.mobile.sdk.model.permission.request.PermissionWriteConfig
+import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
+import de.netid.mobile.sdk.model.permission.response.PermissionUpdateErrorResponse
+import de.netid.mobile.sdk.model.permission.response.PermissionUpdateResponse
+import de.netid.mobile.sdk.model.permission.response.read.PermissionReadResponse
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.HttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
+import java.net.HttpURLConnection
 
 /**
  * Provides functions to perform web requests.
@@ -43,6 +51,8 @@ internal object WebserviceApi {
      * A [OkHttpClient] instance to enqueue web calls
      */
     private val client = OkHttpClient()
+
+    private val userInfoJsonObject = Json { ignoreUnknownKeys = true }
 
     /**
      * Performs a request to fetch information related to an authorized user.
@@ -79,11 +89,11 @@ internal object WebserviceApi {
                 response.use {
                     if (response.isSuccessful) {
                         // Unknown JSON claims are ignored
-                        val userInfo = Json{ ignoreUnknownKeys = true }.decodeFromString<UserInfo>(response.body?.string() ?: "")
+                        val userInfo = userInfoJsonObject.decodeFromString<UserInfo>(response.body.string())
                         Handler(Looper.getMainLooper()).post {
                             userInfoCallback.onUserInfoFetched(userInfo)
                         }
-                    } else if (response.code == 401) {
+                    } else if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
                         Handler(Looper.getMainLooper()).post {
                             userInfoCallback.onUserInfoFetchFailed(
                                 NetIdError(
@@ -112,33 +122,34 @@ internal object WebserviceApi {
      * The result of the request is provided via the given [PermissionReadResponse] instance.
      *
      * @param accessToken a currently valid ID token to read permissions
-     * @param collapseSyncId If `true`, the response will not contain the sync id
+     * @param configuration A configuration to define request properties
      * @param permissionReadCallback a [PermissionReadCallback] instance receiving callbacks when the request is complete
      */
     fun performPermissionReadRequest(
         accessToken: String,
-        collapseSyncId: Boolean,
+        configuration: PermissionReadConfig,
         permissionReadCallback: PermissionReadCallback
     ) {
+        val urlBuilder = HttpUrl.Builder()
+            .scheme(WebserviceConstants.HTTPS_PROTOCOL)
+            .host(WebserviceConstants.PERMISSION_READ_HOST)
+            .addPathSegment(WebserviceConstants.PERMISSION_READ_PATH)
+
+        configuration.queryParameter?.let { queryParameter ->
+            urlBuilder.addQueryParameter(queryParameter.key, queryParameter.value)
+        }
+
+        val httpUrl = urlBuilder.build()
+
         val requestBuilder = Request.Builder()
-            .url(WebserviceConstants.HTTPS_PROTOCOL + WebserviceConstants.PERMISSION_READ_HOST + WebserviceConstants.PERMISSION_READ_PATH)
+            .url(httpUrl)
             .method(WebserviceConstants.GET_METHOD, null)
             .header(
                 WebserviceConstants.AUTHORIZATION_HEADER,
                 WebserviceConstants.AUTHORIZATION_BEARER_PREFIX + accessToken
             )
+            .header(WebserviceConstants.ACCEPT_HEADER_KEY, configuration.acceptHeader)
 
-        if (collapseSyncId) {
-            requestBuilder.header(
-                WebserviceConstants.ACCEPT_HEADER_KEY,
-                WebserviceConstants.ACCEPT_HEADER_PERMISSION_READ
-            )
-        } else {
-            requestBuilder.header(
-                WebserviceConstants.ACCEPT_HEADER_KEY,
-                WebserviceConstants.ACCEPT_HEADER_PERMISSION_READ_AUDIT
-            )
-        }
         val request = requestBuilder.build()
 
         client.newCall(request).enqueue(object : Callback {
@@ -153,21 +164,15 @@ internal object WebserviceApi {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                var permissionResponse: PermissionReadResponse
-                // Unknown JSON claims are ignored, unknown ENUM values mapped to default
-                val format = Json { ignoreUnknownKeys = true; coerceInputValues = true }
-                val responseBody: String = response.body?.string() ?: ""
+                val responseBody: String = response.body.string()
+                val permissionResponse = configuration.decodePermissionResponse(responseBody)
 
                 response.use {
                     if (response.isSuccessful) {
-                        permissionResponse = format.decodeFromString(responseBody)
                         Handler(Looper.getMainLooper()).post {
                             permissionReadCallback.onPermissionsFetched(permissionResponse)
                         }
                     } else {
-                        // parse response for status_code for error details
-                        permissionResponse = format.decodeFromString(responseBody)
-
                         // determine proper NetIDErrorCode
                         val errorCode: NetIdErrorCode =
                             if (permissionResponse.statusCode == PermissionResponseStatus.TPID_EXISTENCE_ERROR) {
@@ -198,13 +203,13 @@ internal object WebserviceApi {
      *
      * @param accessToken a currently valid ID token to read permissions
      * @param permissionUpdate a [NetIdPermissionUpdate] instance, defining the permission to update
-     * @param collapseSyncId If `true`, the response will not contain the sync id
+     * @param configuration A configuration to define request properties
      * @param permissionUpdateCallback a [PermissionUpdateCallback] instance receiving callbacks when the request is complete
      */
     fun performPermissionUpdateRequest(
         accessToken: String,
         permissionUpdate: NetIdPermissionUpdate,
-        collapseSyncId: Boolean,
+        configuration: PermissionWriteConfig,
         permissionUpdateCallback: PermissionUpdateCallback
     ) {
         val jsonElement = Json.encodeToJsonElement(permissionUpdate)
@@ -212,31 +217,29 @@ internal object WebserviceApi {
         val byteArray = jsonElement.toString().toByteArray()
         val body = byteArray.toRequestBody(mediaType)
 
+        val urlBuilder = HttpUrl.Builder()
+            .scheme(WebserviceConstants.HTTPS_PROTOCOL)
+            .host(WebserviceConstants.PERMISSION_WRITE_HOST)
+            .addPathSegment(WebserviceConstants.PERMISSION_WRITE_PATH)
+
+        configuration.queryParameter?.let { queryParameter ->
+            urlBuilder.addQueryParameter(queryParameter.key, queryParameter.value)
+        }
+
+        val httpUrl = urlBuilder.build()
+
         val requestBuilder = Request.Builder()
-            .url(WebserviceConstants.HTTPS_PROTOCOL + WebserviceConstants.PERMISSION_WRITE_HOST + WebserviceConstants.PERMISSION_WRITE_PATH)
+            .url(httpUrl)
             .method(WebserviceConstants.POST_METHOD, body)
             .header(
                 WebserviceConstants.AUTHORIZATION_HEADER,
                 WebserviceConstants.AUTHORIZATION_BEARER_PREFIX + accessToken
             )
+            .header(WebserviceConstants.ACCEPT_HEADER_KEY, configuration.acceptHeader)
+            .header(WebserviceConstants.CONTENT_TYPE_HEADER_KEY, WebserviceConstants.CONTENT_TYPE_PERMISSION_WRITE)
 
-        if (collapseSyncId) {
-            requestBuilder.header(
-                WebserviceConstants.ACCEPT_HEADER_KEY,
-                WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE
-            )
-        } else {
-            requestBuilder.header(
-                WebserviceConstants.ACCEPT_HEADER_KEY,
-                WebserviceConstants.ACCEPT_HEADER_PERMISSION_WRITE_AUDIT
-            )
-        }
+        val request = requestBuilder.build()
 
-        val request = requestBuilder.header(
-            WebserviceConstants.CONTENT_TYPE_HEADER_KEY,
-            WebserviceConstants.CONTENT_TYPE_PERMISSION_WRITE
-        )
-        .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
@@ -253,8 +256,11 @@ internal object WebserviceApi {
                 var permissionUpdateErrorResponse: PermissionUpdateErrorResponse
                 var permissionUpdateResponse: PermissionUpdateResponse
                 // Unknown JSON claims are ignored, unknown ENUM values mapped to default
-                val format = Json { ignoreUnknownKeys = true; coerceInputValues = true }
-                val responseBody = response.body?.string() ?: ""
+                val format = Json {
+                    ignoreUnknownKeys = true
+                    coerceInputValues = true
+                }
+                val responseBody = response.body.string()
 
                 response.use {
                     if (response.isSuccessful) {
@@ -268,7 +274,7 @@ internal object WebserviceApi {
 
                         // determine proper NetIDErrorCode
                         val errorCode: NetIdErrorCode =
-                            if (permissionUpdateErrorResponse.statusCode == PermissionResponseStatus.TPID_EXISTENCE_ERROR){
+                            if (permissionUpdateErrorResponse.statusCode == PermissionResponseStatus.TPID_EXISTENCE_ERROR) {
                                 NetIdErrorCode.Other
                             } else {
                                 NetIdErrorCode.InvalidRequest

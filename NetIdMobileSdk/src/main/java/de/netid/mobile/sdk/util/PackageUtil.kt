@@ -56,11 +56,9 @@ internal class PackageUtil {
             return try {
                 val info = packageManager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
                 // Filter for specific activity
-                if (info.activities != null) {
-                    info.activities?.forEach {
-                        if (it.name.equals(activityName)) {
-                            return@isPackageInstalled true
-                        }
+                info.activities?.forEach {
+                    if (it.name.equals(activityName)) {
+                        return@isPackageInstalled true
                     }
                 }
                 false

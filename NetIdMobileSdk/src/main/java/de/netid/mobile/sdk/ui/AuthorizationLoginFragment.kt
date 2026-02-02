@@ -17,14 +17,16 @@ package de.netid.mobile.sdk.ui
 import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.toColorInt
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import de.netid.mobile.sdk.R
@@ -81,10 +83,10 @@ class AuthorizationLoginFragment(
      * Actually, this button just closes the login dialog.
      */
     private fun configureStandardButton() {
-        var netIdLogoResource = R.drawable.ic_netid_logo_small
-        var buttonBackgroundResource = R.color.authorization_agree_button_color
-        var buttonForegroundResource = R.color.authorization_agree_text_color
-        var buttonOutlineResource = R.color.authorization_close_button_color
+        val netIdLogoResource: Int
+        val buttonBackgroundResource: Int
+        val buttonForegroundResource: Int
+        val buttonOutlineResource: Int
 
         when (NetIdService.getLayerStyle()) {
             NetIdLayerStyle.Outline -> {
@@ -93,6 +95,7 @@ class AuthorizationLoginFragment(
                 buttonForegroundResource = R.color.outline_text_color
                 buttonOutlineResource = R.color.outline_outline_color
             }
+
             else -> {
                 netIdLogoResource = R.drawable.ic_netid_logo_small
                 buttonBackgroundResource = R.color.authorization_agree_button_color
@@ -104,7 +107,7 @@ class AuthorizationLoginFragment(
         binding.fragmentAuthorizationButtonAgreeAndContinue.setTextColor(resources.getColor(buttonForegroundResource, null))
         binding.fragmentAuthorizationButtonAgreeAndContinue.setBackgroundColor(resources.getColor(buttonBackgroundResource, null))
         binding.fragmentAuthorizationButtonAgreeAndContinue.setStrokeColorResource(buttonOutlineResource)
-        binding.fragmentAuthorizationButtonAgreeAndContinue.icon = resources.getDrawable(netIdLogoResource, null)
+        binding.fragmentAuthorizationButtonAgreeAndContinue.icon = ResourcesCompat.getDrawable(resources, netIdLogoResource, null)
 
         binding.fragmentAuthorizationButtonCloseContinue.setOnClickListener {
             listener.onCloseClicked()
@@ -141,11 +144,11 @@ class AuthorizationLoginFragment(
      * @param appIdentifier AppIdentifier holds all information to configure the button
      * @return button
      */
-    public fun createButton(appIdentifier: AppIdentifier): MaterialButton {
-        var netIdLogoResource = appIdentifier.typeFaceIcon
-        var buttonBackgroundResource = appIdentifier.backgroundColor
-        var buttonForegroundResource = Color.parseColor(appIdentifier.foregroundColor)
-        var strokeWidth = R.dimen.authorization_close_button_stroke_zero_width
+    fun createButton(appIdentifier: AppIdentifier): MaterialButton {
+        val netIdLogoResource: String
+        val buttonBackgroundResource: String
+        val buttonForegroundResource: Int
+        val strokeWidth: Int
 
         when (NetIdService.getLayerStyle()) {
             NetIdLayerStyle.Outline -> {
@@ -154,18 +157,18 @@ class AuthorizationLoginFragment(
                 buttonForegroundResource = resources.getColor(R.color.authorization_agree_text_color, null)
                 strokeWidth = R.dimen.authorization_close_button_stroke_width
             }
+
             else -> {
                 netIdLogoResource = appIdentifier.typeFaceIcon
                 buttonBackgroundResource = appIdentifier.backgroundColor
-                buttonForegroundResource = Color.parseColor(appIdentifier.foregroundColor)
+                buttonForegroundResource = appIdentifier.foregroundColor.toColorInt()
                 strokeWidth = R.dimen.authorization_close_button_stroke_zero_width
             }
         }
 
         val appButton = layoutInflater.inflate(R.layout.account_provider_app_button, null, false) as MaterialButton
 
-        val resourceId =
-            context?.resources?.getIdentifier(netIdLogoResource, "drawable", requireContext().packageName)
+        val resourceId = context?.resources?.getIdentifier(netIdLogoResource, "drawable", requireContext().packageName)
         appButton.icon = resourceId?.let {
             ResourcesCompat.getDrawable(
                 requireContext().resources,
@@ -181,7 +184,7 @@ class AuthorizationLoginFragment(
         }
         appButton.text = loginString.uppercase()
         appButton.setTextColor(buttonForegroundResource)
-        appButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(buttonBackgroundResource))
+        appButton.backgroundTintList = ColorStateList.valueOf(buttonBackgroundResource.toColorInt())
         appButton.setStrokeWidthResource(strokeWidth)
 
         appButton.setOnClickListener {
@@ -202,11 +205,16 @@ class AuthorizationLoginFragment(
      */
     private fun openApp(appIdentifier: AppIdentifier) {
         authorizationIntent.extras?.apply {
-            val authIntent = getParcelable<Intent>("authIntent") ?: return@apply
+            val authIntent: Intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getParcelable("authIntent", Intent::class.java) ?: return@apply
+            } else {
+                @Suppress("DEPRECATION")
+                getParcelable("authIntent") ?: return@apply
+            }
             val authUri = authIntent.data as Uri
             val uri = authUri.toString().replaceBefore("?", appIdentifier.android.verifiedAppLink)
             authIntent.setPackage(appIdentifier.android.applicationId)
-            authIntent.data = Uri.parse(uri)
+            authIntent.data = uri.toUri()
             putParcelable("authIntent", authIntent)
         }
         resultLauncher.launch(authorizationIntent)

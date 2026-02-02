@@ -15,8 +15,8 @@
 package de.netid.mobile.sdk.permission
 
 import de.netid.mobile.sdk.api.NetIdError
-import de.netid.mobile.sdk.model.PermissionReadResponse
-import de.netid.mobile.sdk.model.PermissionResponseStatus
+import de.netid.mobile.sdk.model.permission.response.read.PermissionReadResponse
+import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 
 internal interface PermissionManagerListener {

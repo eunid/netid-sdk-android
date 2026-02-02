@@ -12,9 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.sdk.model
+package de.netid.mobile.sdk.model.permission.response
 
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class AppDetailsAndroid(val applicationId: String, val verifiedAppLink: String, val activityFilter: String)
+enum class PermissionResponseStatus(val code: String) {
+    PERMISSIONS_FOUND("PERMISSIONS_FOUND"),
+    PERMISSIONS_NOT_FOUND("PERMISSIONS_NOT_FOUND"),
+    PERMISSION_PARAMETERS_ERROR("PERMISSION_PARAMETERS_ERROR"),
+    NO_TOKEN("NO_TOKEN"),
+    TOKEN_ERROR("TOKEN_ERROR"),
+    NO_PERMISSIONS("NO_PERMISSIONS"),
+    JSON_PARSE_ERROR("JSON_PARSE_ERROR"),
+    NO_REQUEST_BODY("NO_REQUEST_BODY"),
+    TAPP_NOT_ALLOWED("TAPP_NOT_ALLOWED"),
+    TPID_EXISTENCE_ERROR("TPID_EXISTENCE_ERROR"),
+    UNKNOWN("UNKNOWN")
+}

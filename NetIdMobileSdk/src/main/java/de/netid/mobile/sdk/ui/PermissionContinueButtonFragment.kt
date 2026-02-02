@@ -7,18 +7,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.api.NetIdAuthFlow
 import de.netid.mobile.sdk.api.NetIdButtonStyle
 import de.netid.mobile.sdk.api.NetIdService
 import de.netid.mobile.sdk.databinding.PermissionContinueButtonBinding
-import de.netid.mobile.sdk.model.AppIdentifier
 
 class PermissionContinueButtonFragment(
     private val listener: AuthorizationFragmentListener,
     private val continueText: String = "",
-): Fragment() {
+) : Fragment() {
 
     private var _binding: PermissionContinueButtonBinding? = null
 
@@ -67,11 +67,11 @@ class PermissionContinueButtonFragment(
      * @param buttonStyle Button style to set.
      */
     fun setButtonStyle(buttonStyle: NetIdButtonStyle) {
-        var netIdLogoResource = R.drawable.ic_netid_logo_small
-        var buttonBackgroundResource = R.color.authorization_agree_button_color
-        var buttonForegroundResource = R.color.authorization_agree_text_color
-        var buttonOutlineResource = R.color.authorization_agree_outline_color
-        var buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_width
+        val netIdLogoResource: Int
+        val buttonBackgroundResource: Int
+        val buttonForegroundResource: Int
+        val buttonOutlineResource: Int
+        val buttonStrokeWidthResource: Int
 
         when (buttonStyle) {
             NetIdButtonStyle.GreenSolid -> {
@@ -81,6 +81,7 @@ class PermissionContinueButtonFragment(
                 buttonOutlineResource = R.color.green_outline_color
                 buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_zero_width
             }
+
             NetIdButtonStyle.GrayOutline -> {
                 netIdLogoResource = R.drawable.ic_netid_logo_small
                 buttonBackgroundResource = R.color.outline_background_color
@@ -88,6 +89,7 @@ class PermissionContinueButtonFragment(
                 buttonOutlineResource = R.color.outline_outline_color
                 buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_width
             }
+
             else -> {
                 netIdLogoResource = R.drawable.ic_netid_logo_small
                 buttonBackgroundResource = R.color.authorization_agree_button_color
@@ -100,7 +102,7 @@ class PermissionContinueButtonFragment(
         binding.buttonPermissionContinue.setTextColor(resources.getColor(buttonForegroundResource, null))
         binding.buttonPermissionContinue.setBackgroundColor(resources.getColor(buttonBackgroundResource, null))
         binding.buttonPermissionContinue.setStrokeColorResource(buttonOutlineResource)
-        binding.buttonPermissionContinue.icon = resources.getDrawable(netIdLogoResource, null)
+        binding.buttonPermissionContinue.icon = ResourcesCompat.getDrawable(resources, netIdLogoResource, null)
         binding.buttonPermissionContinue.setStrokeWidthResource(buttonStrokeWidthResource)
     }
 

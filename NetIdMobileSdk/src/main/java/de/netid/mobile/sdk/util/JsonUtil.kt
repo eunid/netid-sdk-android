@@ -18,7 +18,6 @@ import android.content.Context
 import android.util.Log
 import de.netid.mobile.sdk.model.AppIdentifier
 import de.netid.mobile.sdk.model.NetIdAppIdentifiers
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.json.JSONException
 import java.io.IOException

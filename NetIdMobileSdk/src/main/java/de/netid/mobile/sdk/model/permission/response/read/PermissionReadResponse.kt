@@ -12,18 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package de.netid.mobile.sdk.model
+package de.netid.mobile.sdk.model.permission.response.read
 
-enum class PermissionResponseStatus(val code: String) {
-    PERMISSIONS_FOUND("PERMISSIONS_FOUND"),
-    PERMISSIONS_NOT_FOUND("PERMISSIONS_NOT_FOUND"),
-    PERMISSION_PARAMETERS_ERROR("PERMISSION_PARAMETERS_ERROR"),
-    NO_TOKEN("NO_TOKEN"),
-    TOKEN_ERROR("TOKEN_ERROR"),
-    NO_PERMISSIONS("NO_PERMISSIONS"),
-    JSON_PARSE_ERROR("JSON_PARSE_ERROR"),
-    NO_REQUEST_BODY("NO_REQUEST_BODY"),
-    TAPP_NOT_ALLOWED("TAPP_NOT_ALLOWED"),
-    TPID_EXISTENCE_ERROR("TPID_EXISTENCE_ERROR"),
-    UNKNOWN("UNKNOWN")
-}
+import de.netid.mobile.sdk.model.NetIdPrivacySetting
+import de.netid.mobile.sdk.model.SubjectIdentifiers
+import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
+
+data class PermissionReadResponse(
+    val statusCode: PermissionResponseStatus = PermissionResponseStatus.UNKNOWN,
+    val subjectIdentifiers: SubjectIdentifiers? = null,
+    val netIdPrivacySettings: List<NetIdPrivacySetting>? = null
+)

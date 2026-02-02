@@ -1,30 +1,34 @@
 package de.netid.mobile.sdk.example.buttonapp
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
-import de.netid.mobile.sdk.api.*
+import de.netid.mobile.sdk.api.NetIdAuthFlow
+import de.netid.mobile.sdk.api.NetIdButtonStyle
+import de.netid.mobile.sdk.api.NetIdConfig
+import de.netid.mobile.sdk.api.NetIdError
+import de.netid.mobile.sdk.api.NetIdService
+import de.netid.mobile.sdk.api.NetIdServiceListener
 import de.netid.mobile.sdk.example.buttonapp.databinding.ActivityMainBinding
-import de.netid.mobile.sdk.model.PermissionReadResponse
-import de.netid.mobile.sdk.model.PermissionResponseStatus
+import de.netid.mobile.sdk.model.permission.response.read.PermissionReadResponse
+import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 import de.netid.mobile.sdk.model.UserInfo
 
-
 class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedListener {
-
     /** Companion object for basic configuration of the [NetIdService] via [NetIdConfig] object.
      *  clientId and redirectUri are mandatory, all other parameters are optional.
      *  Nevertheless, we set a standard set of claims here.
      */
     companion object {
-        private const val clientId = "ec54097f-83f6-4bb1-86f3-f7c584c649cd"
-        private const val redirectUri = "https://eunid.github.io/redirectApp"
-        private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
+        private const val CLIENT_ID = "ec54097f-83f6-4bb1-86f3-f7c584c649cd"
+        private const val REDIRECT_URI = "https://eunid.github.io/redirectApp"
+        private const val CLAIMS = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
         private val permissionLayerConfig = null
         private val loginLayerConfig = null
 
@@ -48,9 +52,9 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
         }
 
         val netIdConfig = NetIdConfig(
-            clientId = clientId,
-            redirectUri = redirectUri,
-            claims = claims,
+            clientId = CLIENT_ID,
+            redirectUri = REDIRECT_URI,
+            claims = CLAIMS,
             promptWeb = "consent",
             permissionLayerConfig = permissionLayerConfig,
             loginLayerConfig = loginLayerConfig
@@ -107,9 +111,14 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
 
     override fun onRestoreInstanceState(inState: Bundle) {
         super.onRestoreInstanceState(inState)
-        serviceState = inState.getSerializable("serviceState") as ServiceState
+        serviceState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            inState.getSerializable("serviceState", ServiceState::class.java) as ServiceState
+        } else {
+            @Suppress("DEPRECATION")
+            inState.getSerializable("serviceState") as ServiceState
+        }
         // Restore log messages.
-        binding.activityMainLogs.text = inState.getString("log","Logs:\n\n")
+        binding.activityMainLogs.text = inState.getString("log", "Logs:\n\n")
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -127,9 +136,10 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
 
     private fun updateElementsForServiceState() {
         val isAuthorized =
-            serviceState == ServiceState.AuthorizationSuccessful || serviceState == ServiceState.UserInfoFailed
-                    || serviceState == ServiceState.UserInfoSuccessful || serviceState == ServiceState.PermissionWriteSuccessful || serviceState == ServiceState.PermissionWriteFailed
-                    || serviceState == ServiceState.PermissionReadFailed || serviceState == ServiceState.PermissionReadSuccessful
+            serviceState == ServiceState.AuthorizationSuccessful || serviceState == ServiceState.UserInfoFailed ||
+                serviceState == ServiceState.UserInfoSuccessful || serviceState == ServiceState.PermissionWriteSuccessful ||
+                serviceState == ServiceState.PermissionWriteFailed || serviceState == ServiceState.PermissionReadFailed ||
+                serviceState == ServiceState.PermissionReadSuccessful
 
         binding.activityMainButtonEndSession.isEnabled = isAuthorized
     }
@@ -138,7 +148,6 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
         error?.let {
             appendLog("netID service initialization failed: ${it.code}, ${it.process}")
             serviceState = ServiceState.InitializationFailed
-
         } ?: run {
             appendLog("netID service initialized successfully")
             serviceState = ServiceState.InitializationSuccessful
@@ -218,7 +227,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, OnItemSelectedLi
 
     // OnItemSelectedListener
     override fun onItemSelected(adapter: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        NetIdService.setButtonStyle(NetIdButtonStyle.values()[position])
+        NetIdService.setButtonStyle(NetIdButtonStyle.entries[position])
     }
 
     override fun onNothingSelected(arg0: AdapterView<*>?) {

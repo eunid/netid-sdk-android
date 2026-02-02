@@ -7,9 +7,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.api.NetIdAuthFlow
@@ -23,7 +23,7 @@ class AccountProviderAppButtonFragment(
     private val appIdentifier: AppIdentifier,
     private val flow: NetIdAuthFlow,
     private val continueText: String
-): Fragment() {
+) : Fragment() {
 
     private var _binding: AccountProviderAppButtonBinding? = null
 
@@ -58,9 +58,14 @@ class AccountProviderAppButtonFragment(
         setButtonStyle(NetIdService.getButtonStyle())
 
         when (flow) {
-            NetIdAuthFlow.Permission -> binding.buttonApp.text = String.format(getString(R.string.authorization_permission_continue_button)).uppercase()
-            NetIdAuthFlow.Login -> binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue), appIdentifier.name).uppercase()
-            NetIdAuthFlow.LoginPermission -> binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue), appIdentifier.name).uppercase()
+            NetIdAuthFlow.Permission ->
+                binding.buttonApp.text = String.format(getString(R.string.authorization_permission_continue_button)).uppercase()
+
+            NetIdAuthFlow.Login ->
+                binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue), appIdentifier.name).uppercase()
+
+            NetIdAuthFlow.LoginPermission ->
+                binding.buttonApp.text = String.format(getString(R.string.authorization_login_continue), appIdentifier.name).uppercase()
         }
         if (continueText.isNotEmpty()) {
             binding.buttonApp.text = continueText
@@ -82,11 +87,11 @@ class AccountProviderAppButtonFragment(
      * @param buttonStyle Button style to set.
      */
     fun setButtonStyle(buttonStyle: NetIdButtonStyle) {
-        var netIdLogoResource = R.drawable.ic_netid_logo_small
-        var buttonBackgroundResource = R.color.authorization_agree_button_color
-        var buttonForegroundResource = R.color.authorization_agree_text_color
-        var buttonOutlineResource = R.color.authorization_agree_outline_color
-        var buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_width
+        val netIdLogoResource: Int
+        val buttonBackgroundResource: Int
+        val buttonForegroundResource: Int
+        val buttonOutlineResource: Int
+        val buttonStrokeWidthResource: Int
 
         when (buttonStyle) {
             NetIdButtonStyle.GreenSolid -> {
@@ -96,6 +101,7 @@ class AccountProviderAppButtonFragment(
                 buttonOutlineResource = R.color.green_outline_color
                 buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_zero_width
             }
+
             NetIdButtonStyle.GrayOutline -> {
                 netIdLogoResource = R.drawable.ic_netid_logo_small
                 buttonBackgroundResource = R.color.outline_background_color
@@ -103,6 +109,7 @@ class AccountProviderAppButtonFragment(
                 buttonOutlineResource = R.color.outline_outline_color
                 buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_width
             }
+
             else -> {
                 netIdLogoResource = R.drawable.ic_netid_logo_small
                 buttonBackgroundResource = R.color.authorization_agree_button_color
@@ -115,7 +122,7 @@ class AccountProviderAppButtonFragment(
         binding.buttonApp.setTextColor(resources.getColor(buttonForegroundResource, null))
         binding.buttonApp.setBackgroundColor(resources.getColor(buttonBackgroundResource, null))
         binding.buttonApp.setStrokeColorResource(buttonOutlineResource)
-        binding.buttonApp.icon = resources.getDrawable(netIdLogoResource, null)
+        binding.buttonApp.icon = ResourcesCompat.getDrawable(resources, netIdLogoResource, null)
         binding.buttonApp.setStrokeWidthResource(buttonStrokeWidthResource)
     }
 
@@ -129,7 +136,7 @@ class AccountProviderAppButtonFragment(
             val authUri = authIntent.data as Uri
             val uri = authUri.toString().replaceBefore("?", appIdentifier.android.verifiedAppLink)
             authIntent.setPackage(appIdentifier.android.applicationId)
-            authIntent.data = Uri.parse(uri)
+            authIntent.data = uri.toUri()
             putParcelable("authIntent", authIntent)
         }
         resultLauncher.launch(authorizationIntent)

@@ -14,7 +14,8 @@
 
 package de.netid.mobile.sdk.model
 
-import kotlinx.serialization.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 @Serializable
@@ -32,10 +33,13 @@ data class UserInfo(
     val shippingAddress: ShippingAddress? = null,
     val gender: String? = null,
     val email: String? = null,
-    ) {
+) {
     override fun toString(): String {
         // Unknown JSON claims are ignored
-        val format = Json { encodeDefaults = false; ignoreUnknownKeys = true; }
+        val format = Json {
+            encodeDefaults = false
+            ignoreUnknownKeys = true
+        }
         return format.encodeToString(this)
     }
 }

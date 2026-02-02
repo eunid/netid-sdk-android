@@ -16,16 +16,32 @@ package de.netid.mobile.sdk.example
 
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import de.netid.mobile.sdk.api.*
+import de.netid.mobile.sdk.api.NetIdAuthFlow
+import de.netid.mobile.sdk.api.NetIdConfig
+import de.netid.mobile.sdk.api.NetIdError
+import de.netid.mobile.sdk.api.NetIdErrorProcess
+import de.netid.mobile.sdk.api.NetIdIdentifierFetchOption
+import de.netid.mobile.sdk.api.NetIdLayerStyle
+import de.netid.mobile.sdk.api.NetIdService
+import de.netid.mobile.sdk.api.NetIdServiceListener
 import de.netid.mobile.sdk.example.databinding.ActivityMainBinding
-import de.netid.mobile.sdk.model.*
+import de.netid.mobile.sdk.model.NetIdPermissionStatus
+import de.netid.mobile.sdk.model.NetIdPermissionUpdate
+import de.netid.mobile.sdk.model.SubjectIdentifiers
+import de.netid.mobile.sdk.model.UserInfo
+import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
+import de.netid.mobile.sdk.model.permission.response.read.PermissionReadResponse
 import org.json.JSONObject
+import kotlin.math.max
 
 class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnItemSelectedListener {
 
@@ -35,14 +51,19 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
      */
     companion object {
         /* Basic configuration of the [NetIdService] via [NetIdConfig] object.
-        *  clientId and redirectUri are mandatory, all other parameters are optional.
-        *  Nevertheless, we set a standard set of claims here.
-        */
-        private const val clientId = "ec54097f-83f6-4bb1-86f3-f7c584c649cd"
-        private const val redirectUri = "https://eunid.github.io/redirectApp"
-        private const val claims = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
+         * clientId and redirectUri are mandatory, all other parameters are optional.
+         * Nevertheless, we set a standard set of claims here.
+         */
+        private const val CLIENT_ID = "ec54097f-83f6-4bb1-86f3-f7c584c649cd"
+        private const val REDIRECT_URI = "https://eunid.github.io/redirectApp"
+        private const val CLAIMS = "{\"userinfo\":{\"email\": {\"essential\": true}, \"email_verified\": {\"essential\": true}}}"
 
         private const val INVALID_ACCESS_TOKEN = "<INSERT_EXPIRED_TOKEN_HERE>"
+
+        private val permissionIdentifierOptionList = arrayListOf(
+            PermissionIdentifierOption.Default.optionString,
+            PermissionIdentifierOption.AllIdentifiers.optionString
+        )
 
         // Using default text / icon
         private val permissionLayerConfig = null
@@ -64,6 +85,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
 
         setupInitializeButton()
         setupAuthorizeButton()
+        setupIdentifierOptionSpinner()
         setupUserInfoButton()
         setupPermissionManagementButtons()
         setupSetAccessTokenButton()
@@ -72,7 +94,12 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
 
         // If we have a saved state then we can restore it now
         if (savedInstanceState != null) {
-            serviceState = savedInstanceState.getSerializable("serviceState") as ServiceState
+            serviceState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                savedInstanceState.getSerializable("serviceState", ServiceState::class.java) as ServiceState
+            } else {
+                @Suppress("DEPRECATION")
+                savedInstanceState.getSerializable("serviceState") as ServiceState
+            }
 
             updateElementsForServiceState()
         }
@@ -80,9 +107,14 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
 
     override fun onRestoreInstanceState(inState: Bundle) {
         super.onRestoreInstanceState(inState)
-        serviceState = inState.getSerializable("serviceState") as ServiceState
+        serviceState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            inState.getSerializable("serviceState", ServiceState::class.java) as ServiceState
+        } else {
+            @Suppress("DEPRECATION")
+            inState.getSerializable("serviceState") as ServiceState
+        }
         // Restore log messages.
-        binding.activityMainLogsTextView.text = inState.getString("log","Logs:\n\n")
+        binding.activityMainLogsTextView.text = inState.getString("log", "Logs:\n\n")
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -93,7 +125,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
     }
 
     private fun setupNetIdConfig() {
-        var effectiveClaims = claims
+        var effectiveClaims = CLAIMS
         if (binding.activityMainCheckBoxShippingAddress.isChecked) {
             val jsonClaims = JSONObject(effectiveClaims)
             val userinfo = jsonClaims.get("userinfo") as JSONObject
@@ -108,12 +140,13 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
         }
 
         netIdConfig = NetIdConfig(
-            clientId = clientId,
-            redirectUri = redirectUri,
+            clientId = CLIENT_ID,
+            redirectUri = REDIRECT_URI,
             claims = effectiveClaims,
             promptWeb = "consent",
             permissionLayerConfig = permissionLayerConfig,
-            loginLayerConfig = loginLayerConfig)
+            loginLayerConfig = loginLayerConfig
+        )
 
         NetIdService.addListener(this)
     }
@@ -122,7 +155,7 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
         binding.activityMainButtonInitialize.setOnClickListener {
             it.isEnabled = false
             setupNetIdConfig()
-            NetIdService.initialize(netIdConfig, this.applicationContext)
+            NetIdService.initialize(netIdConfig, applicationContext)
         }
     }
 
@@ -135,18 +168,21 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
             builder.setTitle(R.string.net_id_service_choose_auth_way)
             builder.setPositiveButton(R.string.net_id_service_auth_permission) { _, _ ->
                 bottomDialogFragment.sdkContentFragment = NetIdService.getAuthorizationFragment(this, NetIdAuthFlow.Permission)
-                if (bottomDialogFragment.sdkContentFragment != null)
+                if (bottomDialogFragment.sdkContentFragment != null) {
                     bottomDialogFragment.show(supportFragmentManager, null)
+                }
             }
             builder.setNegativeButton(R.string.net_id_service_auth_login) { _, _ ->
                 bottomDialogFragment.sdkContentFragment = NetIdService.getAuthorizationFragment(this, NetIdAuthFlow.Login)
-                if (bottomDialogFragment.sdkContentFragment != null)
+                if (bottomDialogFragment.sdkContentFragment != null) {
                     bottomDialogFragment.show(supportFragmentManager, null)
+                }
             }
             builder.setNeutralButton(R.string.net_id_service_auth_login_permission) { _, _ ->
                 bottomDialogFragment.sdkContentFragment = NetIdService.getAuthorizationFragment(this, NetIdAuthFlow.LoginPermission)
-                if (bottomDialogFragment.sdkContentFragment != null)
+                if (bottomDialogFragment.sdkContentFragment != null) {
                     bottomDialogFragment.show(supportFragmentManager, null)
+                }
             }
             builder.setOnDismissListener {
                 binding.activityMainButtonAuthorize.isEnabled = true
@@ -156,28 +192,96 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
         }
     }
 
+    private fun setupIdentifierOptionSpinner() {
+        val backendVersionDataAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, permissionIdentifierOptionList)
+        backendVersionDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        binding.activityMainSpinnerBackendVersion.adapter = backendVersionDataAdapter
+
+        val preselectedItem = SessionPreferences.loadBackendVersion(this, PermissionIdentifierOption.Default.toString())
+        Log.d(javaClass.simpleName, "Preselected backend version: $preselectedItem")
+        val preselectedIdentifierOption = PermissionIdentifierOption.valueOf(preselectedItem)
+        val preselectedIndex = max(permissionIdentifierOptionList.indexOf(preselectedIdentifierOption.optionString), 0)
+        Log.d(javaClass.simpleName, "Preselected backend version index: $preselectedIndex")
+        binding.activityMainSpinnerBackendVersion.setSelection(preselectedIndex)
+
+        binding.activityMainSpinnerBackendVersion.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                Log.i(javaClass.simpleName, "Backend version $position was selected")
+                if (position < permissionIdentifierOptionList.size) {
+                    val apiVersion = PermissionIdentifierOption.forOptionString(permissionIdentifierOptionList[position])
+                    SessionPreferences.saveBackendVersion(this@MainActivity, apiVersion.toString())
+                } else {
+                    Log.e(
+                        javaClass.simpleName,
+                        "Selected backend version position is $position while backend version list size is " +
+                            "${permissionIdentifierOptionList.size}"
+                    )
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                Log.w(javaClass.simpleName, "No backend version selected")
+            }
+        }
+    }
+
     private fun setupUserInfoButton() {
         binding.activityMainButtonUserInfo.setOnClickListener {
             it.isEnabled = false
-            NetIdService.fetchUserInfo(this.applicationContext)
+            NetIdService.fetchUserInfo(applicationContext)
         }
     }
 
     private fun setupPermissionManagementButtons() {
         binding.activityMainButtonPermissionRead.setOnClickListener {
             it.isEnabled = false
-            NetIdService.fetchPermissions(this.applicationContext)
-        }
 
+            val version = SessionPreferences.loadBackendVersion(this, PermissionIdentifierOption.Default.toString())
+            val apiVersion = PermissionIdentifierOption.valueOf(version)
+            if (apiVersion == PermissionIdentifierOption.AllIdentifiers) {
+                NetIdService.fetchPermissions(
+                    applicationContext,
+                    fetchOptions = setOf(
+                        NetIdIdentifierFetchOption.TagProtocolIdentifier,
+                        NetIdIdentifierFetchOption.SynchronizationIdentifier,
+                        NetIdIdentifierFetchOption.EncryptedTagProtocolIdentifier
+                    )
+                )
+            } else {
+                NetIdService.fetchPermissions(applicationContext)
+            }
+        }
 
         binding.activityMainButtonPermissionWrite.setOnClickListener {
             it.isEnabled = false
+
             // these values are only for demonstration purposes
             val permission = NetIdPermissionUpdate(
                 NetIdPermissionStatus.VALID,
                 "CPdfZIAPdfZIACnABCDECbCkAP_AAAAAAAYgIzJd9D7dbXFDefx_SPt0OYwW0NBXCuQCChSAA2AFVAOQcLQA02EaMATAhiACEQIAolIBAAEEHAFEAECQQIAEAAHsAgSEhAAKIAJEEBEQAAIQAAoKAAAAAAAIgAABoASAmBiQS5bmRUCAOIAQRgBIgggBCIADAgMBBEAIABgIAIIIgSgAAQAAAKIAAAAAARAAAASGgFABcAEMAPwAgoBaQEiAJ2AUiAxgBnwqASAEMAJgAXABHAEcALSAkEBeYDPh0EIABYAFQAMgAcgA-AEAALgAZAA0AB4AD6AIYAigBMACfAFwAXQAxABmADeAHMAPwAhgBLACYAE0AKMAUoAsQBbgDDAGiAPaAfgB-gEDAIoARaAjgCOgEpALEAWmAuYC6gF5AMUAbQA3ABxADnAHUAPQAi8BIICRAE7AKHAXmAwYBjADJAGVAMsAZmAz4BrADiwHjgPrAg0BDkhAbAAWABkAFwAQwAmABcADEAGYAN4AjgBSgCxAIoARwAlIBaQC5gGKANoAc4A6gB6AEggJEAScAz4B45KBAAAgABYAGQAOAAfAB4AEQAJgAXAAxABmADaAIYARwAowBSgC3AH4ARwAk4BaQC6gGKANwAdQBF4CRAF5gMsAZ8A1gCGoSBeAAgABYAFQAMgAcgA8AEAAMgAaAA8gCGAIoATAAngBvADmAH4AQgAhgBHACWAE0AKUAW4AwwB7QD8AP0AgYBFICNAI4ASkAuYBigDaAG4AOIAegBIgCdgFDgKRAXmAwYBkgDPoGsAayA4IB44EOREAYAQwA_AEiAJ2AUiAz4ZAHACGAEwARwBHAEnALzAZ8UgXAALAAqABkADkAHwAgABkADQAHkAQwBFACYAE8AKQAYgAzABzAD8AIYAUYApQBYgC3AGjAPwA_QCLQEcAR0AlIBcwC8gGKANoAbgA9ACLwEiAJOATsAocBeYDGAGSAMsAZ9A1gDWQHBAPHAhm.f_gAAAAAAsgA"
             )
-            NetIdService.updatePermission(this.applicationContext, permission)
+
+            val version = SessionPreferences.loadBackendVersion(this, PermissionIdentifierOption.Default.toString())
+            val apiVersion = PermissionIdentifierOption.valueOf(version)
+            if (apiVersion == PermissionIdentifierOption.AllIdentifiers) {
+                NetIdService.updatePermission(
+                    applicationContext,
+                    permission,
+                    fetchOptions = setOf(
+                        NetIdIdentifierFetchOption.TagProtocolIdentifier,
+                        NetIdIdentifierFetchOption.SynchronizationIdentifier,
+                        NetIdIdentifierFetchOption.EncryptedTagProtocolIdentifier
+                    )
+                )
+            } else {
+                NetIdService.updatePermission(applicationContext, permission)
+            }
         }
     }
 
@@ -342,27 +446,35 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
             PermissionResponseStatus.NO_TOKEN ->
                 // no token was passed (handled by SDK should not happen)
                 appendLog("No bearer token in request available.")
+
             PermissionResponseStatus.TOKEN_ERROR ->
                 // current token expired / is invalid
                 appendLog("Token error - token refresh / reauthorization necessary")
+
             PermissionResponseStatus.TPID_EXISTENCE_ERROR ->
                 // netID Account was deleted
                 appendLog("netID Account was deleted")
+
             PermissionResponseStatus.TAPP_NOT_ALLOWED ->
                 // Invalid configuration of client
                 appendLog("Client not authorized to use permission management")
+
             PermissionResponseStatus.PERMISSION_PARAMETERS_ERROR ->
                 // Invalid parameter payload
                 appendLog("Syntactic or semantic error in a permission")
+
             PermissionResponseStatus.NO_PERMISSIONS ->
                 // No permission parameter given
                 appendLog("Parameters are missing. At least one permission must be set.")
+
             PermissionResponseStatus.NO_REQUEST_BODY ->
                 // Request body missing
                 appendLog("Required request body is missing")
+
             PermissionResponseStatus.JSON_PARSE_ERROR ->
                 // Error parsing JSON body
                 appendLog("Invalid JSON body, parse error")
+
             else ->
                 appendLog("netID service permission - update failed with error: ${error.code}")
         }
@@ -374,22 +486,27 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
     }
 
     override fun onPermissionFetchFinishedWithError(statusCode: PermissionResponseStatus, error: NetIdError) {
-        when (statusCode){
+        when (statusCode) {
             PermissionResponseStatus.NO_TOKEN ->
                 // no token was passed (handled by SDK should not happen)
                 appendLog("No bearer token in request available.")
+
             PermissionResponseStatus.TOKEN_ERROR ->
                 // current token expired / is invalid
                 appendLog("Token error - token refresh / reauthorization necessary")
+
             PermissionResponseStatus.TPID_EXISTENCE_ERROR ->
                 // netID Account was deleted
                 appendLog("netID Account was deleted")
+
             PermissionResponseStatus.TAPP_NOT_ALLOWED ->
                 // Invalid configuration of client
                 appendLog("Client not authorized to use permission management")
+
             PermissionResponseStatus.PERMISSIONS_NOT_FOUND ->
                 // Missing permissions
                 appendLog("Permissions for tpid not found")
+
             else ->
                 appendLog("netID service permission - fetch failed with error: ${error.code}")
         }
@@ -407,15 +524,16 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
             PermissionResponseStatus.PERMISSIONS_FOUND ->
                 // Response contains existing permission
                 appendLog("Permissions: $permissions")
+
             PermissionResponseStatus.PERMISSIONS_NOT_FOUND ->
                 // No existing permission found
                 appendLog("No permissions found")
+
             else ->
                 appendLog("This should not happen")
         }
         serviceState = ServiceState.PermissionReadSuccessful
         updateElementsForServiceState()
-
     }
 
     override fun onPermissionUpdateFinished(subjectIdentifiers: SubjectIdentifiers) {
@@ -427,11 +545,10 @@ class MainActivity : AppCompatActivity(), NetIdServiceListener, AdapterView.OnIt
 
     // OnItemSelectedListener
     override fun onItemSelected(adapter: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        NetIdService.setLayerStyle(NetIdLayerStyle.values()[position])
+        NetIdService.setLayerStyle(NetIdLayerStyle.entries[position])
     }
 
     override fun onNothingSelected(arg0: AdapterView<*>?) {
         // TODO Auto-generated method stub
     }
-
 }

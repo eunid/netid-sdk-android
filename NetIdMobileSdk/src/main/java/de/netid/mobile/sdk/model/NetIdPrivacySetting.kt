@@ -14,24 +14,9 @@
 
 package de.netid.mobile.sdk.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-
-@Serializable
 data class NetIdPrivacySetting(
-    // type of entry - default to other if unexpected value is received
-    val type: NetIdPrivacySettingType = NetIdPrivacySettingType.OTHER,
-    // optional only present for netID Permissions
+    val type: NetIdPrivacySettingType = NetIdPrivacySettingType.Other,
     val status: NetIdPermissionStatus? = null,
-    // optional
     val value: String? = null,
-    @SerialName("changed_at")
     val changedAt: String
-) {
-    override fun toString(): String {
-        val format = Json { encodeDefaults = false }
-        return format.encodeToString(this)
-    }
-}
+)

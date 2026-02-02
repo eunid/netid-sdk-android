@@ -26,7 +26,6 @@ import androidx.core.content.res.ResourcesCompat
 import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.model.AppIdentifier
 
-
 class AuthorizationAppListAdapter(
     val context: Context,
     private val items: List<AppIdentifier>,
@@ -47,31 +46,23 @@ class AuthorizationAppListAdapter(
 
             viewHolder = ViewHolder(rowView)
             rowView.tag = viewHolder
-
         } else {
             rowView = view
             viewHolder = rowView.tag as ViewHolder
         }
 
-        viewHolder.itemName.text = context.resources.getString(R.string.authorization_cell_use_app_text, items[position].name)
-        val resourceId: Int =
-            context.resources.getIdentifier(items[position].icon, "drawable", context.packageName)
-        viewHolder.itemImage.setImageDrawable(
-            ResourcesCompat.getDrawable(
-                context.resources,
-                resourceId,
-                null
-            )
-        )
+        viewHolder.itemName?.text = context.resources.getString(R.string.authorization_cell_use_app_text, items[position].name)
+        val resourceId: Int = context.resources.getIdentifier(items[position].icon, "drawable", context.packageName)
+        viewHolder.itemImage?.setImageDrawable(ResourcesCompat.getDrawable(context.resources, resourceId, null))
 
-        viewHolder.itemRadioButton.setOnCheckedChangeListener { _, isEnabled ->
+        viewHolder.itemRadioButton?.setOnCheckedChangeListener { _, isEnabled ->
             if (isEnabled) {
                 selectedPosition = position
                 listener?.onAppSelected(items[position].name)
                 notifyDataSetChanged()
             }
         }
-        viewHolder.itemRadioButton.isChecked = selectedPosition == position
+        viewHolder.itemRadioButton?.isChecked = selectedPosition == position
 
         return rowView
     }
@@ -85,8 +76,8 @@ class AuthorizationAppListAdapter(
     }
 
     private class ViewHolder(view: View?) {
-        val itemName = view?.findViewById(R.id.netidAppCellTextView) as TextView
-        val itemImage = view?.findViewById(R.id.netidAppCellImageView) as ImageView
-        val itemRadioButton = view?.findViewById(R.id.netidAppCellRadioButton) as RadioButton
+        val itemName: TextView? = view?.findViewById(R.id.netidAppCellTextView)
+        val itemImage: ImageView? = view?.findViewById(R.id.netidAppCellImageView)
+        val itemRadioButton: RadioButton? = view?.findViewById(R.id.netidAppCellRadioButton)
     }
 }

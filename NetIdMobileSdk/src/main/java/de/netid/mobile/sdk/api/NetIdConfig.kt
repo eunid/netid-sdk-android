@@ -15,7 +15,8 @@
 package de.netid.mobile.sdk.api
 
 /**
- * @property logoName References an icon resource by its name to be set during permission flow (in the upper left corner of the dialog). The icon has to be part of the application's drawable assets.
+ * @property logoName References an icon resource by its name to be set during permission flow (in the upper left corner of the dialog).
+ * The icon has to be part of the application's drawable assets.
  * @property headlineText Sets the text of the headline (beneath the logo).
  * @property legalText Sets the text of the first part of the legal information text. However, the second part is fixed and can not be set.
  * @property continueText Sets the text of the continue button at the bottom of the dialog.
@@ -29,7 +30,8 @@ data class PermissionLayerConfig(
 
 /**
  * @property headlineText Sets the text of the headline (beneath the logo). Only visible, if at least one id app is installed.
- * @property loginText Sets the text of the buttons displayed, if id apps are installed. The name of the app will be displayed as well, if the string is a format string containing  "%1$s".
+ * @property loginText Sets the text of the buttons displayed, if id apps are installed.
+ * The name of the app will be displayed as well, if the string is a format string containing  "%1$s".
  * @property continueText Sets the text of the continue button at the bottom of the dialog. Only visible, if there is no id app installed.
  */
 data class LoginLayerConfig(

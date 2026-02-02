@@ -22,8 +22,8 @@ import java.nio.charset.StandardCharsets
 internal class TokenUtil {
 
     companion object {
-        private const val claimPermissionManagement = "permission_management"
-        private const val accessTokenKey = "access_token"
+        private const val CLAIM_PERMISSION_MANAGEMENT = "permission_management"
+        private const val ACCESS_TOKEN_KEY = "access_token"
 
         private fun decode(token: String): List<String> {
             val parts: Array<String> = token.split(".").toTypedArray()
@@ -42,9 +42,9 @@ internal class TokenUtil {
                 return try {
                     val json = JSONObject(permissionClaim)
                     val permissions: JSONObject? =
-                        json.get(claimPermissionManagement) as? JSONObject
-                    permissions?.get(accessTokenKey) as? String
-                } catch (jse: JSONException) {
+                        json.get(CLAIM_PERMISSION_MANAGEMENT) as? JSONObject
+                    permissions?.get(ACCESS_TOKEN_KEY) as? String
+                } catch (_: JSONException) {
                     null
                 }
             }

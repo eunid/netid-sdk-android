@@ -2,25 +2,24 @@ package de.netid.mobile.sdk.ui
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import de.netid.mobile.sdk.R
 import de.netid.mobile.sdk.api.NetIdAuthFlow
 import de.netid.mobile.sdk.api.NetIdButtonStyle
 import de.netid.mobile.sdk.api.NetIdService
 import de.netid.mobile.sdk.databinding.LoginContinueButtonBinding
-import de.netid.mobile.sdk.model.AppIdentifier
 
 class LoginContinueButtonFragment(
     private val listener: AuthorizationFragmentListener,
     private val continueText: String = "",
     private val flow: NetIdAuthFlow = NetIdAuthFlow.Login
-): Fragment() {
+) : Fragment() {
 
     private var _binding: LoginContinueButtonBinding? = null
 
@@ -69,11 +68,11 @@ class LoginContinueButtonFragment(
      * @param buttonStyle Button style to set.
      */
     fun setButtonStyle(buttonStyle: NetIdButtonStyle) {
-        var netIdLogoResource = R.drawable.ic_netid_logo_small
-        var buttonBackgroundResource = R.color.authorization_agree_button_color
-        var buttonForegroundResource = R.color.authorization_agree_text_color
-        var buttonOutlineResource = R.color.authorization_agree_outline_color
-        var buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_width
+        val netIdLogoResource: Int
+        val buttonBackgroundResource: Int
+        val buttonForegroundResource: Int
+        val buttonOutlineResource: Int
+        val buttonStrokeWidthResource: Int
 
         when (buttonStyle) {
             NetIdButtonStyle.GreenSolid -> {
@@ -83,6 +82,7 @@ class LoginContinueButtonFragment(
                 buttonOutlineResource = R.color.green_outline_color
                 buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_zero_width
             }
+
             NetIdButtonStyle.GrayOutline -> {
                 netIdLogoResource = R.drawable.ic_netid_logo_small
                 buttonBackgroundResource = R.color.outline_background_color
@@ -90,6 +90,7 @@ class LoginContinueButtonFragment(
                 buttonOutlineResource = R.color.outline_outline_color
                 buttonStrokeWidthResource = R.dimen.authorization_close_button_stroke_width
             }
+
             else -> {
                 netIdLogoResource = R.drawable.ic_netid_logo_small
                 buttonBackgroundResource = R.color.authorization_agree_button_color
@@ -102,10 +103,9 @@ class LoginContinueButtonFragment(
         binding.buttonLoginContinue.setTextColor(resources.getColor(buttonForegroundResource, null))
         binding.buttonLoginContinue.setBackgroundColor(resources.getColor(buttonBackgroundResource, null))
         binding.buttonLoginContinue.setStrokeColorResource(buttonOutlineResource)
-        binding.buttonLoginContinue.icon = resources.getDrawable(netIdLogoResource, null)
+        binding.buttonLoginContinue.icon = ResourcesCompat.getDrawable(resources, netIdLogoResource, null)
         binding.buttonLoginContinue.setStrokeWidthResource(buttonStrokeWidthResource)
     }
-
 
     override fun onDestroyView() {
         _binding = null

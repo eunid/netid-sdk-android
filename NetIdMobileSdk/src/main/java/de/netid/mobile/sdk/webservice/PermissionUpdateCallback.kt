@@ -15,7 +15,7 @@
 package de.netid.mobile.sdk.webservice
 
 import de.netid.mobile.sdk.api.NetIdError
-import de.netid.mobile.sdk.model.PermissionResponseStatus
+import de.netid.mobile.sdk.model.permission.response.PermissionResponseStatus
 import de.netid.mobile.sdk.model.SubjectIdentifiers
 
 internal interface PermissionUpdateCallback {
