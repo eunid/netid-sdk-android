@@ -5,6 +5,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.2.0] - 2026-04-20
+
+### Changed
+- Use new permission management API 1.6 calls
+
+## [1.1.1] - 2025-08-13
+
+### Changed
+- Switched to jdk 17
+
+## [1.1.0] - 2025-08-05
+
+### Added
+- Possibility to set external access token
+
+## [1.0.2] - 2023-06-03
+
+### Changed
+- Improved error handling for loading of custom logo resource
+
+## [1.0.1] - 2023-02-16
+
 ### Added
 - Initial commit
 - Permission management webservices and API functions
@@ -21,7 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added session persistence
 - Added possibility to add optional claims to login flow
 - Added button workflow, with own demo app
-- Possibility to set external access token
 
 ### Changed
 - Renamed NetID to netID
@@ -60,9 +82,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated documentation
 - Updated some tests
 - Be more explicit about custom logo resource
-- Improved error handling for loading of custom logo resource
-- Switched to jdk 17
-- Use new permission management API 1.6 calls
 
 ### Fixed
 - Fixed UserInfo json parser error
